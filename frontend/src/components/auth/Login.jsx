@@ -15,8 +15,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { login as authlogin } from "./store/AuthSlice";
+import { useDispatch } from "react-redux";
+import { login as authlogin } from "../../store/AuthSlice";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {

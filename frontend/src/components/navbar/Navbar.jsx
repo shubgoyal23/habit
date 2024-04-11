@@ -14,9 +14,9 @@ function Navbar() {
               { title: "Register", to: "/register" },
            ])
          : setMenu([
-            { title: "Add Habit", to: "/logout" },
-            { title: "Habit Chart", to: "/logout" },
-            { title: "Streak Table", to: "/logout" },
+            { title: "Habits", to: "/habit" },
+            { title: "Add Habit", to: "/habit/new" },
+            { title: "Streak Table", to: "/steak" },
             { title: "Logout", to: "/logout" },
          ]);
    }, [loggedin]);

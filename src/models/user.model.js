@@ -6,17 +6,14 @@ const taskSchema = new mongoose.Schema({
    name: {
       type: String,
       required: true,
+      unique: true
    },
-   description: {
-      type: String,
-   },
+   description:String,
    time: String,
    place: String,
    how: String,
    ifthen: String,
-   point: {
-      type: Number,
-   },
+   point: Number,
 });
 
 const userSchema = new mongoose.Schema(
