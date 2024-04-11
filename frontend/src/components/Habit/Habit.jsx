@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
 import { addHabit, addListHabits, deleteHabit } from "@/store/HabitSlice";
+import MarkSteak from "./MarkSteak";
 function Habit() {
    const dispatch = useDispatch();
    const navigate = useNavigate();
@@ -78,11 +79,7 @@ function Habit() {
                {habitList.map((item) => (
                   <TableRow key={item._id}>
                      <TableCell>
-                        <Input
-                           type="checkbox"
-                           className="size-4 cursor-pointer"
-                           onClick={(e) => console.log()}
-                        ></Input>
+                        <MarkSteak data={item}/>
                      </TableCell>
                      <TableCell className="font-medium">{item.name}</TableCell>
                      <TableCell>{item.description}</TableCell>
