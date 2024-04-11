@@ -2,20 +2,6 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-const taskSchema = new mongoose.Schema({
-   name: {
-      type: String,
-      required: true,
-      unique: true
-   },
-   description:String,
-   time: String,
-   place: String,
-   how: String,
-   ifthen: String,
-   point: Number,
-});
-
 const userSchema = new mongoose.Schema(
    {
       firstName: String,
@@ -49,7 +35,6 @@ const userSchema = new mongoose.Schema(
          },
       },
       refreshToken: String,
-      taskList: [taskSchema],
    },
    { timestamps: true }
 );

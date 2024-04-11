@@ -16,16 +16,15 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
-import { login as authlogin } from "../../store/AuthSlice";
 import { useNavigate } from "react-router-dom";
+import { addHabit, deleteHabit, editHabit } from "@/store/HabitSlice";
 
 export default function AddHabit() {
    let { id } = useParams();
    const dispatch = useDispatch();
    const navigate = useNavigate();
 
-   const userData =
-      useSelector((state) => state.auth?.userDate?.taskList) || [];
+   const userData = useSelector((state) => state.habit) || [];
    const {
       register,
       handleSubmit,
@@ -64,7 +63,7 @@ export default function AddHabit() {
          });
          addHAbit
             .then((data) => {
-               dispatch(authlogin(data.data.data));
+               dispatch(addHabit(data.data.data));
                navigate(`/habit`);
             })
             .catch((err) => console.log(err));
@@ -82,7 +81,7 @@ export default function AddHabit() {
                `${err.response?.data?.message || "Something went wrong"}`,
          });
          addHAbit
-            .then((data) => {dispatch(authlogin(data.data.data))
+            .then((data) => {dispatch(editHabit(data.data.data))
             navigate("/habit")})
             .catch((err) => console.log(err));
       }

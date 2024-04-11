@@ -110,6 +110,13 @@ const addTask = asyncHandler(async (req, res) => {
    );
 });
 
+const listHabit = asyncHandler(async (req, res) => {
+   const list = await Streak.find({ userId: req.user._id });
+
+   return res
+      .status(200)
+      .json(new ApiResponse(200, list, "habit list fetched successfully"));
+});
 const addHabit = asyncHandler(async (req, res) => {
    const { name, point } = req.body;
 
@@ -117,16 +124,15 @@ const addHabit = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Name and Point Feilds are Reqired");
    }
 
-   const user = await User.findById(req.user._id)?.select(
-      "-password -refreshToken"
-   );
-
-   user.taskList.push({ name, point, ...req.body });
-   await user.save();
+   const add = await Streak.create({
+      userId: req.user._id,
+      startDate: new Date(),
+      ...req.body,
+   });
 
    return res
       .status(200)
-      .json(new ApiResponse(200, user, "Habit Added Successfully"));
+      .json(new ApiResponse(200, add, "Habit Added Successfully"));
 });
 
 const editHabit = asyncHandler(async (req, res) => {
@@ -134,20 +140,22 @@ const editHabit = asyncHandler(async (req, res) => {
    if (!id) {
       throw new ApiError(401, "id is Reqired");
    }
-   const user = await User.findById(req.user._id)?.select("-password -refreshToken")
-   const data = user.taskList.map((item) => {
-       if((item._id).toString() === id){
-         delete req.body.id
-         return {_id: id, ...req.body}
-       }
-       return item
-   });
-   user.taskList = data
-   await user.save()
+   const habit = await Streak.findById(id);
+
+   if (!habit || habit.userId == req.user._id) {
+      throw new ApiError(403, "Habit not found");
+   }
+
+   delete req.body.id;
+   const updatedHabit = await Streak.findByIdAndUpdate(
+      id,
+      { ...req.body },
+      { new: true }
+   );
 
    return res
       .status(200)
-      .json(new ApiResponse(200, user, "Habit updated Successfully"));
+      .json(new ApiResponse(200, updatedHabit, "Habit updated Successfully"));
 });
 
 const DeleteHabit = asyncHandler(async (req, res) => {
@@ -156,16 +164,10 @@ const DeleteHabit = asyncHandler(async (req, res) => {
    if (!id) {
       throw new ApiError(401, "id is Reqired");
    }
-   const user = await User.findById(req.user._id)?.select("-password -refreshToken")
-   const data = user.taskList.filter((item) => {
-      return item._id != id;
-   });
-   user.taskList = data
-   await user.save()
-
+   await Streak.findByIdAndDelete(id);
    return res
       .status(200)
-      .json(new ApiResponse(200, user, "Habit deleted Successfully"));
+      .json(new ApiResponse(200, {}, "Habit deleted Successfully"));
 });
 
-export { addTask, addHabit, DeleteHabit, editHabit };
+export { listHabit, addTask, addHabit, DeleteHabit, editHabit };

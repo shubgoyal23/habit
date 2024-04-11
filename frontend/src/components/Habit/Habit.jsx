@@ -15,15 +15,22 @@ import { login as authlogin } from "../../store/AuthSlice";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
+import { addHabit, addListHabits, deleteHabit } from "@/store/HabitSlice";
 function Habit() {
    const dispatch = useDispatch();
    const navigate = useNavigate();
-   const [habitList, setHabitList] = useState([]);
-   const habits = useSelector((state) => state.auth?.userDate?.taskList);
+   const habitList = useSelector((state) => state.habit) || [];
 
    useEffect(() => {
-      setHabitList(habits ? habits : []);
-   }, [habits]);
+      axios
+         .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/habit`, {
+            withCredentials: true,
+         })
+         .then((data) => {
+            dispatch(addListHabits(data?.data?.data));
+         })
+         .catch((err) => console.log(err));
+   }, []);
 
    const deleteHabitHandler = async (id) => {
       axios
@@ -35,7 +42,7 @@ function Habit() {
             }
          )
          .then((data) => {
-            dispatch(authlogin(data?.data?.data));
+            dispatch(deleteHabit(id));
          })
          .catch((err) => console.log(err));
    };
@@ -44,7 +51,9 @@ function Habit() {
    };
    return (
       <div className="w-full p-2 md:p-6 mt-3">
-         <h1 className="text-center text-xl font-semibold my-3 text-blue-500 underline underline-offset-2">Habit List</h1>
+         <h1 className="text-center text-xl font-semibold my-3 text-blue-500 underline underline-offset-2">
+            Habit List
+         </h1>
          <Table className="md:p-6 text-center">
             <TableCaption>
                {habitList.length === 0
@@ -69,7 +78,11 @@ function Habit() {
                {habitList.map((item) => (
                   <TableRow key={item._id}>
                      <TableCell>
-                        <Input type="checkbox" className="size-4 cursor-pointer" onClick={(e)=> console.log()}></Input>
+                        <Input
+                           type="checkbox"
+                           className="size-4 cursor-pointer"
+                           onClick={(e) => console.log()}
+                        ></Input>
                      </TableCell>
                      <TableCell className="font-medium">{item.name}</TableCell>
                      <TableCell>{item.description}</TableCell>
@@ -92,7 +105,6 @@ function Habit() {
                            onClick={() => deleteHabitHandler(item._id)}
                         ></img>
                      </TableCell>
-                     
                   </TableRow>
                ))}
             </TableBody>

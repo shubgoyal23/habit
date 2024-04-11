@@ -1,20 +1,21 @@
 import mongoose from "mongoose";
 
-const pointSchema = new mongoose.Schema({
-   taskName: String,
-   point: Number,
-}, { _id: false });
-
 const streakSchema = new mongoose.Schema(
    {
       userId: {
          type: mongoose.Schema.Types.ObjectId,
          ref: "users",
-         unique: true,
          index: true,
       },
+      name: String,
+      description: String,
+      time: String,
+      place: String,
+      how: String,
+      ifthen: String,
+      point: Number,
       startDate: Date,
-      dailyPoint: [{date: Date, task: [pointSchema]}],
+      daysCompleted: [],
    },
    { timestamps: true }
 );

@@ -21,7 +21,7 @@ function Navbar() {
          ]);
    }, [loggedin]);
    return (
-      <header className="lg:px-16 px-4 h-16 bg-white flex flex-wrap items-center py-2 shadow-md">
+      <header className="lg:px-16 px-4 h-16 bg-white flex flex-wrap items-center py-2 shadow-md z-50">
          <div className="flex-1 flex justify-between items-center">
             <Link className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 text-transparent bg-clip-text" to={"/"}>
                Habit Tracker
