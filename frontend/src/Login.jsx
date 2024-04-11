@@ -32,13 +32,13 @@ export default function Login() {
    const onSubmit = (data) => {
       const login = axios.post(
          `${import.meta.env.VITE_BACKEND_URL}/api/v1/users/login`,
-         data
+         data, {withCredentials: true}
       );
 
       toast.promise(login, {
          loading: "Loading",
          success: "Login successfull",
-         error: (err) => `${err.response.data.message.toString()}`,
+         error: (err) => `${err.response?.data?.message || "Something went wrong"}`,
       });
       login
          .then((data) => {

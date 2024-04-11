@@ -30,13 +30,13 @@ export default function Register() {
    const onSubmit = (data) => {
       const register = axios.post(
          `${import.meta.env.VITE_BACKEND_URL}/api/v1/users/register`,
-         data
+         data, {withCredentials: true}
       );
 
       toast.promise(register, {
          loading: "Loading",
          success: "Registration successfull",
-         error: (err) => `${err.response.data.message.toString()}`,
+         error: (err) => `${err.response?.data?.message || "Something went wrong"}`,
       });
       register
          .then((data) => navigate("/login"))
