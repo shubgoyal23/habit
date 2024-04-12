@@ -77,7 +77,7 @@ const addSteak = asyncHandler(async (req, res) => {
    const date = new Date();
    let check = habit.daysCompleted.find((item) => {
       if (
-         item.getDay() === date.getDay() &&
+         item.getDate() === date.getDate() &&
          item.getMonth() === date.getMonth() &&
          item.getFullYear() === date.getFullYear()
       ) {
@@ -110,7 +110,7 @@ const removeSteak = asyncHandler(async (req, res) => {
 
    let check = habit.daysCompleted.filter((item) => {
       return (
-         item.getDay() !== date.getDay() &&
+         item.getDate() !== date.getDate() &&
          item.getMonth() !== date.getMonth() &&
          item.getFullYear() !== date.getFullYear()
       );

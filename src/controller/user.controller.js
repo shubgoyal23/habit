@@ -81,7 +81,6 @@ const loginUser = asyncHandler(async (req, res) => {
       await generateAccessTokenAndRefresToken(finduser._id);
 
    const options = {
-      SameSite: "none",
       httpOnly: true,
       secure: true,
    };
@@ -113,7 +112,6 @@ const logoutUser = asyncHandler(async (req, res) => {
    }
 
    const options = {
-      SameSite: "none",
       httpOnly: true,
       secure: true,
    };
