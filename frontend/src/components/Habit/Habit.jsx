@@ -61,12 +61,14 @@ function Habit() {
                   ? "Add habit to see here"
                   : "A list of your Daily Habits."}
             </TableCaption>
-            <TableHeader>
+            <TableHeader className="bg-gray-50">
                <TableRow>
                   <TableHead>mark</TableHead>
                   <TableHead>Habit</TableHead>
                   <TableHead className="md:w-[300px]">Description</TableHead>
-                  <TableHead className="md:w-[100px]">Time</TableHead>
+                  <TableHead className="md:w-[100px]">Start Time</TableHead>
+                  <TableHead className="md:w-[100px]">End Time</TableHead>
+                  <TableHead className="md:w-[100px]">Duration</TableHead>
                   <TableHead className="md:w-[100px]">Place</TableHead>
                   <TableHead>How</TableHead>
                   <TableHead>If Then</TableHead>
@@ -75,7 +77,7 @@ function Habit() {
                   <TableHead className=""></TableHead>
                </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="text-center">
                {habitList.map((item) => (
                   <TableRow key={item._id}>
                      <TableCell>
@@ -83,7 +85,9 @@ function Habit() {
                      </TableCell>
                      <TableCell className="font-medium">{item.name}</TableCell>
                      <TableCell>{item.description}</TableCell>
-                     <TableCell>{item.time}</TableCell>
+                     <TableCell>{item.startTime}</TableCell>
+                     <TableCell>{item.endTime}</TableCell>
+                     <TableCell>{item.duration}</TableCell>
                      <TableCell>{item.place}</TableCell>
                      <TableCell>{item.how}</TableCell>
                      <TableCell>{item.ifthen}</TableCell>

@@ -28,9 +28,29 @@ export default function AddHabit() {
    const {
       register,
       handleSubmit,
+      watch,
       formState: { errors },
       setValue,
    } = useForm();
+
+   const [sTime, eTime] = watch(["startTime", "endTime"]);
+   useEffect(() => {
+      if (sTime && eTime) {
+         const start = sTime.split(":");
+         const end = eTime.split(":");
+         const startDate = new Date(0, 0, 0, start[0], start[1], 0);
+         const endDate = new Date(0, 0, 0, end[0], end[1], 0);
+         const diff = endDate.getTime() - startDate.getTime();
+         // 1 min = 60 000 ms
+         // 1 hr = 36 00 000 ms
+
+         if (diff < 3600000) {
+            setValue("duration", `${diff / 60000} Mins`);
+         } else {
+            setValue("duration", `${diff / 3600000} Hrs`);
+         }
+      }
+   }, [sTime, eTime]);
 
    useEffect(() => {
       if (id && id !== "new") {
@@ -38,7 +58,9 @@ export default function AddHabit() {
          if (data) {
             setValue("name", data.name);
             setValue("description", data.description);
-            setValue("time", data.time);
+            setValue("startTime", data.time);
+            setValue("endTime", data.time);
+            setValue("duration", data.time);
             setValue("place", data.place);
             setValue("how", data.how);
             setValue("ifthen", data.ifthen);
@@ -81,14 +103,16 @@ export default function AddHabit() {
                `${err.response?.data?.message || "Something went wrong"}`,
          });
          addHAbit
-            .then((data) => {dispatch(editHabit(data.data.data))
-            navigate("/habit")})
+            .then((data) => {
+               dispatch(editHabit(data.data.data));
+               navigate("/habit");
+            })
             .catch((err) => console.log(err));
       }
    };
 
    return (
-      <div className="w-full min-h-screen flex justify-center items-center">
+      <div className="w-full min-h-screen flex justify-center items-center mt-10">
          <Card className="mx-auto max-w-sm">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">
@@ -121,15 +145,6 @@ export default function AddHabit() {
                   </div>
                   <div className="flex gap-2 items-center justify-between">
                      <div>
-                        <Label htmlFor="time">Time</Label>
-                        <Input
-                           id="time"
-                           placeholder="1:00 PM"
-                           type="time"
-                           {...register("time")}
-                        />
-                     </div>
-                     <div>
                         <Label htmlFor="place">Place</Label>
                         <Input
                            id="place"
@@ -146,6 +161,35 @@ export default function AddHabit() {
                            required
                            type="number"
                            {...register("point")}
+                        />
+                     </div>
+                  </div>
+                  <div className="flex gap-2 items-center justify-between">
+                     <div>
+                        <Label htmlFor="startTime">Start Time</Label>
+                        <Input
+                           id="startTime"
+                           placeholder="1:00 PM"
+                           type="time"
+                           {...register("startTime")}
+                        />
+                     </div>
+                     <div>
+                        <Label htmlFor="endTime">End Time</Label>
+                        <Input
+                           id="endTime"
+                           placeholder="1:00 PM"
+                           type="time"
+                           {...register("endTime")}
+                        />
+                     </div>
+                     <div>
+                        <Label htmlFor="time">Duration</Label>
+                        <Input
+                           id="time"
+                           placeholder="1 hr"
+                           type="text"
+                           {...register("duration")}
                         />
                      </div>
                   </div>

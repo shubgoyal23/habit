@@ -71,7 +71,7 @@ function Steak() {
          StartDate.getFullYear() === indexDate.getFullYear()
       ) {
          return (
-            <div className="bg-yellow-400 size-6 rounded-md flex justify-center items-center">
+            <div className="bg-yellow-400 m-auto size-6 rounded-md flex justify-center items-center">
                S
             </div>
          );
@@ -92,7 +92,7 @@ function Steak() {
       });
       if (check) {
          return (
-            <div className="bg-green-400 size-6 rounded-md flex justify-center items-center">
+            <div className="bg-green-400 size-6 m-auto rounded-md flex justify-center items-center">
                <img src="./check.svg" className="size-5"></img>
             </div>
          );
@@ -133,22 +133,22 @@ function Steak() {
                   ? "Add habit to see here"
                   : "A list of your Daily Habits."}
             </TableCaption>
-            <TableHeader>
+            <TableHeader className='bg-violet-50'>
                <TableRow>
-                  <TableHead>Day/ Habit</TableHead>
+                  <TableHead className="w-[100px]">Day/ Habit</TableHead>
                   {habitList.map((item) => (
-                     <TableHead key={item._id}>{item.name}</TableHead>
+                     <TableHead key={item._id} className="w-[100px]">{item.name}</TableHead>
                   ))}
                </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="text-center">
                {Array(daysInMonth(month))
                   .fill(0)
                   .map((_, i) => (
                      <TableRow key={`day-${i + 1}`}>
                         <TableCell>{`${i + 1}-${month + 1}-${year}`}</TableCell>
                         {habitList.map((item) => (
-                           <TableCell key={item._id}>
+                           <TableCell key={item._id} className="align-center">
                               {checkDate(item, i)}
                            </TableCell>
                         ))}
