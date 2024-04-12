@@ -4,19 +4,25 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login as authlogin } from "./store/AuthSlice";
 import { useEffect } from "react";
-import {Login, Register, Habit, AddHabit, SteakList} from "./components/index"
+import {Login, Register, Habit, AddHabit, SteakList, Home, Logout} from "./components/index";
+import ErrorPage from "./components/Error/ErrorHandler"
 const router = createBrowserRouter([
    {
       path: "/",
       element: <Layout />,
+      errorElement: <ErrorPage />,
       children: [
          {
             path: "/",
-            element: <h1>Hello world</h1>,
+            element: <Home />,
          },
          {
             path: "/login",
             element: <Login />,
+         },
+         {
+            path: "/logout",
+            element: <Logout />,
          },
          {
             path: "/register",
