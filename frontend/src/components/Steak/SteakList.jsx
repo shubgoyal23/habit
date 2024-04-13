@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
    Table,
    TableBody,
@@ -11,9 +11,7 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { addListHabits } from "@/store/HabitSlice";
-import MarkSteak from "../Habit/MarkSteak";
 function Steak() {
    const dispatch = useDispatch();
    const habitList = useSelector((state) => state.habit) || [];

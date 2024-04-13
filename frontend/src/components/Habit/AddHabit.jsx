@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
    CardTitle,
@@ -17,7 +17,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { addHabit, deleteHabit, editHabit } from "@/store/HabitSlice";
+import { addHabit, editHabit } from "@/store/HabitSlice";
 
 export default function AddHabit() {
    let { id } = useParams();
@@ -29,7 +29,6 @@ export default function AddHabit() {
       register,
       handleSubmit,
       watch,
-      formState: { errors },
       setValue,
    } = useForm();
 

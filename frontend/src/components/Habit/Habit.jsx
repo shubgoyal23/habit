@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
    Table,
    TableBody,
@@ -11,11 +11,9 @@ import {
 
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { login as authlogin } from "../../store/AuthSlice";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { Input } from "../ui/input";
-import { addHabit, addListHabits, deleteHabit } from "@/store/HabitSlice";
+import { addListHabits, deleteHabit } from "@/store/HabitSlice";
 import MarkSteak from "./MarkSteak";
 function Habit() {
    const dispatch = useDispatch();
