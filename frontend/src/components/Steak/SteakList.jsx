@@ -125,7 +125,7 @@ function Steak() {
                <img src="./arrowR.svg" alt="arrow right" />
             </button>
          </div>
-         <Table className="md:p-6">
+         <Table className="md:p-6  border border-gray-200 rounded-md">
             <TableCaption>
                {habitList.length === 0
                   ? "Add habit to see here"

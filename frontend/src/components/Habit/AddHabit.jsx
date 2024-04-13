@@ -40,8 +40,6 @@ export default function AddHabit() {
          const startDate = new Date(0, 0, 0, start[0], start[1], 0);
          const endDate = new Date(0, 0, 0, end[0], end[1], 0);
          const diff = endDate.getTime() - startDate.getTime();
-         // 1 min = 60 000 ms
-         // 1 hr = 36 00 000 ms
 
          if (diff < 3600000) {
             setValue("duration", `${diff / 60000} Mins`);
@@ -57,8 +55,8 @@ export default function AddHabit() {
          if (data) {
             setValue("name", data.name);
             setValue("description", data.description);
-            setValue("startTime", data.time);
-            setValue("endTime", data.time);
+            setValue("startTime", data.startTime);
+            setValue("endTime", data.endTime);
             setValue("duration", data.time);
             setValue("place", data.place);
             setValue("how", data.how);

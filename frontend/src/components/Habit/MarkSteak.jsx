@@ -5,25 +5,29 @@ import { editHabit } from "@/store/HabitSlice";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
 
-function MarkSteak({ data }) {
+function MarkSteak({ row }) {
+   const data = row.original;
    const dispatch = useDispatch();
    const [marked, setmarked] = useState(false);
 
-   const handleMarked = () => {    
-       const request = axios.post(
-           `${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/${marked? "remove": "add"}`,
-           { id: data._id },
-           {
-               withCredentials: true,
-            }
+   const handleMarked = () => {
+      const request = axios.post(
+         `${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/${
+            marked ? "remove" : "add"
+         }`,
+         { id: data._id },
+         {
+            withCredentials: true,
+         }
       );
       toast.promise(request, {
-          loading: "Loading",
-          success: (data) => `${data.data?.message || "Marked successfully"}`,
-          error: (err) => `${err.response?.data?.message || "Something went wrong"}`,
-        });
-        request
-        .then((data) => {
+         loading: "Loading",
+         success: (data) => `${data.data?.message || "Marked successfully"}`,
+         error: (err) =>
+            `${err.response?.data?.message || "Something went wrong"}`,
+      });
+      request
+         .then((data) => {
             setmarked((prev) => !prev);
             dispatch(editHabit(data.data.data));
          })

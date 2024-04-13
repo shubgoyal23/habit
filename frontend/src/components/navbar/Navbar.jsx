@@ -14,8 +14,8 @@ function Navbar() {
               { title: "Register", to: "/register" },
            ])
          : setMenu([
-              { title: "Habits", to: "/habit" },
-              { title: "Add Habit", to: "/habit/new" },
+            { title: "Add Habit", to: "/habit/new" },
+            { title: "Habits Table", to: "/habit" },
               { title: "Streak Table", to: "/steak" },
               { title: "Logout", to: "/logout" },
            ]);

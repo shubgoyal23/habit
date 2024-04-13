@@ -11,16 +11,24 @@ const listHabit = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, list, "habit list fetched successfully"));
 });
 const addHabit = asyncHandler(async (req, res) => {
-   const { name, point } = req.body;
-
-   if (!(name && point)) {
-      throw new ApiError(401, "Name and Point Feilds are Reqired");
+   const { name } = req.body;
+   if (!name) {
+      throw new ApiError(401, "Name Feild is Reqired");
    }
 
    const add = await Streak.create({
       userId: req.user._id,
+      name: name,
       startDate: new Date(),
-      ...req.body,
+      description: req.body?.description,
+      duration: req.body?.duration,
+      startTime: req.body?.startTime,
+      endTime: req.body?.endTime,
+      place: req.body?.place,
+      how: req.body?.how,
+      ifthen: req.body?.ifthen,
+      point: req.body?.point,
+      daysCompleted: [],
    });
 
    return res
@@ -42,7 +50,17 @@ const editHabit = asyncHandler(async (req, res) => {
    delete req.body.id;
    const updatedHabit = await Streak.findByIdAndUpdate(
       id,
-      { ...req.body },
+      {
+         name: req.body?.name,
+         description: req.body?.description,
+         duration: req.body?.duration,
+         startTime: req.body?.startTime,
+         endTime: req.body?.endTime,
+         place: req.body?.place,
+         how: req.body?.how,
+         ifthen: req.body?.ifthen,
+         point: req.body?.point,
+      },
       { new: true }
    );
 
@@ -92,7 +110,7 @@ const addSteak = asyncHandler(async (req, res) => {
 
    return res
       .status(200)
-      .json(new ApiResponse(200, habit, "habit marked Completed"));
+      .json(new ApiResponse(200, habit, "habit marked Completed for Today"));
 });
 
 const removeSteak = asyncHandler(async (req, res) => {
@@ -121,7 +139,7 @@ const removeSteak = asyncHandler(async (req, res) => {
 
    return res
       .status(200)
-      .json(new ApiResponse(200, habit, "habit marked Incomplete"));
+      .json(new ApiResponse(200, habit, "habit marked Pending for Today"));
 });
 
 export { listHabit, addHabit, DeleteHabit, editHabit, addSteak, removeSteak };

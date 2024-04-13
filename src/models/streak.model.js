@@ -17,7 +17,7 @@ const streakSchema = new mongoose.Schema(
       ifthen: String,
       point: Number,
       startDate: Date,
-      daysCompleted: [],
+      daysCompleted: [Date],
    },
    { timestamps: true }
 );
