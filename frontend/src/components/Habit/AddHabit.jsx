@@ -163,12 +163,11 @@ export default function AddHabit() {
                         />
                      </div>
                   </div>
-                  <div className="flex gap-2 items-center justify-between">
+                  <div className="grid grid-cols-3 gap-2 items-center justify-between">
                      <div>
                         <Label htmlFor="startTime">Start Time</Label>
                         <Input
                            id="startTime"
-                           className="min-w-20"
                            placeholder="1:00 PM"
                            type="time"
                            {...register("startTime")}
@@ -178,7 +177,6 @@ export default function AddHabit() {
                         <Label htmlFor="endTime">End Time</Label>
                         <Input
                            id="endTime"
-                           className="min-w-20"
                            placeholder="1:00 PM"
                            type="time"
                            {...register("endTime")}
