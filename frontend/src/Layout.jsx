@@ -4,7 +4,7 @@ import { Toaster } from "react-hot-toast";
 
 function Layout() {
    return (
-      <div>
+      <div className="pt-16">
          <Navbar />
          <Outlet />
          <Toaster />

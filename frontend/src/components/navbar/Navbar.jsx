@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 function Navbar() {
    const loggedin = useSelector((state) => state.auth.loggedin);
@@ -21,10 +22,10 @@ function Navbar() {
            ]);
    }, [loggedin]);
    return (
-      <header className="lg:px-16 px-4 h-16 bg-white flex flex-wrap items-center py-2 shadow-md z-50">
+      <header className="fixed top-0 w-full lg:px-16 px-4 h-16 bg-white/50 backdrop-blur-lg flex flex-wrap items-center py-2 shadow-md z-50">
          <div className="flex-1 flex justify-between items-center">
             <Link
-               className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 text-transparent bg-clip-text"
+               className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-yellow-400 to-pink-500 text-transparent bg-clip-text"
                to={"/"}
             >
                Habit Tracker
@@ -63,19 +64,19 @@ function Navbar() {
                <ul className="md:flex items-center justify-between text-base text-gray-700 pt-4 md:pt-0">
                   {menu.map((item) => (
                      <li key={item.title}>
-                        <Link
-                           className="md:p-4 py-3 px-0 block md:mb-0 mb-2"
+                        <NavLink
+                           className={({isActive}) => `${isActive? "font-bold" : ""} md:p-4 py-3 px-0 block md:mb-0 mb-2`}
                            to={item.to}
                         >
                            {item.title}
-                        </Link>
+                        </NavLink>
                      </li>
                   ))}
                </ul>
             </nav>
          </div>
          <div
-            className={`absolute z-50 ${
+            className={`absolute z-50 min-h-screen ${
                mobileNav ? "left-0" : "-left-[800px]"
             } transition-all duration-300 ease-in top-16 md:hidden bg-white/30 w-full backdrop-blur-sm flex justify-center pt-3 h-full`}
          >
