@@ -76,21 +76,21 @@ function Navbar() {
             </nav>
          </div>
          <div
-            className={`absolute z-50 min-h-screen ${
+            className={`absolute z-30 h-screen ${
                mobileNav ? "left-0" : "-left-[800px]"
-            } transition-all duration-300 ease-in top-16 md:hidden bg-white/30 w-full backdrop-blur-sm flex justify-center pt-3 h-full`}
+            } transition-all duration-300 ease-in top-16 md:hidden bg-white/90 backdrop-blur-2xl w-full flex justify-center pt-3 h-full`}
          >
             <nav>
                <ul className="md:flex items-center justify-between text-base text-gray-700 pt-4 md:pt-0">
                   {menu.map((item) => (
                      <li key={item.title}>
-                        <Link
-                           className="md:p-4 py-3 px-0 block font-semibold text-xl text-center mb-2"
+                        <NavLink
+                           className={({isActive}) => `${isActive? "font-bold" : ""} md:p-4 py-3 px-0 font-semibold text-xl text-center block md:mb-0 mb-2`}
                            to={item.to}
                            onClick={() => setMobileNav((prev) => !prev)}
                         >
                            {item.title}
-                        </Link>
+                        </NavLink>
                      </li>
                   ))}
                </ul>
