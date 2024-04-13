@@ -93,6 +93,7 @@ const columns = [
 
 function Habit() {
    const habitList = useSelector((state) => state.habit) || [];
+   const user = useSelector((state) => state.auth.loggedin);
    const [data, setData] = useState(habitList);
    const dispatch = useDispatch();
    const navigate = useNavigate();
@@ -117,6 +118,9 @@ function Habit() {
    });
 
    useEffect(() => {
+      if(!user){
+         navigate("/login")
+      }
       axios
          .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/habit`, {
             withCredentials: true,

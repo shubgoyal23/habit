@@ -10,10 +10,12 @@ import {
 } from "@/components/ui/table";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { addListHabits } from "@/store/HabitSlice";
 function Steak() {
    const dispatch = useDispatch();
+   const navigate = useNavigate();
+   const user = useSelector((state) => state.auth.loggedin);
    const habitList = useSelector((state) => state.habit) || [];
    const [month, setMonth] = useState(new Date().getMonth());
    const [year, setYear] = useState(new Date().getFullYear());
@@ -46,6 +48,9 @@ function Steak() {
    };
 
    useEffect(() => {
+      if (!user) {
+         navigate("/login");
+      }
       axios
          .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/habit`, {
             withCredentials: true,

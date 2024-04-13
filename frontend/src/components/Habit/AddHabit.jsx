@@ -20,17 +20,13 @@ import { useNavigate } from "react-router-dom";
 import { addHabit, editHabit } from "@/store/HabitSlice";
 
 export default function AddHabit() {
+   const user = useSelector((state) => state.auth.loggedin);
    let { id } = useParams();
    const dispatch = useDispatch();
    const navigate = useNavigate();
 
    const userData = useSelector((state) => state.habit) || [];
-   const {
-      register,
-      handleSubmit,
-      watch,
-      setValue,
-   } = useForm();
+   const { register, handleSubmit, watch, setValue } = useForm();
 
    const [sTime, eTime] = watch(["startTime", "endTime"]);
    useEffect(() => {
@@ -65,6 +61,12 @@ export default function AddHabit() {
          }
       }
    }, [userData]);
+
+   useEffect(() => {
+      if (!user) {
+         navigate("/login");
+      }
+   }, []);
 
    const onSubmit = (data) => {
       if (id === "new") {
