@@ -49,7 +49,7 @@ export default function Login() {
    };
 
    return (
-      <div className="w-full min-h-screen flex justify-center items-start my-10">
+      <div className="w-full flex justify-center items-start my-10">
          <Card className="mx-auto max-w-sm">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Login</CardTitle>
