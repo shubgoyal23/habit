@@ -168,6 +168,7 @@ export default function AddHabit() {
                         <Label htmlFor="startTime">Start Time</Label>
                         <Input
                            id="startTime"
+                           className="min-w-20"
                            placeholder="1:00 PM"
                            type="time"
                            {...register("startTime")}
@@ -177,6 +178,7 @@ export default function AddHabit() {
                         <Label htmlFor="endTime">End Time</Label>
                         <Input
                            id="endTime"
+                           className="min-w-20"
                            placeholder="1:00 PM"
                            type="time"
                            {...register("endTime")}
