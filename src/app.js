@@ -23,7 +23,6 @@ app.use("/api/v1/steak", steakRouter);
 const __filename = new URL(import.meta.url).pathname;
 const __dirname = path.dirname(__filename);
 app.use("*",(_, res) => {
-   console.log("this we are loggoing",path.join(__dirname + '/../frontend/dist/index.html'))
    res.sendFile(path.join(__dirname + '/../frontend/dist/index.html'));
  });
 app.use((err, req, res, next) => {
