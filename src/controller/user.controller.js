@@ -2,6 +2,7 @@ import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResposne.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
+import jwt from "jsonwebtoken";
 
 const generateAccessTokenAndRefresToken = async (id) => {
    try {
@@ -128,6 +129,39 @@ const currentUser = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, req.user, "User fetched successfully"));
 });
 
+const refreshToken = asyncHandler(async (req, res) => {
+   const token = req.cookies.refreshToken || req.header.refreshToken;
+
+   if (!token) {
+      throw new ApiError(401, "RefreshToken not found");
+   }
+   const decodedToken = await jwt.verify(
+      token,
+      process.env.REFRESH_TOKEN_SECRET
+   );
+
+   const user = await User.findById(decodedToken._id)?.select("-password");
+
+   if (!user && !(user.refreshToken === token)) {
+      throw new ApiError(401, "User not found");
+   }
+
+   const { refreshToken, accessToken } =
+      await generateAccessTokenAndRefresToken(user._id);
+
+   user.refreshToken = refreshToken;
+   const options = {
+      httpOnly: true,
+      secure: true,
+   };
+
+   return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json(new ApiResponse(200, user, "Tokens Renewed successfully"));
+});
+
 const editUserDetails = asyncHandler(async (req, res) => {
    let { firstName, lastName, email } = req.body;
    const id = req.user._id;
@@ -219,5 +253,6 @@ export {
    currentUser,
    editUserDetails,
    editUserPassword,
-   forgetPassword
+   forgetPassword,
+   refreshToken
 };

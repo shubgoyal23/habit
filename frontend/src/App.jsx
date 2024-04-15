@@ -3,9 +3,18 @@ import Layout from "./Layout";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login as authlogin } from "./store/AuthSlice";
-import { useEffect } from "react";
-import {Login, Register, Habit, AddHabit, SteakList, Home, Logout} from "./components/index";
-import ErrorPage from "./components/Error/ErrorHandler"
+import { useEffect, useState } from "react";
+import {
+   Login,
+   Register,
+   Habit,
+   AddHabit,
+   SteakList,
+   Home,
+   Logout,
+} from "./components/index";
+import ErrorPage from "./components/Error/ErrorHandler";
+import Loader from "./components/Loading/Loading";
 const router = createBrowserRouter([
    {
       path: "/",
@@ -46,17 +55,39 @@ const router = createBrowserRouter([
 
 export default function App() {
    const dispatch = useDispatch();
-   useEffect(() => {
+   const [loading, setLoading] = useState(true);
+   const checkUser = async () => {
       axios
          .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/users/current`, {
             withCredentials: true,
          })
          .then((data) => {
             dispatch(authlogin(data?.data?.data));
+            setLoading(false);
          })
-         .catch((err) => console.log(err));
+         .catch((err) =>
+            axios
+               .get(
+                  `${
+                     import.meta.env.VITE_BACKEND_URL
+                  }/api/v1/users/renew-token`,
+                  {
+                     withCredentials: true,
+                  }
+               )
+               .then((data) => {
+                  dispatch(authlogin(data?.data?.data));
+                  setLoading(false);
+               })
+               .catch((err) => setLoading(false))
+         );
+   };
+   useEffect(() => {
+      checkUser();
    }, []);
-   return (
+   return loading ? (
+      <Loader />
+   ) : (
       <div className="">
          <RouterProvider router={router}>
             <Layout />

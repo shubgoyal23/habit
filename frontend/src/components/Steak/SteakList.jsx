@@ -100,7 +100,11 @@ function Steak() {
             </div>
          );
       }
-      return null;
+      return (
+         <div className="bg-red-500 size-6 m-auto rounded-md flex justify-center items-center">
+            <img src="./cross.svg" className="size-5"></img>
+         </div>
+      );
    };
 
    const changeMonth = (i) => {
@@ -136,11 +140,13 @@ function Steak() {
                   ? "Add habit to see here"
                   : "A list of your Daily Habits."}
             </TableCaption>
-            <TableHeader className='bg-violet-50'>
+            <TableHeader className="bg-violet-50">
                <TableRow>
                   <TableHead className="w-[100px]">Day/ Habit</TableHead>
                   {habitList.map((item) => (
-                     <TableHead key={item._id} className="w-[100px]">{item.name}</TableHead>
+                     <TableHead key={item._id} className="w-[100px]">
+                        {item.name}
+                     </TableHead>
                   ))}
                </TableRow>
             </TableHeader>

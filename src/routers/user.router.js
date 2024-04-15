@@ -7,6 +7,7 @@ import {
    editUserDetails,
    editUserPassword,
    forgetPassword,
+   refreshToken,
 } from "../controller/user.controller.js";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 
@@ -15,6 +16,7 @@ const router = Router();
 router.route("/register").post(registeruser);
 router.route("/login").post(loginUser);
 router.route("/forgot-password").post(forgetPassword);
+router.route("/renew-token").get(refreshToken);
 
 //secure route
 router.route("/logout").get(verifyJwt, logoutUser);
