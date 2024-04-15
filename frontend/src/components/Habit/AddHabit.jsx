@@ -36,12 +36,7 @@ export default function AddHabit() {
          const startDate = new Date(0, 0, 0, start[0], start[1], 0);
          const endDate = new Date(0, 0, 0, end[0], end[1], 0);
          const diff = endDate.getTime() - startDate.getTime();
-
-         if (diff < 3600000) {
-            setValue("duration", `${diff / 60000} Mins`);
-         } else {
-            setValue("duration", `${diff / 3600000} Hrs`);
-         }
+         setValue("duration", diff / 60000);
       }
    }, [sTime, eTime]);
 

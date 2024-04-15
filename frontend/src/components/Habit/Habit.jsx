@@ -59,7 +59,14 @@ const columns = [
    {
       accessorKey: "duration",
       header: "Duration",
-      cell: (prop) => <p>{prop.getValue()}</p>,
+      cell: (prop) => {
+         const value = prop.getValue()
+         if(value >= 60){
+            return <p>{`${value/60} hrs`}</p>
+         }else{
+            return <p>{`${value} mins`}</p>
+         }
+      },
    },
    {
       accessorKey: "place",
