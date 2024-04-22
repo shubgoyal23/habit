@@ -12,6 +12,8 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { addListHabits } from "@/store/HabitSlice";
+import EditSteak from "./EditSteak";
+import toast from "react-hot-toast";
 function Steak() {
    const dispatch = useDispatch();
    const navigate = useNavigate();
@@ -19,6 +21,9 @@ function Steak() {
    const habitList = useSelector((state) => state.habit) || [];
    const [month, setMonth] = useState(new Date().getMonth());
    const [year, setYear] = useState(new Date().getFullYear());
+   const [showEdit, setShowEdit] = useState(false);
+   const [editData, setShowEditData] = useState({});
+
    const monthsName = [
       "January",
       "February",
@@ -51,6 +56,9 @@ function Steak() {
       if (!user) {
          navigate("/login");
       }
+      toast("Double Click on Mark to Edit it!", {
+         icon: "🖱️",
+      });
       axios
          .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/habit`, {
             withCredentials: true,
@@ -95,13 +103,29 @@ function Steak() {
       });
       if (check) {
          return (
-            <div className="bg-green-400 size-6 m-auto rounded-md flex justify-center items-center">
+            <div
+               onDoubleClick={() => {
+                  setShowEdit(true);
+                  setShowEditData({
+                     _id: data._id,
+                     mark: true,
+                     date: indexDate,
+                  });
+               }}
+               className="bg-green-400 size-6 cursor-pointer m-auto rounded-md flex justify-center items-center"
+            >
                <img src="./check.svg" className="size-5"></img>
             </div>
          );
       }
       return (
-         <div className="bg-red-500 size-6 m-auto rounded-md flex justify-center items-center">
+         <div
+            onDoubleClick={() => {
+               setShowEdit(true);
+               setShowEditData({ _id: data._id, mark: false, date: indexDate });
+            }}
+            className="bg-red-500 size-6 cursor-pointer m-auto rounded-md flex justify-center items-center"
+         >
             <img src="./cross.svg" className="size-5"></img>
          </div>
       );
@@ -122,6 +146,9 @@ function Steak() {
 
    return (
       <div className="w-full p-2 md:p-6 mt-3">
+         {showEdit && (
+            <EditSteak data={editData} open={showEdit} edit={setShowEdit} />
+         )}
          <h1 className="text-center text-xl font-semibold my-3 text-blue-500 underline underline-offset-2">
             Habits Streak
          </h1>
@@ -134,7 +161,7 @@ function Steak() {
                <img src="./arrowR.svg" alt="arrow right" />
             </button>
          </div>
-         <Table className="md:p-6  border border-gray-200 rounded-md">
+         <Table className="md:p-6 border border-gray-200 rounded-md">
             <TableCaption>
                {habitList.length === 0
                   ? "Add habit to see here"

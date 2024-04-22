@@ -82,7 +82,7 @@ const DeleteHabit = asyncHandler(async (req, res) => {
 });
 
 const addSteak = asyncHandler(async (req, res) => {
-   const { id } = req.body;
+   const { id, date: habitDate } = req.body;
    if (!id) {
       throw new ApiError(401, "Habit Id is required to add Steak");
    }
@@ -92,7 +92,7 @@ const addSteak = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Habit with Id not found");
    }
 
-   const date = new Date();
+   const date = new Date(habitDate || Date.now());
    let check = habit.daysCompleted.find((item) => {
       if (
          item.getDate() === date.getDate() &&
@@ -103,18 +103,18 @@ const addSteak = asyncHandler(async (req, res) => {
       }
    });
    if (check) {
-      throw new ApiError(401, "Steak for Today is Already Marked");
+      throw new ApiError(401, "Steak is Already Marked Completed");
    }
    habit.daysCompleted.push(date);
    await habit.save();
 
    return res
       .status(200)
-      .json(new ApiResponse(200, habit, "habit marked Completed for Today"));
+      .json(new ApiResponse(200, habit, "habit marked Completed"));
 });
 
 const removeSteak = asyncHandler(async (req, res) => {
-   const { id } = req.body;
+   const { id, date: habitDate } = req.body;
    if (!id) {
       throw new ApiError(401, "Habit Id is required to add Steak");
    }
@@ -124,12 +124,12 @@ const removeSteak = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Habit with Id not found");
    }
 
-   const date = new Date();
+   const date = new Date(habitDate || Date.now());
 
    let check = habit.daysCompleted.filter((item) => {
       return (
-         item.getDate() !== date.getDate() &&
-         item.getMonth() !== date.getMonth() &&
+         item.getDate() !== date.getDate() ||
+         item.getMonth() !== date.getMonth() ||
          item.getFullYear() !== date.getFullYear()
       );
    });
@@ -139,7 +139,7 @@ const removeSteak = asyncHandler(async (req, res) => {
 
    return res
       .status(200)
-      .json(new ApiResponse(200, habit, "habit marked Pending for Today"));
+      .json(new ApiResponse(200, habit, "habit marked Pending"));
 });
 
 export { listHabit, addHabit, DeleteHabit, editHabit, addSteak, removeSteak };

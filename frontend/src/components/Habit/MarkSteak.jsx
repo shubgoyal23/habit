@@ -39,7 +39,7 @@ function MarkSteak({ row }) {
       let check = data.daysCompleted.find((item) => {
          const checkDate = new Date(item);
          if (
-            checkDate.getDay() === date.getDay() &&
+            checkDate.getDate() === date.getDate() &&
             checkDate.getMonth() === date.getMonth() &&
             checkDate.getFullYear() === date.getFullYear()
          ) {
