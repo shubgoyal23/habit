@@ -84,6 +84,7 @@ const loginUser = asyncHandler(async (req, res) => {
    const options = {
       httpOnly: true,
       secure: true,
+      maxAge: 864000000
    };
 
    finduser.password = "";
@@ -153,6 +154,7 @@ const refreshToken = asyncHandler(async (req, res) => {
    const options = {
       httpOnly: true,
       secure: true,
+      maxAge: 864000000
    };
 
    return res
