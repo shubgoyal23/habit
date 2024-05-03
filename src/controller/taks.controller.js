@@ -91,8 +91,9 @@ const addSteak = asyncHandler(async (req, res) => {
    if (!habit || habit.userId.toString() !== req.user._id.toString()) {
       throw new ApiError(401, "Habit with Id not found");
    }
+   const dateTemp = new Date(habitDate || Date.now());
+   const date = new Date(dateTemp.getFullYear(), dateTemp.getMonth(), dateTemp.getDate(), 0, 0, 0, 0);
 
-   const date = new Date(habitDate || Date.now());
    let check = habit.daysCompleted.find((item) => {
       if (
          item.getDate() === date.getDate() &&
