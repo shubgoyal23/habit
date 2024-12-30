@@ -1,9 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import "./style.css";
+import { useSelector } from "react-redux";
 function Home() {
+   const loggedin = useSelector((state) => state.auth.loggedin);
+   useEffect(() => {
+      if (!loggedin) {
+         window.location.href = "/login";
+      }else{
+         window.location.href = "/habit/new";
+      }
+   }, []);
    return (
-      <div className="leading-normal tracking-normal text-white gradient">
+      <div className="leading-normal tracking-normal text-white gradient hidden lg:block">
          <>
             {/*Hero*/}
             <div className="pt-20 px-10">

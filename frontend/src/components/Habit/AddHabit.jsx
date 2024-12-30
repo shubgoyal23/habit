@@ -106,7 +106,7 @@ export default function AddHabit() {
    };
 
    return (
-      <div className="w-full flex justify-center items-start my-10">
+      <div className="w-full flex justify-center items-start">
          <Card className="mx-auto max-w-sm">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">
@@ -209,7 +209,7 @@ export default function AddHabit() {
                      {id === "new" ? "Create Habit" : "Edit Habit"}
                   </Button>
                </form>
-               <CardFooter className="pt-3 justify-center">
+               <CardFooter className="p-3 justify-center">
                   Return Back to Habit Page
                   <Link className="text-blue-500 ml-1" to={"/habit"}>
                      Click Here

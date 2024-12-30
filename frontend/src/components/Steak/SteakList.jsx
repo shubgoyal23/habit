@@ -152,7 +152,7 @@ function Steak() {
          <h1 className="text-center text-xl font-semibold my-3 text-blue-500 underline underline-offset-2">
             Habits Streak
          </h1>
-         <div className="flex justify-between text-xl font-bold items-center gap-2 mb-6 w-60 bg-gray-50 m-auto px-5 h-10 rounded-lg">
+         <div className="flex justify-between text-xl font-bold items-center gap-2 mb-6 w-fit bg-gray-50 m-auto px-5 h-10 rounded-lg">
             <button onClick={() => changeMonth(-1)} className="size-6">
                <img src="./arrowL.svg" alt="arrow left" />
             </button>
@@ -182,7 +182,7 @@ function Steak() {
                   .fill(0)
                   .map((_, i) => (
                      <TableRow key={`day-${i + 1}`}>
-                        <TableCell>{`${i + 1}-${month + 1}-${year}`}</TableCell>
+                        <TableCell>{`${i + 1}`}</TableCell>
                         {habitList.map((item) => (
                            <TableCell key={item._id} className="align-center">
                               {checkDate(item, i)}
