@@ -1,14 +1,16 @@
 import React, { useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./style.css";
 import { useSelector } from "react-redux";
 function Home() {
    const loggedin = useSelector((state) => state.auth.loggedin);
+      const navigate = useNavigate();
+   
    useEffect(() => {
       if (!loggedin) {
-         window.location.href = "/login";
+         navigate("/login");
       }else{
-         window.location.href = "/habit/new";
+         navigate("/habit/new");
       }
    }, []);
    return (

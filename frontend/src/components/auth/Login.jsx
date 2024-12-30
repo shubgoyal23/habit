@@ -43,7 +43,7 @@ export default function Login() {
       login
          .then((data) => {
             dispatch(authlogin(data.data.data));
-            navigate("/");
+            navigate("/habit");
          })
          .catch((err) => console.log(err));
    };
