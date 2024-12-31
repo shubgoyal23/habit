@@ -22,6 +22,10 @@ app.get("/ping", (req, res) => {
 app.use((req, res, next) => {
    connectDb().then(() => next()).catch((error) => console.log(error));
 })
+app.use((req, res, next) => {
+   console.log(req.get("origin"));
+   next()
+})
 
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/steak", steakRouter);
