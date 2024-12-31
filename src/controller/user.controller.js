@@ -87,7 +87,10 @@ const loginUser = asyncHandler(async (req, res) => {
       maxAge: 864000000,
    };
 
-  let user = finduser.select("_id firstName lastName")
+  let user = {}
+  user._id = finduser._id
+  user.firstName = finduser.firstName
+  user.lastName = finduser.lastName
   user.refreshToken = refreshToken
   user.accessToken = accessToken
 
