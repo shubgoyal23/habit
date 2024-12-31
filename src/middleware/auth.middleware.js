@@ -5,7 +5,7 @@ import { User } from "../models/user.model.js";
 
 export const verifyJwt = asyncHandler(async (req, res, next) => {
    try {
-      const token = req.cookies.accessToken || req.header.AccessToken;
+      const token = req.cookies.accessToken || req.headers.accesstoken;
 
       if (!token) {
          throw new ApiError(401, "AccessToken not found");
