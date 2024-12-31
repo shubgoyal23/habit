@@ -26,24 +26,23 @@ export default function AddHabit() {
    const navigate = useNavigate();
 
    const userData = useSelector((state) => state.habit) || [];
-   const { register, handleSubmit, watch, setValue } = useForm();
+   const { register, handleSubmit, setValue, getValues } = useForm();
+   const [timeEdit, setTimeEdit] = useState(null);
 
-   const [sTime, eTime, dur] = watch(["startTime", "endTime", "duration"]);
-   const [timeEdit, setTimeEdit] = useState("");
    useEffect(() => {
-      if (sTime && eTime && timeEdit == "end") {
-         const start = sTime.split(":");
-         const end = eTime.split(":");
-         const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
+      const sTime = getValues("startTime");
+      const start = sTime.split(":");
+      const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
+      if (sTime && timeEdit?.type == "endTime") {
+         const end = timeEdit?.val?.split(":");
          const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
          const diff = endDate.getTime() - startDate.getTime();
-         setValue("duration", diff / 60000);
+         const dur = Math.round(diff / 60000);
+         setValue("duration", dur);
       }
-      if (sTime && dur && timeEdit == "dur") {
-         const start = sTime.split(":");
-         const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
-         const endDate = startDate.getTime() + dur * 60000;
-         const end = new Date(endDate);
+      if (sTime && timeEdit?.type == "duration") {
+         const dur = timeEdit?.val * 60000;
+         const end = new Date(startDate.getTime() + dur);
          setValue("endTime", `${end.getHours()}:${end.getMinutes()}`);
       }
    }, [timeEdit]);
@@ -183,7 +182,7 @@ export default function AddHabit() {
                            placeholder="1:00 PM"
                            type="time"
                            {...register("endTime")}
-                           onChange={() => setTimeEdit("end")}
+                           onChange={(e) => setTimeEdit({ type: "endTime" , val: e.target.value })}
                         />
                      </div>
                      <div>
@@ -193,7 +192,7 @@ export default function AddHabit() {
                            placeholder="60 min"
                            type="number"
                            {...register("duration")}
-                           onChange={() => setTimeEdit("dur")}
+                           onChange={(e) => setTimeEdit({ type: "duration", val: e.target.value })}
                         />
                      </div>
                   </div>
