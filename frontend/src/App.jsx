@@ -61,6 +61,9 @@ export default function App() {
       axios
          .get(`${conf.BACKEND_URL}/api/v1/users/current`, {
             withCredentials: true,
+            headers: {
+               "accessToken": localStorage.getItem("accessToken"),
+            }
          })
          .then((data) => {
             dispatch(authlogin(data?.data?.data));
@@ -74,6 +77,9 @@ export default function App() {
                   }/api/v1/users/renew-token`,
                   {
                      withCredentials: true,
+                     headers: {
+                        "refreshToken": localStorage.getItem("refreshToken"),
+                     }
                   }
                )
                .then((data) => {
