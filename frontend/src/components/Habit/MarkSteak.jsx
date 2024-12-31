@@ -4,6 +4,7 @@ import axios from "axios";
 import { editHabit } from "@/store/HabitSlice";
 import { useDispatch } from "react-redux";
 import toast from "react-hot-toast";
+import { conf } from "@/conf/conf";
 
 function MarkSteak({ row }) {
    const data = row.original;
@@ -12,7 +13,7 @@ function MarkSteak({ row }) {
 
    const handleMarked = () => {
       const request = axios.post(
-         `${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/${
+         `${conf.BACKEND_URL}/api/v1/steak/${
             marked ? "remove" : "add"
          }`,
          { id: data._id },

@@ -18,6 +18,7 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { login as authlogin } from "../../store/AuthSlice";
 import { useNavigate } from "react-router-dom";
+import { conf } from "@/conf/conf";
 
 export default function Login() {
    const [showPass, setShowPass] = useState(false);
@@ -38,7 +39,7 @@ export default function Login() {
 
    const onSubmit = (data) => {
       const login = axios.post(
-         `${import.meta.env.VITE_BACKEND_URL}/api/v1/users/login`,
+         `${conf.BACKEND_URL}/api/v1/users/login`,
          data, {withCredentials: true}
       );
 

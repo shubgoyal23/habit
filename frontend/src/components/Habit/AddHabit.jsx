@@ -18,6 +18,7 @@ import axios from "axios";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addHabit, editHabit } from "@/store/HabitSlice";
+import { conf } from "@/conf/conf";
 
 export default function AddHabit() {
    const user = useSelector((state) => state.auth.loggedin);
@@ -73,7 +74,7 @@ export default function AddHabit() {
    const onSubmit = (data) => {
       if (id === "new") {
          const addHAbit = axios.post(
-            `${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/habit`,
+            `${conf.BACKEND_URL}/api/v1/steak/habit`,
             data,
             { withCredentials: true }
          );
@@ -92,7 +93,7 @@ export default function AddHabit() {
             .catch((err) => console.log(err));
       } else {
          const addHAbit = axios.patch(
-            `${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/habit`,
+            `${conf.BACKEND_URL}/api/v1/steak/habit`,
             { id: id, ...data },
             { withCredentials: true }
          );

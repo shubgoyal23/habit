@@ -12,13 +12,14 @@ import {
    DialogHeader,
    DialogTitle,
 } from "@/components/ui/dialog";
+import { conf } from "@/conf/conf";
 
 function EditSteak({ edit, data, open }) {
    const [marked, setmarked] = useState(data.mark);
    const dispatch = useDispatch();
    const handleMarked = () => {
       const request = axios.post(
-         `${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/${
+         `${conf.BACKEND_URL}/api/v1/steak/${
             marked ? "remove" : "add"
          }`,
          { id: data._id, date: data.date },
