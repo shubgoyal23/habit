@@ -15,6 +15,7 @@ import {
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import toast from "react-hot-toast";
+import { conf } from "@/conf/conf";
 
 function Action({ row }) {
    const dispatch = useDispatch();
@@ -24,7 +25,7 @@ function Action({ row }) {
    const deleteHabitHandler = async (id) => {
       axios
          .post(
-            `${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/habit-d`,
+            `${conf.BACKEND_URL}/api/v1/steak/habit-d`,
             { id },
             {
                withCredentials: true,
@@ -45,7 +46,7 @@ function Action({ row }) {
          name: `${habit.name}-copy`,
       };
       const addHAbit = axios.post(
-         `${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/habit`,
+         `${conf.BACKEND_URL}/api/v1/steak/habit`,
          data,
          { withCredentials: true }
       );

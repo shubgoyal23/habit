@@ -26,6 +26,7 @@ import Action from "./Action";
 import { ChevronsUpDown } from "lucide-react";
 import RowSelector from "./RowSelector";
 import FilterInput from "./FilterInput";
+import { conf } from "@/conf/conf";
 
 const columns = [
    {
@@ -129,7 +130,7 @@ function Habit() {
          navigate("/login")
       }
       axios
-         .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/steak/habit`, {
+         .get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
             withCredentials: true,
          })
          .then((data) => {

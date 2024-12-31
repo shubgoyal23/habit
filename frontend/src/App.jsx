@@ -15,6 +15,7 @@ import {
 } from "./components/index";
 import ErrorPage from "./components/Error/ErrorHandler";
 import Loader from "./components/Loading/Loading";
+import { conf } from "./conf/conf";
 const router = createBrowserRouter([
    {
       path: "/",
@@ -58,7 +59,7 @@ export default function App() {
    const [loading, setLoading] = useState(true);
    const checkUser = async () => {
       axios
-         .get(`${import.meta.env.VITE_BACKEND_URL}/api/v1/users/current`, {
+         .get(`${conf.BACKEND_URL}/api/v1/users/current`, {
             withCredentials: true,
          })
          .then((data) => {
@@ -69,7 +70,7 @@ export default function App() {
             axios
                .get(
                   `${
-                     import.meta.env.VITE_BACKEND_URL
+                     conf.BACKEND_URL
                   }/api/v1/users/renew-token`,
                   {
                      withCredentials: true,

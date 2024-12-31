@@ -16,6 +16,7 @@ import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { conf } from "@/conf/conf";
 
 export default function Register() {
    const [showPass, setShowPass] = useState(false);
@@ -29,7 +30,7 @@ export default function Register() {
 
    const onSubmit = (data) => {
       const register = axios.post(
-         `${import.meta.env.VITE_BACKEND_URL}/api/v1/users/register`,
+         `${conf.BACKEND_URL}/api/v1/users/register`,
          data, {withCredentials: true}
       );
 
