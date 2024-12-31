@@ -10,17 +10,18 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login as authlogin } from "../../store/AuthSlice";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
    const [showPass, setShowPass] = useState(false);
+   const isloggedin = useSelector((state) => state.auth.loggedin);
    const dispatch = useDispatch();
    const navigate = useNavigate();
    const {
@@ -28,6 +29,12 @@ export default function Login() {
       handleSubmit,
       formState: { errors },
    } = useForm();
+
+   useEffect(() => {
+      if (isloggedin) {
+         navigate("/habit");
+      }
+   }, [isloggedin]);
 
    const onSubmit = (data) => {
       const login = axios.post(
