@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
    CardTitle,
@@ -28,17 +28,25 @@ export default function AddHabit() {
    const userData = useSelector((state) => state.habit) || [];
    const { register, handleSubmit, watch, setValue } = useForm();
 
-   const [sTime, eTime] = watch(["startTime", "endTime"]);
+   const [sTime, eTime, dur] = watch(["startTime", "endTime", "duration"]);
+   const [timeEdit, setTimeEdit] = useState("");
    useEffect(() => {
-      if (sTime && eTime) {
+      if (sTime && eTime && timeEdit == "end") {
          const start = sTime.split(":");
          const end = eTime.split(":");
-         const startDate = new Date(0, 0, 0, start[0], start[1], 0);
-         const endDate = new Date(0, 0, 0, end[0], end[1], 0);
+         const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
+         const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
          const diff = endDate.getTime() - startDate.getTime();
          setValue("duration", diff / 60000);
       }
-   }, [sTime, eTime]);
+      if (sTime && dur && timeEdit == "dur") {
+         const start = sTime.split(":");
+         const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
+         const endDate = startDate.getTime() + dur * 60000;
+         const end = new Date(endDate);
+         setValue("endTime", `${end.getHours()}:${end.getMinutes()}`);
+      }
+   }, [timeEdit]);
 
    useEffect(() => {
       if (id && id !== "new") {
@@ -175,15 +183,17 @@ export default function AddHabit() {
                            placeholder="1:00 PM"
                            type="time"
                            {...register("endTime")}
+                           onChange={() => setTimeEdit("end")}
                         />
                      </div>
                      <div>
                         <Label htmlFor="time">Duration</Label>
                         <Input
                            id="time"
-                           placeholder="1 hr"
-                           type="text"
+                           placeholder="60 min"
+                           type="number"
                            {...register("duration")}
+                           onChange={() => setTimeEdit("dur")}
                         />
                      </div>
                   </div>

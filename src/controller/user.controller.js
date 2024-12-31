@@ -42,7 +42,7 @@ const registeruser = asyncHandler(async (req, res) => {
    });
 
    const checkUserRegistered = await User.findOne({ email })?.select(
-      "-password"
+      "_id firstName lastName"
    );
 
    if (!checkUserRegistered) {
@@ -84,16 +84,18 @@ const loginUser = asyncHandler(async (req, res) => {
    const options = {
       httpOnly: true,
       secure: true,
-      maxAge: 864000000
+      maxAge: 864000000,
    };
 
-   finduser.password = "";
+  let user = finduser.select("_id firstName lastName")
+  user.refreshToken = refreshToken
+  user.accessToken = accessToken
 
    return res
       .status(200)
       .cookie("accessToken", accessToken, options)
       .cookie("refreshToken", refreshToken, options)
-      .json(new ApiResponse(200, finduser, "User Logged in successfully"));
+      .json(new ApiResponse(200, user, "User Logged in successfully"));
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
@@ -141,7 +143,7 @@ const refreshToken = asyncHandler(async (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
    );
 
-   const user = await User.findById(decodedToken._id)?.select("-password");
+   const user = await User.findById(decodedToken._id)?.select("_id firstName lastName refreshToken");
 
    if (!user && !(user.refreshToken === token)) {
       throw new ApiError(401, "User not found");
@@ -150,11 +152,12 @@ const refreshToken = asyncHandler(async (req, res) => {
    const { refreshToken, accessToken } =
       await generateAccessTokenAndRefresToken(user._id);
 
+   user.accessToken = accessToken;
    user.refreshToken = refreshToken;
    const options = {
       httpOnly: true,
       secure: true,
-      maxAge: 864000000
+      maxAge: 864000000,
    };
 
    return res
@@ -256,5 +259,5 @@ export {
    editUserDetails,
    editUserPassword,
    forgetPassword,
-   refreshToken
+   refreshToken,
 };
