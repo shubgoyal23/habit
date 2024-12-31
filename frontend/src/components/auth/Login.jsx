@@ -38,15 +38,15 @@ export default function Login() {
    }, [isloggedin]);
 
    const onSubmit = (data) => {
-      const login = axios.post(
-         `${conf.BACKEND_URL}/api/v1/users/login`,
-         data, {withCredentials: true}
-      );
+      const login = axios.post(`${conf.BACKEND_URL}/api/v1/users/login`, data, {
+         withCredentials: true,
+      });
 
       toast.promise(login, {
          loading: "Loading",
          success: "Login successfull",
-         error: (err) => `${err.response?.data?.message || "Something went wrong"}`,
+         error: (err) =>
+            `${err.response?.data?.message || "Something went wrong"}`,
       });
       login
          .then((data) => {

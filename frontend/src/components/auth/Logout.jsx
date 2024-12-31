@@ -11,10 +11,9 @@ function Logout() {
    const dispatch = useDispatch();
    const navigate = useNavigate();
    useEffect(() => {
-      const logout = axios.get(
-         `${conf.BACKEND_URL}/api/v1/users/logout`,
-         { withCredentials: true }
-      );
+      const logout = axios.get(`${conf.BACKEND_URL}/api/v1/users/logout`, {
+         withCredentials: true,
+      });
 
       toast.promise(logout, {
          loading: "Loading",
@@ -26,9 +25,9 @@ function Logout() {
          .then(() => {
             dispatch(authlogout());
             dispatch(addListHabits([]));
-            navigate("/");
          })
-         .catch((err) => console.log(err));
+         .catch((err) => console.log(err))
+         .finally(() => navigate("/"));
    }, []);
    return <div>LoggingOut...</div>;
 }
