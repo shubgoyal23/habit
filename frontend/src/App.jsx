@@ -16,6 +16,10 @@ import {
 import ErrorPage from "./components/Error/ErrorHandler";
 import Loader from "./components/Loading/Loading";
 import { conf } from "./conf/conf";
+
+import Privacy from "./components/etc/Privacy";
+import DeleteAccount from "./components/etc/DeleteAccount";
+
 const router = createBrowserRouter([
    {
       path: "/",
@@ -49,6 +53,14 @@ const router = createBrowserRouter([
          {
             path: "/steak",
             element: <SteakList />,
+         },
+         {
+            path: "/privacy-policy",
+            element: <Privacy />,
+         },
+         {
+            path: "/close-account",
+            element: <DeleteAccount />,
          },
       ],
    },

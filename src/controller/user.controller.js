@@ -1,3 +1,4 @@
+import { Streak } from "../models/streak.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResposne.js";
@@ -273,6 +274,31 @@ const setFcmToken = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, {}, "fcmToken updated successfully"));
 });
 
+const DeleteUser = asyncHandler(async (req, res) => {
+  let { email, password, confirm } = req.body;
+
+   if (!email || !password || !confirm) {
+      throw new ApiError(401, "All fields are required");
+   }
+
+   if (email !== req.user.email) {
+      throw new ApiError(403, "unauthorized user, Check email id and password");
+   }
+   const user = await User.findOne({ email });
+
+   if (!user) {
+      throw new ApiError(401, "User not found");
+   }
+   if (!user.checkPassword(password)) {
+      throw new ApiError(403, "unauthorized user, Check email id and password");
+   }
+   await User.findByIdAndDelete(user._id);
+   await Streak.deleteMany({ userId: id });
+   return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "User deleted successfully"));
+});
+
 export {
    registeruser,
    loginUser,
@@ -283,4 +309,5 @@ export {
    forgetPassword,
    refreshToken,
    setFcmToken,
+   DeleteUser,
 };

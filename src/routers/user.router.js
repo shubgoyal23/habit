@@ -9,6 +9,7 @@ import {
    forgetPassword,
    refreshToken,
    setFcmToken,
+   DeleteUser,
 } from "../controller/user.controller.js";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 
@@ -25,5 +26,6 @@ router.route("/current").get(verifyJwt, currentUser);
 router.route("/details").post(verifyJwt, editUserDetails);
 router.route("/password").post(verifyJwt, editUserPassword);
 router.route("/fcm-token").post(verifyJwt, setFcmToken);
+router.route("/close-account").post(verifyJwt, DeleteUser);
 
 export default router;
