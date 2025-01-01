@@ -4,12 +4,12 @@ import "./style.css";
 import { useSelector } from "react-redux";
 function Home() {
    const loggedin = useSelector((state) => state.auth.loggedin);
-      const navigate = useNavigate();
-   
+   const navigate = useNavigate();
+
    useEffect(() => {
       if (!loggedin) {
          navigate("/login");
-      }else{
+      } else {
          navigate("/habit/new");
       }
    }, []);
