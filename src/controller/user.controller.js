@@ -87,12 +87,12 @@ const loginUser = asyncHandler(async (req, res) => {
       maxAge: 864000000,
    };
 
-  let user = {}
-  user._id = finduser._id
-  user.firstName = finduser.firstName
-  user.lastName = finduser.lastName
-  user.refreshToken = refreshToken
-  user.accessToken = accessToken
+   let user = {};
+   user._id = finduser._id;
+   user.firstName = finduser.firstName;
+   user.lastName = finduser.lastName;
+   user.refreshToken = refreshToken;
+   user.accessToken = accessToken;
 
    return res
       .status(200)
@@ -130,9 +130,14 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const currentUser = asyncHandler(async (req, res) => {
+   let user = {
+      _id: req.user._id,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+   };
    return res
       .status(200)
-      .json(new ApiResponse(200, req.user, "User fetched successfully"));
+      .json(new ApiResponse(200, user, "User fetched successfully"));
 });
 
 const refreshToken = asyncHandler(async (req, res) => {
@@ -146,7 +151,9 @@ const refreshToken = asyncHandler(async (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
    );
 
-   const user = await User.findById(decodedToken._id)?.select("_id firstName lastName refreshToken");
+   const user = await User.findById(decodedToken._id)?.select(
+      "_id firstName lastName refreshToken"
+   );
 
    if (!user && !(user.refreshToken === token)) {
       throw new ApiError(401, "User not found");
@@ -254,6 +261,18 @@ const forgetPassword = asyncHandler(async (req, res) => {
       );
 });
 
+const setFcmToken = asyncHandler(async (req, res) => {
+   const { fcmToken } = req.body;
+   if (!fcmToken) {
+      throw new ApiError(401, "fcmToken is required");
+   }
+   const id = req.user._id;
+   await User.findByIdAndUpdate(id, { fcmToken });
+   return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "fcmToken updated successfully"));
+});
+
 export {
    registeruser,
    loginUser,
@@ -263,4 +282,5 @@ export {
    editUserPassword,
    forgetPassword,
    refreshToken,
+   setFcmToken,
 };
