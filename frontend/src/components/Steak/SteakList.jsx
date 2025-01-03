@@ -153,7 +153,7 @@ function Steak() {
          <h1 className="text-center text-xl font-semibold my-3 text-blue-500 underline underline-offset-2">
             Habits Streak
          </h1>
-         <div className="flex justify-between text-xl font-bold items-center gap-2 mb-6 w-fit bg-gray-50 m-auto px-5 h-10 rounded-lg">
+         <div className="flex justify-between text-xl font-bold items-center gap-2 mb-6 w-fit bg-gray-50 dark:bg-gray-800 m-auto px-5 h-10 rounded-lg">
             <button onClick={() => changeMonth(-1)} className="size-6">
                <img src="./arrowL.svg" alt="arrow left" />
             </button>
@@ -168,7 +168,7 @@ function Steak() {
                   ? "Add habit to see here"
                   : "A list of your Daily Habits."}
             </TableCaption>
-            <TableHeader className="bg-violet-50">
+            <TableHeader className="bg-violet-50 dark:bg-gray-950">
                <TableRow>
                   <TableHead className="w-[100px]">Day/ Habit</TableHead>
                   {habitList.map((item) => (

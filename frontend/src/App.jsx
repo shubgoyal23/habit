@@ -107,7 +107,7 @@ export default function App() {
    return loading ? (
       <Loader />
    ) : (
-      <div className="">
+      <div className="text-black dark:text-white">
          <RouterProvider router={router}>
             <Layout />
          </RouterProvider>
