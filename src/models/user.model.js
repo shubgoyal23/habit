@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
          required: true,
          validate: {
             validator: function (v) {
-               return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+               return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/.test(
                   v
                );
             },
