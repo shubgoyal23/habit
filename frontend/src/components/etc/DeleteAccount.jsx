@@ -9,13 +9,19 @@ import {
 } from "../ui/card";
 import { useForm } from "react-hook-form";
 import { Button } from "../ui/button";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import { Input } from "../ui/input";
 import { Checkbox } from "../ui/checkbox";
 import { Label } from "../ui/label";
+import axios from "axios";
+import { conf } from "@/conf/conf";
+import { useDispatch } from "react-redux";
+import { logout } from "@/store/AuthSlice";
+import toast from "react-hot-toast";
 
 function DeleteAccount() {
    const [showPass, setShowPass] = useState(false);
+   const dispatch = useDispatch();
    const {
       register,
       handleSubmit,
@@ -38,7 +44,8 @@ function DeleteAccount() {
             `${err.response?.data?.message || "Something went wrong"}`,
       });
       DeleteAccount.then((data) => {
-         navigate("/login");
+         Navigate("/login");
+         dispatch(logout());
       }).catch((err) => console.log(err));
    };
 

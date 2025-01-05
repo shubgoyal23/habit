@@ -7,23 +7,41 @@ import connectDb from "./db/connectDb.js";
 dotenv.config();
 
 const app = express();
-app.use(cors({origin: process.env.CORS_ORIGIN.split(";"), credentials: true}));
+app.use(
+   cors({ origin: process.env.CORS_ORIGIN.split(";"), credentials: true })
+);
 app.use(cookieParser());
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 import userRouter from "./routers/user.router.js";
 import steakRouter from "./routers/steak.router.js";
+import { ConnectRedis } from "./db/redis.js";
+import { ApiResponse } from "./utils/ApiResposne.js";
 
 app.get("/ping", (req, res) => {
    res.send("pong");
-})
+});
 
 app.use((req, res, next) => {
-   connectDb().then(() => next()).catch((error) => console.log(error));
-})
+   connectDb()
+      .then(() => next())
+      .catch((error) => console.log(error));
+});
 app.use("/api/v1/users", userRouter);
-app.use("/api/v1/steak", steakRouter);
+app.use(
+   "/api/v1/steak",
+   async (req, res, next) => {
+      ConnectRedis()
+         .then(() => next())
+         .catch(() =>
+            res
+               .status(500)
+               .json(new ApiResponse(500, {}, "Internal Server Error"))
+         );
+   },
+   steakRouter
+);
 
 app.use((err, req, res, next) => {
    if (err instanceof ApiError) {

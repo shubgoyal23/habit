@@ -1,3 +1,4 @@
+import { ConnectRedis, Redisclient } from "../db/redis.js";
 import { Streak } from "../models/streak.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
@@ -275,25 +276,35 @@ const setFcmToken = asyncHandler(async (req, res) => {
 });
 
 const DeleteUser = asyncHandler(async (req, res) => {
-  let { email, password, confirm } = req.body;
+   let { email, password, confirm } = req.body;
 
    if (!email || !password || !confirm) {
       throw new ApiError(401, "All fields are required");
    }
 
-   if (email !== req.user.email) {
-      throw new ApiError(403, "unauthorized user, Check email id and password");
-   }
    const user = await User.findOne({ email });
 
    if (!user) {
       throw new ApiError(401, "User not found");
    }
+
+   if (user.email != req.user.email) {
+      throw new ApiError(403, "unauthorized user, Check email id and password");
+   }
    if (!user.checkPassword(password)) {
       throw new ApiError(403, "unauthorized user, Check email id and password");
    }
    await User.findByIdAndDelete(user._id);
-   await Streak.deleteMany({ userId: id });
+   let ids = await Streak.find({ userId: user._id }).select("_id");
+   await Streak.deleteMany({ userId: user._id });
+   
+   // remove from redis too
+   let rmids = [];
+   await ConnectRedis();
+   for (let i = 0; i < ids.length; i++) {
+      rmids.push(ids[i]._id.toString());
+   }
+   await Redisclient.SREM("habitList", rmids);
    return res
       .status(200)
       .json(new ApiResponse(200, {}, "User deleted successfully"));

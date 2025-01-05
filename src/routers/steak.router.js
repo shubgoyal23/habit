@@ -1,7 +1,14 @@
 import { Router } from "express";
 
 import { verifyJwt } from "../middleware/auth.middleware.js";
-import { addSteak, addHabit, DeleteHabit, editHabit, listHabit, removeSteak } from "../controller/taks.controller.js";
+import {
+   addSteak,
+   addHabit,
+   DeleteHabit,
+   editHabit,
+   listHabit,
+   removeSteak,
+} from "../controller/taks.controller.js";
 
 const router = Router();
 
