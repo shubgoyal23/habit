@@ -44,7 +44,15 @@ export default function AddHabit() {
       if (sTime && timeEdit?.type == "duration") {
          const dur = timeEdit?.val * 60000;
          const end = new Date(startDate.getTime() + dur);
-         setValue("endTime", `${end.getHours()}:${end.getMinutes()}`);
+         let h = end.getHours();
+         let m = end.getMinutes();
+         if (h < 10) {
+            h = "0" + h;
+         }
+         if (m < 10) {
+            m = "0" + m;
+         }
+         setValue("endTime", `${h}:${m}`);
       }
    }, [timeEdit]);
 
@@ -183,7 +191,12 @@ export default function AddHabit() {
                            placeholder="1:00 PM"
                            type="time"
                            {...register("endTime")}
-                           onChange={(e) => setTimeEdit({ type: "endTime" , val: e.target.value })}
+                           onChange={(e) =>
+                              setTimeEdit({
+                                 type: "endTime",
+                                 val: e.target.value,
+                              })
+                           }
                         />
                      </div>
                      <div>
@@ -193,7 +206,12 @@ export default function AddHabit() {
                            placeholder="60 min"
                            type="number"
                            {...register("duration")}
-                           onChange={(e) => setTimeEdit({ type: "duration", val: e.target.value })}
+                           onChange={(e) =>
+                              setTimeEdit({
+                                 type: "duration",
+                                 val: e.target.value,
+                              })
+                           }
                         />
                      </div>
                   </div>
