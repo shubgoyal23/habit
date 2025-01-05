@@ -2,7 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResposne.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Streak } from "../models/streak.model.js";
-import {Redisclient as RedisConn} from "../db/redis.js";
+import { Redisclient as RedisConn } from "../db/redis.js";
 
 const GetTimeFormated = (data) => {
    let startTime = Number(data?.replace(":", ""));
@@ -51,8 +51,14 @@ const addHabit = asyncHandler(async (req, res) => {
    if (!add) {
       throw new ApiError(401, "Habit Creation Failed, try again later");
    }
-   await RedisConn.sAdd("habitList", add._id.toString());
-   await RedisConn.sAdd(`habitTime:${hours}:${minutes}`, add._id.toString());
+   await RedisConn.sAdd(
+      "habitList",
+      `${add._id.toString()}:${req.user._id.toString()}`
+   );
+   await RedisConn.sAdd(
+      `habitTime:${hours}:${minutes}`,
+      `${add._id.toString()}:${req.user._id.toString()}`
+   );
 
    return res
       .status(200)
@@ -98,11 +104,11 @@ const editHabit = asyncHandler(async (req, res) => {
       } = GetTimeFormated(habit?.startTime);
       await RedisConn.SREM(
          `habitTime:${oldHours}:${oldMinutes}`,
-         habit._id.toString()
+         `${habit._id.toString()}:${req.user._id.toString()}`
       );
       await RedisConn.sAdd(
          `habitTime:${hours}:${minutes}`,
-         habit._id.toString()
+         `${habit._id.toString()}:${req.user._id.toString()}`
       );
    }
 
@@ -124,8 +130,14 @@ const DeleteHabit = asyncHandler(async (req, res) => {
    }
    let { startTime, hours, minutes } = GetTimeFormated(del?.startTime);
 
-   await RedisConn.SREM(`habitTime:${hours}:${minutes}`, del._id.toString());
-   await RedisConn.SREM("habitList", del._id.toString());
+   await RedisConn.SREM(
+      `habitTime:${hours}:${minutes}`,
+      `${del._id.toString()}:${req.user._id.toString()}`
+   );
+   await RedisConn.SREM(
+      "habitList",
+      `${del._id.toString()}:${req.user._id.toString()}`
+   );
 
    return res
       .status(200)
@@ -167,10 +179,10 @@ const addSteak = asyncHandler(async (req, res) => {
    }
    habit.daysCompleted.push(date);
    await habit.save();
-   
+
    await RedisConn.SADD(
       `habitDate:${date.getFullYear()}:${date.getMonth()}:${date.getDate()}`,
-      habit._id.toString()
+      `${habit._id.toString()}:${req.user._id.toString()}`
    );
 
    return res
@@ -212,7 +224,7 @@ const removeSteak = asyncHandler(async (req, res) => {
    await habit.save();
    await RedisConn.SREM(
       `habitDate:${date.getFullYear()}:${date.getMonth()}:${date.getDate()}`,
-      habit._id.toString()
+      `${habit._id.toString()}:${req.user._id.toString()}`
    );
 
    return res
