@@ -302,7 +302,7 @@ const DeleteUser = asyncHandler(async (req, res) => {
    let rmids = [];
    await ConnectRedis();
    for (let i = 0; i < ids.length; i++) {
-      rmids.push(ids[i]._id.toString());
+      rmids.push(`${ids[i]._id.toString()}:${user._id.toString()}`);
    }
    await Redisclient.SREM("habitList", rmids);
    return res
