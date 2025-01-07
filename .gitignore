@@ -24,3 +24,5 @@ android
 *.sln
 *.sw?
 .env
+
+serviceAccountKey.json
