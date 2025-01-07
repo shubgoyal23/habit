@@ -10,6 +10,7 @@ import {
    refreshToken,
    setFcmToken,
    DeleteUser,
+   VerifyOtp,
 } from "../controller/user.controller.js";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 
@@ -17,6 +18,7 @@ const router = Router();
 
 router.route("/register").post(registeruser);
 router.route("/login").post(loginUser);
+router.route("/verify").post(VerifyOtp);
 router.route("/forgot-password").post(forgetPassword);
 router.route("/renew-token").get(refreshToken);
 

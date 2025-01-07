@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { CiBrightnessDown as Moon, CiBrightnessUp as Sun } from "react-icons/ci";
 
 function Theme() {
    const [mode, setMode] = useState("");

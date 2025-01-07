@@ -19,6 +19,7 @@ import { conf } from "./conf/conf";
 
 import Privacy from "./components/etc/Privacy";
 import DeleteAccount from "./components/etc/DeleteAccount";
+import { OTPPage } from "./components/auth/Otp";
 
 const router = createBrowserRouter([
    {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
          {
             path: "/register",
             element: <Register />,
+         },
+         {
+            path: "/verify",
+            element: <OTPPage />,
          },
          {
             path: "/habit",
@@ -74,8 +79,8 @@ export default function App() {
          .get(`${conf.BACKEND_URL}/api/v1/users/current`, {
             withCredentials: true,
             headers: {
-               "accessToken": localStorage.getItem("accessToken"),
-            }
+               accessToken: localStorage.getItem("accessToken"),
+            },
          })
          .then((data) => {
             dispatch(authlogin(data?.data?.data));
@@ -83,17 +88,12 @@ export default function App() {
          })
          .catch((err) =>
             axios
-               .get(
-                  `${
-                     conf.BACKEND_URL
-                  }/api/v1/users/renew-token`,
-                  {
-                     withCredentials: true,
-                     headers: {
-                        "refreshToken": localStorage.getItem("refreshToken"),
-                     }
-                  }
-               )
+               .get(`${conf.BACKEND_URL}/api/v1/users/renew-token`, {
+                  withCredentials: true,
+                  headers: {
+                     refreshToken: localStorage.getItem("refreshToken"),
+                  },
+               })
                .then((data) => {
                   dispatch(authlogin(data?.data?.data));
                   setLoading(false);
@@ -107,10 +107,8 @@ export default function App() {
    return loading ? (
       <Loader />
    ) : (
-      <div className="text-black dark:text-white">
-         <RouterProvider router={router}>
-            <Layout />
-         </RouterProvider>
-      </div>
+      <RouterProvider router={router}>
+         <Layout />
+      </RouterProvider>
    );
 }

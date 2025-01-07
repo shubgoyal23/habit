@@ -23,10 +23,11 @@ import { useNavigate } from "react-router-dom";
 import { addListHabits } from "@/store/HabitSlice";
 import MarkSteak from "./MarkSteak";
 import Action from "./Action";
-import { ChevronsUpDown } from "lucide-react";
+import { LuChevronsUpDown } from "react-icons/lu";
 import RowSelector from "./RowSelector";
 import FilterInput from "./FilterInput";
 import { conf } from "@/conf/conf";
+import toast from "react-hot-toast";
 
 const columns = [
    {
@@ -54,18 +55,18 @@ const columns = [
    },
    {
       accessorKey: "endTime",
-      header: "End Yime",
+      header: "End Time",
       cell: (prop) => <p>{prop.getValue()}</p>,
    },
    {
       accessorKey: "duration",
       header: "Duration",
       cell: (prop) => {
-         const value = prop.getValue()
-         if(value >= 60){
-            return <p>{`${value/60} hrs`}</p>
-         }else{
-            return <p>{`${value} mins`}</p>
+         const value = prop.getValue();
+         if (value >= 60) {
+            return <p>{`${value / 60} hrs`}</p>;
+         } else {
+            return <p>{`${value} mins`}</p>;
          }
       },
    },
@@ -126,13 +127,32 @@ function Habit() {
    });
 
    useEffect(() => {
-      if(!user){
-         navigate("/login")
+      if (!user) {
+         navigate("/login");
+      } else {
+         let columns = table.getAllColumns();
+         for (let column of columns) {
+            let id = column.id;
+            if (
+               id == "description" ||
+               id == "place" ||
+               id == "how" ||
+               id == "ifthen"
+            ) {
+               column.toggleVisibility(false);
+            }
+         }
       }
-      axios
-         .get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
-            withCredentials: true,
-         })
+      let request = axios.get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
+         withCredentials: true,
+      });
+      toast.promise(request, {
+         loading: "Loading Habit List",
+         success: "successfull",
+         error: (err) =>
+            `${err.response?.data?.message || "Something went wrong"}`,
+      });
+      request
          .then((data) => {
             dispatch(addListHabits(data?.data?.data));
          })
@@ -149,8 +169,8 @@ function Habit() {
             Habit List
          </h1>
          <div className="flex justify-between items-center">
-         <FilterInput table={table}/>
-         <RowSelector table={table} />
+            <FilterInput table={table} />
+            <RowSelector table={table} />
          </div>
          <Table className="md:p-6 text-center border border-gray-200 rounded-md">
             <TableCaption>
@@ -180,7 +200,7 @@ function Habit() {
                                          header.getContext()
                                       )}
                                  {header.column.getCanSort() && (
-                                    <ChevronsUpDown className="h-4 w-4" />
+                                    <LuChevronsUpDown className="h-4 w-4" />
                                  )}
                               </span>
                            </TableHead>
