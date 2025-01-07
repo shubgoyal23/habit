@@ -57,7 +57,7 @@ export default function Login() {
    };
 
    return (
-      <div className="w-full flex justify-center items-start my-10">
+      <div className="w-full flex justify-center items-center my-10">
          <Card className="mx-auto max-w-sm">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Login</CardTitle>
@@ -85,7 +85,7 @@ export default function Login() {
                         type={showPass ? "text" : "password"}
                         {...register("password")}
                      />
-                     <div className="flex items-center space-x-2">
+                     <div className="flex items-center space-x-2 pt-1">
                         <Checkbox
                            id="showpassword"
                            onClick={() => setShowPass((prev) => !prev)}
@@ -98,11 +98,13 @@ export default function Login() {
                         </label>
                      </div>
                   </div>
-                  <Button className="w-full" type="submit">
-                     Login
-                  </Button>
+                  <div className="w-full pt-4">
+                     <Button className="w-full" type="submit">
+                        Login 
+                     </Button>
+                  </div>
                </form>
-               <CardFooter className="pt-3 justify-center">
+               <CardFooter className="pt-4 justify-center">
                   Don't have Account?
                   <Link className="text-blue-500 ml-1" to={"/register"}>
                      Create One

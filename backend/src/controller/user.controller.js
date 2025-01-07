@@ -5,6 +5,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResposne.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
+import { SendOtp } from "../utils/Email.js";
 
 const generateAccessTokenAndRefresToken = async (id) => {
    try {
@@ -22,7 +23,7 @@ const generateAccessTokenAndRefresToken = async (id) => {
    }
 };
 const registeruser = asyncHandler(async (req, res) => {
-   const { firstName, lastName, email, password } = req.body;
+   const { firstName, lastName, email, password, timeZone } = req.body;
 
    if (!firstName || !email || !password) {
       throw new ApiError(
@@ -36,12 +37,23 @@ const registeruser = asyncHandler(async (req, res) => {
       throw new ApiError(403, "User with same Email id is already registered");
    }
 
+   const otpcheck = await SendOtp(email, firstName);
+   if (!otpcheck) {
+      throw new ApiError(500, "user registration failed");
+   }
    const user = await User.create({
       email,
       password,
       firstName,
       lastName,
+      timeZone,
+      isActive: false,
    });
+   await Redisclient.set(
+      `OTP:${user._id.toString()}`,
+      JSON.stringify({ email, otp: otpcheck, attempt: 3 })
+   );
+   Redisclient.expire(`OTP:${user._id.toString()}`, 300);
 
    const checkUserRegistered = await User.findOne({ email })?.select(
       "_id firstName lastName"
@@ -62,6 +74,39 @@ const registeruser = asyncHandler(async (req, res) => {
       );
 });
 
+const VerifyOtp = asyncHandler(async (req, res) => {
+   const { id, otp } = req.body;
+   if (!id || !otp) {
+      throw new ApiError(403, "unauthorise request");
+   }
+
+   const data = await Redisclient.get(`OTP:${id}`);
+   if (!data) {
+      throw new ApiError(400, "OTP expired");
+   }
+
+   const { email, attempt, otp: otpcheck } = JSON.parse(data);
+   if (attempt <= 0) {
+      throw new ApiError(400, "OTP expired");
+   }
+   if (otpcheck != otp) {
+      throw new ApiError(403, "Wrong OTP");
+   }
+   const finduser = await User.findOneAndUpdate({ email }, { isActive: true });
+   if (!finduser) {
+      throw new ApiError(403, "User not found, check Email id or register one");
+   }
+   if (finduser._id.toString() != id) {
+      await User.findOneAndUpdate({ email }, { isActive: false });
+      throw new ApiError(403, "User not found, check Email id or register one");
+   }
+
+   await Redisclient.del(`OTP:${id}`);
+
+   return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Verification successfully"));
+});
 const loginUser = asyncHandler(async (req, res) => {
    const { email, password } = req.body;
 
@@ -69,7 +114,7 @@ const loginUser = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Email, and Password is required to Login");
    }
 
-   const finduser = await User.findOne({ email });
+   const finduser = await User.findOne({ email, isActive: true });
    if (!finduser) {
       throw new ApiError(403, "User not found, check Email id or register one");
    }
@@ -297,7 +342,7 @@ const DeleteUser = asyncHandler(async (req, res) => {
    await User.findByIdAndDelete(user._id);
    let ids = await Streak.find({ userId: user._id }).select("_id");
    await Streak.deleteMany({ userId: user._id });
-   
+
    // remove from redis too
    let rmids = [];
    await ConnectRedis();
@@ -321,4 +366,5 @@ export {
    refreshToken,
    setFcmToken,
    DeleteUser,
+   VerifyOtp,
 };

@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -29,18 +29,21 @@ export default function Register() {
    } = useForm();
 
    const onSubmit = (data) => {
+      data.timeZone = new Date().getTimezoneOffset();
       const register = axios.post(
          `${conf.BACKEND_URL}/api/v1/users/register`,
-         data, {withCredentials: true}
+         data,
+         { withCredentials: true }
       );
 
       toast.promise(register, {
          loading: "Loading",
-         success: "Registration successfull",
-         error: (err) => `${err.response?.data?.message || "Something went wrong"}`,
+         success: "OTP Sent to Email ID",
+         error: (err) =>
+            `${err.response?.data?.message || "Something went wrong"}`,
       });
       register
-         .then((data) => navigate("/login"))
+         .then((data) => navigate(`/verify?id=${data.data.data._id}`))
          .catch((err) => console.log(err));
    };
 
@@ -95,7 +98,7 @@ export default function Register() {
                         type={showPass ? "text" : "password"}
                         {...register("password")}
                      />
-                     <div className="flex items-center space-x-2">
+                     <div className="flex items-center space-x-2 pt-1">
                         <Checkbox
                            id="showpassword"
                            onClick={() => setShowPass((prev) => !prev)}
@@ -108,12 +111,14 @@ export default function Register() {
                         </label>
                      </div>
                   </div>
-                  <Button className="w-full" type="submit">
-                     Create Account
-                  </Button>
+                  <div className="w-full pt-4">
+                     <Button className="w-full" type="submit">
+                        Create Account
+                     </Button>
+                  </div>
                </form>
 
-               <CardFooter className="pt-3 justify-center">
+               <CardFooter className="pt-4 justify-center">
                   Already have Account?
                   <Link className="text-blue-500 ml-1" to={"/login"}>
                      Login

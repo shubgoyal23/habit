@@ -26,22 +26,19 @@ app.get("/ping", (req, res) => {
 app.use((req, res, next) => {
    connectDb()
       .then(() => next())
-      .catch((error) => console.log(error));
+      .catch(() =>
+         res.status(500).json(new ApiResponse(500, {}, "Internal Server Error"))
+      );
+});
+app.use((req, res, next) => {
+   ConnectRedis()
+      .then(() => next())
+      .catch(() =>
+         res.status(500).json(new ApiResponse(500, {}, "Internal Server Error"))
+      );
 });
 app.use("/api/v1/users", userRouter);
-app.use(
-   "/api/v1/steak",
-   async (req, res, next) => {
-      ConnectRedis()
-         .then(() => next())
-         .catch(() =>
-            res
-               .status(500)
-               .json(new ApiResponse(500, {}, "Internal Server Error"))
-         );
-   },
-   steakRouter
-);
+app.use("/api/v1/steak", steakRouter);
 
 app.use((err, req, res, next) => {
    if (err instanceof ApiError) {
