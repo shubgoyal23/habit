@@ -14,12 +14,13 @@ import { conf } from "@/conf/conf";
 export function OTPPage() {
    const [searchParams] = useSearchParams();
    const id = searchParams.get("id");
+   const type = searchParams.get("type");
    const [otpVal, setotpVal] = useState();
    const HandelOtp = (value) => {
       setotpVal(value);
       let o = Number(value);
       if (o && o > 99999) {
-         let data = { otp: o, id };
+         let data = { otp: o, id, type };
          const checkOtp = axios.post(
             `${conf.BACKEND_URL}/api/v1/users/verify`,
             data,
