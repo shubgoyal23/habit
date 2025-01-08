@@ -105,10 +105,10 @@ export default function Login() {
                   </div>
                </form>
                <CardFooter className="p-0 pt-1 justify-between">
-                  <Link className="text-gray-500 hover:text-blue-500 ml-1" to={"/reset?id=1abvm"}>
+                  <Link className="text-gray-500 hover:text-blue-500 ml-1" to={"/reset?id=verify-email"}>
                      Verify Email
                   </Link>
-                  <Link className="text-gray-500 hover:text-blue-500 ml-1" to={"/reset?id=2abfp"}>
+                  <Link className="text-gray-500 hover:text-blue-500 ml-1" to={"/reset?id=forgot-password"}>
                      Forget Password
                   </Link>
                </CardFooter>

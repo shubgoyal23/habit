@@ -167,7 +167,7 @@ const ResendOtp = asyncHandler(async (req, res) => {
       throw new ApiError(403, "User not found, check Email id or register one");
    }
 
-   const otpcheck = await SendOtp(email, firstName);
+   const otpcheck = await SendOtp(email, user.firstName);
    if (!otpcheck) {
       throw new ApiError(500, "user verification failed");
    }
@@ -323,18 +323,19 @@ const editUserPassword = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, {}, "Account password updated successfully"));
 });
 const forgetPassword = asyncHandler(async (req, res) => {
-   let { email } = req.body;
+   let { email, password, _id } = req.body;
 
-   if (!email) {
-      throw new ApiError(401, "email id is required");
+   if (!email || !password || !_id) {
+      throw new ApiError(401, "all fields are required");
    }
 
-   const user = await User.findOne({ email });
+   const user = await User.findOne({ email, _id, isActive: true });
    if (!user) {
       throw new ApiError(401, "user with email not found");
    }
 
-   //send email todo
+   user.password = password;
+   await user.save();
 
    return res
       .status(200)
@@ -342,7 +343,7 @@ const forgetPassword = asyncHandler(async (req, res) => {
          new ApiResponse(
             200,
             {},
-            "An Email to reset password has been send to your email id"
+            "Password updated successfully, you can login now"
          )
       );
 });

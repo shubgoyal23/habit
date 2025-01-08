@@ -19,7 +19,7 @@ import { conf } from "./conf/conf";
 
 import Privacy from "./components/etc/Privacy";
 import DeleteAccount from "./components/etc/DeleteAccount";
-import { OTPPage } from "./components/auth/Otp";
+import { VerifyOtp } from "./components/auth/VerifyOtp";
 import { ResetPage } from "./components/auth/Reset";
 
 const router = createBrowserRouter([
@@ -46,7 +46,7 @@ const router = createBrowserRouter([
          },
          {
             path: "/verify",
-            element: <OTPPage />,
+            element: <VerifyOtp />,
          },
          {
             path: "/reset",
