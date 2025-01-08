@@ -100,7 +100,7 @@ const VerifyOtp = asyncHandler(async (req, res) => {
       throw new ApiError(403, "User not found, check Email id or register one");
    }
    Redisclient.del(`OTP:${id}`);
-   if (type == "verify") {
+   if (type == "register" || type == "verify-email") {
       await User.findOneAndUpdate({ email }, { isActive: true });
    }
 
@@ -156,7 +156,7 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const ResendOtp = asyncHandler(async (req, res) => {
-   const { email } = req.body;
+   const { email, type } = req.body;
 
    if (!email) {
       throw new ApiError(401, "Email is required to register user");
@@ -165,6 +165,13 @@ const ResendOtp = asyncHandler(async (req, res) => {
    const user = await User.findOne({ email });
    if (!user) {
       throw new ApiError(403, "User not found, check Email id or register one");
+   }
+
+   if (type == "verify-email" && user.isActive) {
+      throw new ApiError(
+         403,
+         "Email Already Verified, Please login to continue"
+      );
    }
 
    const otpcheck = await SendOtp(email, user.firstName);

@@ -33,6 +33,7 @@ export function ResetPage() {
       formState: { errors },
    } = useForm();
    const onSubmit = (data) => {
+      data.type = id;
       const checkOtp = axios.post(
          `${conf.BACKEND_URL}/api/v1/users/resend-otp`,
          data,

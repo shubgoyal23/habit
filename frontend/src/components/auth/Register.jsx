@@ -43,7 +43,7 @@ export default function Register() {
             `${err.response?.data?.message || "Something went wrong"}`,
       });
       register
-         .then((data) => navigate(`/verify?id=${data.data.data._id}`))
+         .then((data) => navigate(`/verify?id=${data.data.data._id}&type=register`))
          .catch((err) => console.log(err));
    };
 
