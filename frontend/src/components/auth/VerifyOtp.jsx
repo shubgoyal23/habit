@@ -6,16 +6,20 @@ import {
    InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { useState } from "react";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { conf } from "@/conf/conf";
+import { PasswordReset } from "./PasswordReset";
 
-export function OTPPage() {
+export function VerifyOtp() {
    const [searchParams] = useSearchParams();
+   const navigate = useNavigate();
    const id = searchParams.get("id");
    const type = searchParams.get("type");
    const [otpVal, setotpVal] = useState();
+   const [open, setOpen] = useState(false);
+   const [val, setval] = useState();
    const HandelOtp = (value) => {
       setotpVal(value);
       let o = Number(value);
@@ -37,7 +41,13 @@ export function OTPPage() {
          });
          checkOtp
             .then((data) => {
-               Navigate("/login");
+               console.log(type)
+               if (type == "forgot-password") {
+                  setval(data.data.data);
+                  setOpen(true);
+               } else {
+                  navigate("/login");
+               }
             })
             .catch((err) => console.log(err));
       }
@@ -60,6 +70,7 @@ export function OTPPage() {
                <InputOTPSlot index={5} />
             </InputOTPGroup>
          </InputOTP>
+         <PasswordReset open={open} onClose={() => setOpen(false)} val={val} />
       </div>
    );
 }

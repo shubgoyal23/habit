@@ -1,4 +1,4 @@
-import { Link, Navigate, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { conf } from "@/conf/conf";
@@ -17,13 +17,14 @@ import { useForm } from "react-hook-form";
 
 export function ResetPage() {
    const [searchParams] = useSearchParams();
+   const navigate = useNavigate();
    const id = searchParams.get("id");
    let head = "Reset Password";
    if (!id) {
       return <Navigate to="/login" />;
-   } else if (id == "1abvm") {
+   } else if (id == "verify-email") {
       head = "Verify Email";
-   } else if (id == "2abfp") {
+   } else if (id == "forgot-password") {
       head = "Reset Password";
    }
    const {
@@ -48,7 +49,7 @@ export function ResetPage() {
       });
       checkOtp
          .then((data) => {
-            Navigate(`/verify?id=${data.data.data._id}&type=${id}`);
+            navigate(`/verify?id=${data.data.data._id}&type=${id}`);
          })
          .catch((err) => console.log(err));
    };
