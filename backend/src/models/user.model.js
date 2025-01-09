@@ -24,20 +24,27 @@ const userSchema = new mongoose.Schema(
       password: {
          type: String,
          required: true,
-         validate: {
-            validator: function (v) {
-               return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/.test(
-                  v
-               );
-            },
-            message: (props) =>
-               `Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, one digit, and one special character.`,
-         },
+      },
+      username: {
+         type: String,
+         required: true,
+         unique: true,
       },
       refreshToken: String,
       fcmToken: String,
       timeZone: Number,
       isActive: Boolean,
+      phone: String,
+      phoneDetails: {
+         deviceId: String, // device id
+         model: String, // phone model
+         os: String, // operating system
+         osVersion: String, // os version
+         appVersion: String, // app version
+         manufacturer: String, // phone manufacturer
+         memUsed: Number, // memory used by app
+         lan: String, // phone language
+      },
    },
    { timestamps: true }
 );
