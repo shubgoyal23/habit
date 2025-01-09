@@ -19,6 +19,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addHabit, editHabit } from "@/store/HabitSlice";
 import { conf } from "@/conf/conf";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Calendar } from "../ui/calendar";
+import { CalendarIcon } from "@radix-ui/react-icons";
 
 export default function AddHabit() {
    const user = useSelector((state) => state.auth.loggedin);
@@ -29,6 +32,8 @@ export default function AddHabit() {
    const userData = useSelector((state) => state.habit) || [];
    const { register, handleSubmit, setValue, getValues } = useForm();
    const [timeEdit, setTimeEdit] = useState(null);
+   const [startDate, setStartdate] = useState(new Date());
+   const [endDate, setEnddate] = useState(new Date());
 
    useEffect(() => {
       const sTime = getValues("startTime");
@@ -62,13 +67,18 @@ export default function AddHabit() {
          if (data) {
             setValue("name", data.name);
             setValue("description", data.description);
-            setValue("startTime", data.startTime);
-            setValue("endTime", data.endTime);
+            setValue("startDate", data.startTime); // can be set from current time or start date
+            setValue("endDate", data.startTime); // cant we less then start date
+            setValue("frequency", data.startTime); // daily, weekly, monthly, yearly, few times a day, few times a week, few times a month
+
+            setValue("startTime", data.startTime); // can be set any time
+            setValue("endTime", data.endTime); // cannot be less then start time
             setValue("duration", data.time);
             setValue("place", data.place);
             setValue("how", data.how);
             setValue("ifthen", data.ifthen);
-            setValue("point", data.point);
+            setValue("point", data.point); // 1 to 10 , also called priority
+            setValue("type", data.type); // TODO, NavigateHabit, PositiveHabit
          }
       }
    }, [userData]);
@@ -174,6 +184,68 @@ export default function AddHabit() {
                         />
                      </div>
                   </div>
+                  <div className="grid grid-cols-2 gap-2 items-center justify-between">
+                     <div>
+                        <Label htmlFor="startTime">Start Date</Label>
+                        <Popover>
+                           <PopoverTrigger asChild>
+                              <Button
+                                 variant={"outline"}
+                                 className="w-full pl-3 text-left font-normal"
+                              >
+                                 {startDate ? (
+                                    startDate.toLocaleDateString()
+                                 ) : (
+                                    <span>Pick a Start</span>
+                                 )}
+                                 <CalendarIcon className="h-4 w-4 ml-1 first-letter:opacity-50" />
+                              </Button>
+                           </PopoverTrigger>
+                           <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                 mode="single"
+                                 selected={startDate}
+                                 onSelect={(e) => setStartdate(e)}
+                                 disabled={(date) =>
+                                    date < new Date().setHours(0, 0, 0, 0)
+                                 }
+                                 initialFocus
+                                 {...register("startDate")}
+                              />
+                           </PopoverContent>
+                        </Popover>
+                     </div>
+                     <div>
+                        <Label htmlFor="startTime">End Date</Label>
+                        <Popover>
+                           <PopoverTrigger asChild>
+                              <Button
+                                 variant={"outline"}
+                                 className="w-full pl-3 text-left font-normal"
+                              >
+                                 {endDate ? (
+                                    endDate.toLocaleDateString()
+                                 ) : (
+                                    <span>Pick a End</span>
+                                 )}
+                                 <CalendarIcon className="h-4 w-4 ml-1 first-letter:opacity-50" />
+                              </Button>
+                           </PopoverTrigger>
+                           <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                 mode="single"
+                                 selected={startDate}
+                                 onSelect={(e) => setEnddate(e)}
+                                 disabled={(date) =>
+                                    date < startDate.setHours(0, 0, 0, 0)
+                                 }
+                                 initialFocus
+                                 {...register("startDate")}
+                              />
+                           </PopoverContent>
+                        </Popover>
+                     </div>
+                  </div>
                   <div className="grid grid-cols-3 gap-2 items-center justify-between">
                      <div>
                         <Label htmlFor="startTime">Start Time</Label>
@@ -233,7 +305,10 @@ export default function AddHabit() {
                         {...register("ifthen")}
                      />
                   </div>
-                  <Button className="w-full" type="submit">
+                  <Button
+                     className="w-full bg-violet-800 text-white text-bold hover:bg-violet-900 shadow-md dark:shadow-gray-800 shadow-gray-300"
+                     type="submit"
+                  >
                      {id === "new" ? "Create Habit" : "Edit Habit"}
                   </Button>
                </form>

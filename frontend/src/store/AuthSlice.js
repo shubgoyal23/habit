@@ -5,6 +5,7 @@ const authSlice = createSlice({
    initialState: { loggedin: false, userDate: null },
    reducers: {
       login(state, action) {
+         if (!action.payload) return;
          state.loggedin = true;
          state.userDate = action.payload;
       },

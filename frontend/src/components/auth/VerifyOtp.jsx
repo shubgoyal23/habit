@@ -41,7 +41,6 @@ export function VerifyOtp() {
          });
          checkOtp
             .then((data) => {
-               console.log(type)
                if (type == "forgot-password") {
                   setval(data.data.data);
                   setOpen(true);
