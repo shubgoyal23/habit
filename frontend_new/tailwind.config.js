@@ -1,12 +1,17 @@
-/** @type {import('tailwindcss').Config} */
-export default {
+module.exports = {
   content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx,vue}'
   ],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        customPurple: 'rgb(142,151,253)', // This is a solid color
+      },
+      backgroundImage: {
+        gradientPurple: 'linear-gradient(to bottom right, rgb(153, 196, 253), rgb(146, 165, 253))', // This is a gradient
+      },
+    },
   },
   plugins: [],
-}
-
+};
