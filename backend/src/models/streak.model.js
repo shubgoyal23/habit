@@ -6,29 +6,28 @@ const RepeatSchema = new mongoose.Schema({
       enum: ["daily", "weekly", "monthly", "yearly"],
       default: "daily",
    },
-   value: String,
+   value: [Number], // -1 for daily, 0 - 6 for weekly starting from sunday, 1-31 for monthly, 1-365 for yearly
 });
 
 const streakSchema = new mongoose.Schema(
    {
       userId: {
-         type: mongoose.Schema.Types.ObjectId,  // user id who has created the habit
+         type: mongoose.Schema.Types.ObjectId, // user id who has created the habit
          ref: "users",
          index: true,
       },
       name: String,
       description: String,
       duration: String,
-      startTime: String,
-      endTime: String,
-      startDate: String,
-      endDate: String,
+      startTime: Number, // epoch from time of date 1 jan 2025
+      endTime: Number, // epoch from time of date 1 jan 2025
+      startDate: Number, // epoch of start date , start of day 00:00
+      endDate: Number, // epoch of end date, end of the day 23:59
       repeat: RepeatSchema, // how many times to repeat
       place: String,
       how: String,
       ifthen: String,
       point: Number,
-      startDate: Date,
       steak: Number, // regular days user has completed the habit
       habitType: {
          type: String, // regular habit is daily , negative is negative which will be marked completed by default and user has to mark it as undone if he wants , oneTime is oneTime like todo
@@ -36,6 +35,7 @@ const streakSchema = new mongoose.Schema(
          default: "regular",
       },
       daysCompleted: [Date],
+      notify: Boolean, // if yes then notificaion will we sent
    },
    { timestamps: true }
 );
