@@ -5,10 +5,12 @@ const Hero = () => {
   return (
     <div className='h-screen  bg-gradientPurple flex justify-center items-center'>
       <div>
-        <img className='h-30' src={assets.Hero} alt="Hero" />
-        <div className='flex justify-center items-center mt-10'>
-         <a className='bg-blue-900  text-white text-lg font-bold py-2 px-5 rounded-2xl' href="/intro">Get Start</a>
-      </div>
+        <img  src={assets.Hero} alt="Hero" />
+        <button
+  className="absolute bottom-40 left-1/2 transform -translate-x-1/2 bg-white rounded-full w-80 py-3 shadow-lg hover:shadow-xl transition duration-300 ease-in-out flex justify-center items-center">
+  <a className='text-black text-lg font-semibold tracking-wide ' href="/intro">Get Started</a>
+</button>
+
       </div>
     </div>
   );
