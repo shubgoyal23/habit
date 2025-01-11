@@ -22,7 +22,6 @@ function App() {
           <Route path='/frame1' element={<Frame1/>}/>
           <Route path='/frame2' element={<Frame2/>}/>
           <Route path='/frame3' element={<Frame3/>}/>
-          
         </Routes>
       </div>
     </BrowserRouter>

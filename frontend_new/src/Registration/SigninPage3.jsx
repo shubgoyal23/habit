@@ -25,13 +25,13 @@ const Login = () => {
 
       {/* Social Login Icons */}
       <div className="mt-20 flex flex-col space-y-7 mb-2">
-        <img src={assets.Facebook} alt="facebook" />
-        <img src={assets.google} alt="google" />
+        {/* <img src={assets.Facebook} alt="facebook" /> */}
+        <img className='cursor-pointer' src={assets.google} alt="google" />
       </div>
 
       {/* OR */}
       <div className="flex justify-center">
-        <p className="text-[10px] text-blue-300 font-extrabold header">
+        <p className="text-[10px] cursor-pointer text-purple-700 font-extrabold ">
           OR LOG IN WITH EMAIL
         </p>
       </div>
@@ -39,7 +39,8 @@ const Login = () => {
       {/* Email and Password Fields */}
       <div className="flex flex-col mt-20 space-y-5">
         <input
-          className="bg-gray-200 text-black p-3 rounded-xl header"
+          className="bg-gray-200 w-full text-black p-3 rounded-xl header border-2 border-transparent focus:border-customPurple outline-none transition duration-300"
+          // className="bg-gray-200 text-black p-3 rounded-xl header"
           type="text"
           placeholder="Email"
         />
@@ -47,7 +48,8 @@ const Login = () => {
         {/* Password Field */}
         <div className="relative">
           <input
-            className="bg-gray-200 p-3 text-black rounded-xl header w-full"
+            className="bg-gray-200 w-full text-black p-3 rounded-xl header border-2 border-transparent focus:border-customPurple outline-none transition duration-300"
+            // className="bg-gray-200 p-3 text-black rounded-xl header w-full"
             type={hide ? 'text' : 'password'}
             placeholder="Password"
           />
@@ -63,14 +65,14 @@ const Login = () => {
 
       {/* Login Button */}
       <div className="flex justify-center mt-5">
-      <button className="bg-customPurple header p-3 text-white font-extrabold rounded-3xl w-full">
+        <button className="bg-customPurple header p-3 text-white font-extrabold rounded-3xl w-full">
           LOG IN
         </button>
       </div>
 
       {/* Forgot Password */}
       <div className="flex justify-center mt-2">
-        <p className="text-[12px] header">Forgot password?</p>
+        <p className="text-[12px] cursor-pointer header">Forgot password?</p>
       </div>
 
       {/* Sign Up */}
