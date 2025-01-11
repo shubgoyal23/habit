@@ -1,15 +1,18 @@
 import mongoose from "mongoose";
 
-const RepeatSchema = new mongoose.Schema({
-   name: {
-      type: String,
-      enum: ["daily", "weekly", "monthly", "yearly"],
-      default: "daily",
+const RepeatSchema = new mongoose.Schema(
+   {
+      name: {
+         type: String,
+         enum: ["daily", "weekly", "monthly", "yearly"],
+         default: "daily",
+      },
+      value: [Number], // -1 for daily once, or time like 1300 if repeat is many times on a day, 0 - 6 for weekly starting from sunday, 1-31 for monthly, 1-365 for yearly
    },
-   value: [Number], // -1 for daily, 0 - 6 for weekly starting from sunday, 1-31 for monthly, 1-365 for yearly
-});
+   { _id: false }
+);
 
-const streakSchema = new mongoose.Schema(
+const HabitSchema = new mongoose.Schema(
    {
       userId: {
          type: mongoose.Schema.Types.ObjectId, // user id who has created the habit
@@ -29,15 +32,15 @@ const streakSchema = new mongoose.Schema(
       ifthen: String,
       point: Number,
       steak: Number, // regular days user has completed the habit
+      notify: Boolean, // if yes then notificaion will we sent
+      isActive: Boolean,
       habitType: {
          type: String, // regular habit is daily , negative is negative which will be marked completed by default and user has to mark it as undone if he wants , oneTime is oneTime like todo
          enum: ["regular", "negative", "oneTime"],
          default: "regular",
       },
-      daysCompleted: [Date],
-      notify: Boolean, // if yes then notificaion will we sent
    },
    { timestamps: true }
 );
 
-export const Streak = mongoose.model("Streak", streakSchema);
+export const Habit = mongoose.model("Habit", HabitSchema);
