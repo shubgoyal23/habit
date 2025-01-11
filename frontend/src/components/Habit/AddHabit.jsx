@@ -37,28 +37,100 @@ export default function AddHabit() {
 
    useEffect(() => {
       const sTime = getValues("startTime");
-      const start = sTime.split(":");
-      const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
-      if (sTime && timeEdit?.type == "endTime") {
-         const end = timeEdit?.val?.split(":");
-         const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
-         const diff = endDate.getTime() - startDate.getTime();
-         const dur = Math.round(diff / 60000);
-         setValue("duration", dur);
+      const eTime = getValues("endTime");
+      const durr = getValues("duration");
+      switch (timeEdit?.type) {
+         case "startTime":
+            if (eTime) {
+               const start = timeEdit?.val?.split(":");
+               const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
+               const end = eTime.split(":");
+               const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
+               if (startDate > endDate) {
+                  endDate.setDate(endDate.getDate() + 1);
+               }
+               const diff = endDate.getTime() - startDate.getTime();
+               const dur = Math.round(diff / 60000);
+               setValue("duration", dur);
+            } else if (durr) {
+               const start = sTime.split(":");
+               const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
+               const dur = 60000 * durr;
+               const end = new Date(startDate.getTime() + dur);
+               let h = end.getHours();
+               let m = end.getMinutes();
+               if (h < 10) {
+                  h = "0" + h;
+               }
+               if (m < 10) {
+                  m = "0" + m;
+               }
+               setValue("endTime", `${h}:${m}`);
+            }
+            break;
+         case "endTime":
+            if (sTime) {
+               const start = sTime.split(":");
+               const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
+               const end = timeEdit?.val?.split(":");
+               const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
+               if (startDate > endDate) {
+                  endDate.setDate(endDate.getDate() + 1);
+               }
+               const diff = endDate.getTime() - startDate.getTime();
+               const dur = Math.round(diff / 60000);
+               setValue("duration", dur);
+            } else if (durr) {
+               const end = eTime.split(":");
+               const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
+               const dur = 60000 * durr;
+               const start = new Date(endDate.getTime() - dur);
+               let h = start.getHours();
+               let m = start.getMinutes();
+               if (h < 10) {
+                  h = "0" + h;
+               }
+               if (m < 10) {
+                  m = "0" + m;
+               }
+               setValue("startTime", `${h}:${m}`);
+            }
+            break;
+         case "duration":
+            if (sTime) {
+               const start = sTime.split(":");
+               const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
+               const dur = timeEdit?.val * 60000;
+               const end = new Date(startDate.getTime() + dur);
+               let h = end.getHours();
+               let m = end.getMinutes();
+               if (h < 10) {
+                  h = "0" + h;
+               }
+               if (m < 10) {
+                  m = "0" + m;
+               }
+               setValue("endTime", `${h}:${m}`);
+            } else if (eTime) {
+               const end = eTime.split(":");
+               const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
+               const dur = 60000 * durr;
+               const start = new Date(endDate.getTime() - dur);
+               let h = start.getHours();
+               let m = start.getMinutes();
+               if (h < 10) {
+                  h = "0" + h;
+               }
+               if (m < 10) {
+                  m = "0" + m;
+               }
+               setValue("startTime", `${h}:${m}`);
+            }
+            break;
+         default:
+            break;
       }
-      if (sTime && timeEdit?.type == "duration") {
-         const dur = timeEdit?.val * 60000;
-         const end = new Date(startDate.getTime() + dur);
-         let h = end.getHours();
-         let m = end.getMinutes();
-         if (h < 10) {
-            h = "0" + h;
-         }
-         if (m < 10) {
-            m = "0" + m;
-         }
-         setValue("endTime", `${h}:${m}`);
-      }
+      return;
    }, [timeEdit]);
 
    useEffect(() => {
@@ -67,8 +139,8 @@ export default function AddHabit() {
          if (data) {
             setValue("name", data.name);
             setValue("description", data.description);
-            setValue("startDate", data.startTime); // can be set from current time or start date
-            setValue("endDate", data.startTime); // cant we less then start date
+            setValue("startDate", data.startDate); // can be set from current time or start date
+            setValue("endDate", data.endDate); // cant we less then start date
             setValue("frequency", data.startTime); // daily, weekly, monthly, yearly, few times a day, few times a week, few times a month
 
             setValue("startTime", data.startTime); // can be set any time
@@ -205,12 +277,14 @@ export default function AddHabit() {
                               <Calendar
                                  mode="single"
                                  selected={startDate}
-                                 onSelect={(e) => setStartdate(e)}
+                                 onSelect={(e) => {
+                                    setStartdate(e);
+                                    setEnddate(null);
+                                 }}
                                  disabled={(date) =>
                                     date < new Date().setHours(0, 0, 0, 0)
                                  }
                                  initialFocus
-                                 {...register("startDate")}
                               />
                            </PopoverContent>
                         </Popover>
@@ -240,7 +314,6 @@ export default function AddHabit() {
                                     date < startDate.setHours(0, 0, 0, 0)
                                  }
                                  initialFocus
-                                 {...register("startDate")}
                               />
                            </PopoverContent>
                         </Popover>
@@ -254,6 +327,12 @@ export default function AddHabit() {
                            placeholder="1:00 PM"
                            type="time"
                            {...register("startTime")}
+                           onChange={(e) =>
+                              setTimeEdit({
+                                 type: "startTime",
+                                 val: e.target.value,
+                              })
+                           }
                         />
                      </div>
                      <div>
@@ -277,13 +356,23 @@ export default function AddHabit() {
                            id="time"
                            placeholder="60 min"
                            type="number"
+                           min="0"
+                           max="1440"
                            {...register("duration")}
-                           onChange={(e) =>
+                           onChange={(e) => {
+                              let num = Number(e.target.value);
+                              if (num > 1440) {
+                                 num = 1440;
+                              }
+                              if (num < 0) {
+                                 num = 0;
+                              }
+                              e.target.value = num;
                               setTimeEdit({
                                  type: "duration",
                                  val: e.target.value,
-                              })
-                           }
+                              });
+                           }}
                         />
                      </div>
                   </div>
