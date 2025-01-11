@@ -23,7 +23,7 @@ function Navbar() {
            ]);
    }, [loggedin]);
    return (
-      <header className="fixed top-0 w-full lg:px-16 px-4 h-16 bg-white/50 dark:bg-gray-900/50 backdrop-blur-lg flex flex-wrap items-center py-2 shadow-md z-50">
+      <header className="w-full lg:px-16 px-4 h-16 bg-white/50 dark:bg-gray-900/50 backdrop-blur-lg flex flex-wrap items-center py-2 shadow-md z-50">
          <div className="flex-1 flex justify-between items-center">
             <Link
                className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-yellow-400 to-pink-500 text-transparent bg-clip-text"
