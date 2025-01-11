@@ -10,7 +10,11 @@ import Facebook from "./Facebook.png"
 import google from "./google.png"
 import hide from "./hide.png"
 import show from "./show.png"
-
+import frame from "./Frame.png"
+import frame1 from "./Frame (1).png"
+import frame2 from "./Frame (2).png"
+import frame3 from "./Frame (3).png"
+import  Button  from './Button.png'
 const assets = {
     Hero,
     circle,
@@ -23,8 +27,12 @@ const assets = {
     Facebook,
     google,
     hide,
-    show
-
+    show,
+    frame,
+    frame1,
+    frame2,
+    frame3,
+    Button    
 };
 
 

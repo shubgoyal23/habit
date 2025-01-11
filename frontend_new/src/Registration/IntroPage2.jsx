@@ -1,11 +1,17 @@
-import React from 'react'
+import React, { useState } from 'react'
 import assets from '../asset/asset'
+// import Loading from '../components/Loading'
 
 const Intro = () => {
+
+// const [loading,setloading] = useState(true);
+
+//   if(loading) return <Loading/>
+
   return (
     <div className='h-[100vh] overflow-hidden bg-customPurple'>
       <div className='flex mb-5 justify-center'>
-        <div className='w-20  h-20 mt-4 '>
+        <div className='w-20  h-20 mt-10 '>
           <img src={assets.Hero} alt="" />
         </div>
       </div>
@@ -16,7 +22,7 @@ const Intro = () => {
       <p className='text-white flex justify-center items-center'>Explore the app, Find some peace of mind </p>
       <p className='text-white flex justify-center items-center'>to achieve good habits.</p>
 
-      <div className="mt-10 relative flex justify-center items-center">
+      <div className="mt-40 relative flex justify-center  items-center">
         {/* Background Image */}
         <img className='absolute inset-0 ml-3 h-4' src={assets.brid} alt="" />
         <img className='absolute inset-0 ml-20 h-4' src={assets.brid} alt="" />
@@ -39,7 +45,7 @@ const Intro = () => {
             <img src={assets.rect} className='w-full object-contain' alt="Rect" />
 
             {/* Button */}
-            <a href="/signin"><button className="absolute bottom-40 left-1/2 transform -translate-x-1/2 bg-customWhite tracking-wide w-80 py-3 px-2 text-2xl font-bold rounded-full bg-white transition duration-300 ease-in-out">
+            <a href="/signin"><button className="absolute bottom-40 left-1/2 transform -translate-x-1/2 bg-customWhite tracking-wide w-80 py-3 px-2 text-xl font-bold rounded-full header text-gray-700  bg-white transition duration-300 ease-in-out">
              Get Started 
             </button></a>
           </div>

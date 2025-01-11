@@ -9,7 +9,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="p-3" style={{ backgroundImage: `url(${assets.Bg})` }}>
+    <div className="p-3 bg-white min-h-screen" style={{ backgroundImage: `url(${assets.Bg})` }}>
       {/* Back Button */}
       <a href="/intro">
         <img src={assets.back} alt="" />
@@ -27,22 +27,22 @@ const SignUp = () => {
       </div>
 
       {/* OR */}
-      <div className="flex justify-center mt-4">
+      <div className="flex justify-center mt-10">
         <p className="text-[10px] text-blue-300 font-extrabold header">
           OR LOG IN WITH EMAIL
         </p>
       </div>
 
       {/* Input Fields */}
-      <div className="flex flex-col space-y-5 mt-5">
+      <div className="flex flex-col space-y-5 mt-10">
         <input
           type="text"
-          className="bg-gray-200 p-3 rounded-xl header"
+          className="bg-gray-200 text-black p-3 rounded-xl header"
           placeholder="Name"
         />
         <input
           type="text"
-          className="bg-gray-200 p-3 rounded-xl header"
+          className="bg-gray-200 p-3 text-black rounded-xl header"
           placeholder="G-mail"
         />
 
@@ -50,7 +50,7 @@ const SignUp = () => {
         <div className="relative">
           <input
             type={hide ? 'text' : 'password'}
-            className="bg-gray-200 p-3 rounded-xl header w-full"
+            className="bg-gray-200 p-3 text-black rounded-xl header w-full"
             placeholder="Password"
           />
           <img
