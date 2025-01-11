@@ -22,6 +22,17 @@ import { conf } from "@/conf/conf";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Calendar } from "../ui/calendar";
 import { CalendarIcon } from "@radix-ui/react-icons";
+import {
+   Collapsible,
+   CollapsibleContent,
+   CollapsibleTrigger,
+} from "../ui/collapsible";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
+import { Checkbox } from "../ui/checkbox";
+import { HiArrowPathRoundedSquare } from "react-icons/hi2";
+import { AiOutlineStop } from "react-icons/ai";
+import { TiTick } from "react-icons/ti";
+import { IoIosArrowForward } from "react-icons/io";
 
 export default function AddHabit() {
    const user = useSelector((state) => state.auth.loggedin);
@@ -34,6 +45,12 @@ export default function AddHabit() {
    const [timeEdit, setTimeEdit] = useState(null);
    const [startDate, setStartdate] = useState(new Date());
    const [endDate, setEnddate] = useState(new Date());
+   const [isOpen, setIsOpen] = useState(false);
+   const [repeatisOpen, setRepeatIsOpen] = useState(false);
+   const [notify, setNotify] = useState(true);
+   const [repeat, setRepeat] = useState([0, 1, 2, 3, 4, 5, 6]);
+   const [type, setType] = useState("regular");
+   const days = ["S", "M", "T", "W", "T", "F", "S"];
 
    useEffect(() => {
       const sTime = getValues("startTime");
@@ -142,7 +159,7 @@ export default function AddHabit() {
             setValue("startDate", data.startDate); // can be set from current time or start date
             setValue("endDate", data.endDate); // cant we less then start date
             setValue("frequency", data.startTime); // daily, weekly, monthly, yearly, few times a day, few times a week, few times a month
-
+            setValue("notify", data.notify);
             setValue("startTime", data.startTime); // can be set any time
             setValue("endTime", data.endTime); // cannot be less then start time
             setValue("duration", data.time);
@@ -163,6 +180,7 @@ export default function AddHabit() {
 
    const onSubmit = (data) => {
       if (id === "new") {
+         data.notify = notify;
          const addHAbit = axios.post(
             `${conf.BACKEND_URL}/api/v1/steak/habit`,
             data,
@@ -216,6 +234,7 @@ export default function AddHabit() {
             </CardHeader>
             <CardContent>
                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+                  {/* habit name */}
                   <div className="">
                      <Label htmlFor="name">Habit Name</Label>
                      <Input
@@ -226,36 +245,7 @@ export default function AddHabit() {
                         {...register("name")}
                      />
                   </div>
-                  <div className="">
-                     <Label htmlFor="description">Description</Label>
-                     <Textarea
-                        id="description"
-                        placeholder="Read Book Daily for 15 min in Morning"
-                        type="textarea"
-                        {...register("description")}
-                     />
-                  </div>
-                  <div className="flex gap-2 items-center justify-between">
-                     <div>
-                        <Label htmlFor="place">Place</Label>
-                        <Input
-                           id="place"
-                           placeholder="Bed Room"
-                           type="text"
-                           {...register("place")}
-                        />
-                     </div>
-                     <div>
-                        <Label htmlFor="point">Points</Label>
-                        <Input
-                           id="point"
-                           placeholder="2"
-                           required
-                           type="number"
-                           {...register("point")}
-                        />
-                     </div>
-                  </div>
+                  {/* start date and end date */}
                   <div className="grid grid-cols-2 gap-2 items-center justify-between">
                      <div>
                         <Label htmlFor="startTime">Start Date</Label>
@@ -319,6 +309,7 @@ export default function AddHabit() {
                         </Popover>
                      </div>
                   </div>
+                  {/* start time, end time, duration */}
                   <div className="grid grid-cols-3 gap-2 items-center justify-between">
                      <div>
                         <Label htmlFor="startTime">Start Time</Label>
@@ -326,7 +317,7 @@ export default function AddHabit() {
                            id="startTime"
                            placeholder="1:00 PM"
                            type="time"
-                           {...register("startTime")}
+                           {...register("startTime", { required: true })}
                            onChange={(e) =>
                               setTimeEdit({
                                  type: "startTime",
@@ -376,23 +367,192 @@ export default function AddHabit() {
                         />
                      </div>
                   </div>
-                  <div className="space-y-2">
-                     <Label htmlFor="how">How you will do it</Label>
-                     <Input
-                        id="how"
-                        placeholder="Morning just befor Tea/Coffee"
-                        type="text"
-                        {...register("how")}
-                     />
+
+                  {/* habit type */}
+                  <div>
+                     <Label htmlFor="type">Habit Type</Label>
+                     <div className="grid grid-cols-3 gap-2">
+                        <span
+                           className={`${
+                              type === "regular"
+                                 ? "bg-violet-800"
+                                 : "bg-gray-500"
+                           } p-1 rounded-md cursor-pointer flex flex-col justify-center items-center text-xs`}
+                           onClick={() => setType("regular")}
+                        >
+                           <HiArrowPathRoundedSquare className="h-6 w-6" />
+                           Regular
+                        </span>
+                        <span
+                           className={`${
+                              type === "negative"
+                                 ? "bg-violet-800"
+                                 : "bg-gray-500"
+                           } p-1 rounded-md  cursor-pointer flex flex-col justify-center items-center text-xs`}
+                           onClick={() => setType("negative")}
+                        >
+                           <AiOutlineStop className="h-6 w-6" />
+                           Negative
+                        </span>
+                        <span
+                           className={`${
+                              type === "todo" ? "bg-violet-800" : "bg-gray-500"
+                           } p-1 rounded-md  cursor-pointer flex flex-col justify-center items-center text-xs`}
+                           onClick={() => setType("todo")}
+                        >
+                           <TiTick className="h-6 w-6" />
+                           one time Todo
+                        </span>
+                     </div>
                   </div>
-                  <div className="space-y-2">
-                     <Label htmlFor="ifthen">If not done then?</Label>
-                     <Input
-                        id="ifthen"
-                        type="text"
-                        placeholder="if not complete then 30 min extra after lunch"
-                        {...register("ifthen")}
+
+                  {/* repeat */}
+                  <Collapsible
+                     open={repeatisOpen}
+                     onOpenChange={setRepeatIsOpen}
+                     className=""
+                  >
+                     <div className="flex items-center justify-between">
+                        <CollapsibleTrigger asChild>
+                           <Button
+                              variant="outline"
+                              className="w-full flex justify-between hover:bg-none mb-2"
+                           >
+                              <span>Repeat</span>
+                              <span className="flex justify-center items-center gap-1">
+                                 Everyday
+                                 <IoIosArrowForward className="h-3 w-3" />
+                              </span>
+                           </Button>
+                        </CollapsibleTrigger>
+                     </div>
+                     <CollapsibleContent className="space-y-2 mt-2">
+                        <div className="">
+                           <Label htmlFor="description">
+                              Specific Days in Week
+                           </Label>
+                           <div className="grid grid-cols-7 gap-1 pt-1">
+                              {days.map((day, index) => (
+                                 <span
+                                    key={index}
+                                    className={`${
+                                       repeat.includes(index)
+                                          ? "bg-violet-800"
+                                          : "bg-gray-500"
+                                    } p-1 rounded-md cursor-pointer flex flex-col font-bold justify-center items-center text-sm`}
+                                    onClick={() => {
+                                       if (repeat.includes(index)) {
+                                          if (repeat.length === 1) {
+                                             return;
+                                          }
+                                          setRepeat(
+                                             repeat.filter((d) => d !== index)
+                                          );
+                                       } else {
+                                          setRepeat([...repeat, index]);
+                                       }
+                                    }}
+                                 >
+                                    {day}
+                                 </span>
+                              ))}
+                           </div>
+                        </div>
+                     </CollapsibleContent>
+                  </Collapsible>
+
+                  {/* optional fields */}
+                  <Collapsible
+                     open={isOpen}
+                     onOpenChange={setIsOpen}
+                     className=""
+                  >
+                     <div className="flex items-center justify-between">
+                        <CollapsibleTrigger asChild>
+                           <Button
+                              variant="none"
+                              className="w-full flex justify-between p-0 hover:bg-none mb-2"
+                           >
+                              {isOpen ? (
+                                 <>
+                                    <span>Hide Additional Settings</span>
+                                    <FaChevronUp className="h-3 w-3" />
+                                    <span className="sr-only">Toggle</span>
+                                 </>
+                              ) : (
+                                 <>
+                                    <span>Additional Settings</span>
+                                    <FaChevronDown className="h-3 w-3" />
+                                    <span className="sr-only">Toggle</span>
+                                 </>
+                              )}
+                           </Button>
+                        </CollapsibleTrigger>
+                     </div>
+                     <CollapsibleContent className="space-y-2 mt-2">
+                        <div className="">
+                           <Label htmlFor="description">Description</Label>
+                           <Textarea
+                              id="description"
+                              placeholder="Read Book Daily for 15 min in Morning"
+                              type="textarea"
+                              {...register("description")}
+                           />
+                        </div>
+
+                        <div className="flex gap-2 items-center justify-between">
+                           <div>
+                              <Label htmlFor="place">Place</Label>
+                              <Input
+                                 id="place"
+                                 placeholder="Bed Room"
+                                 type="text"
+                                 {...register("place")}
+                              />
+                           </div>
+                           <div>
+                              <Label htmlFor="point">Importance</Label>
+                              <Input
+                                 id="point"
+                                 placeholder="2"
+                                 type="number"
+                                 {...register("point")}
+                              />
+                           </div>
+                        </div>
+
+                        <div className="space-y-2">
+                           <Label htmlFor="how">How you will do it</Label>
+                           <Input
+                              id="how"
+                              placeholder="Morning just befor Tea/Coffee"
+                              type="text"
+                              {...register("how")}
+                           />
+                        </div>
+                        <div className="space-y-2">
+                           <Label htmlFor="ifthen">If not done then?</Label>
+                           <Input
+                              id="ifthen"
+                              type="text"
+                              placeholder="if not complete then 30 min extra after lunch"
+                              {...register("ifthen")}
+                           />
+                        </div>
+                     </CollapsibleContent>
+                  </Collapsible>
+
+                  <div className="flex items-center justify-start">
+                     <Checkbox
+                        id="notify"
+                        checked={notify}
+                        onClick={() => {
+                           setNotify((prev) => !prev);
+                        }}
                      />
+                     <Label htmlFor="notify" className="ml-2">
+                        Send reminder to do the task
+                     </Label>
                   </div>
                   <Button
                      className="w-full bg-violet-800 text-white text-bold hover:bg-violet-900 shadow-md dark:shadow-gray-800 shadow-gray-300"
