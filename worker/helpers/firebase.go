@@ -75,3 +75,25 @@ func SendNotificationToMany(tokens []string, title string, body string, image st
 	fmt.Println("Successfully sent message:", response)
 	return nil
 }
+
+func SendHabitNotification(user UserNotification) error {
+	client, err := firebaseApp.Messaging(context.Background())
+	if err != nil {
+		return err
+	}
+	message := &messaging.Message{
+		Notification: user.Notification,
+		Android: &messaging.AndroidConfig{
+			Notification: &messaging.AndroidNotification{
+				Icon: "icon.png",
+			},
+		},
+		Token: user.Token,
+	}
+	str, err := client.Send(context.Background(), message)
+	if err != nil {
+		return err
+	}
+	fmt.Println("Successfully sent message:", str)
+	return nil
+}
