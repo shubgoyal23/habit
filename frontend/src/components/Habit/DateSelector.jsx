@@ -1,21 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Label } from "../ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { CalendarIcon } from "@radix-ui/react-icons";
 import { Calendar } from "../ui/calendar";
 
-function DateSelector({ setValue, getValues, register }) {
-   const [startDate, setStartdate] = useState();
-   const [endDate, setEnddate] = useState();
-
-   useEffect(() => {
-      setValue("startDate", startDate);
-      setValue("endDate", endDate);
-   }, [startDate, endDate]);
+function DateSelector({ dates, setDates, type }) {
    return (
-      <div className="grid grid-cols-2 gap-2 items-center justify-between">
-         <div>
+      <div className="flex gap-2 items-center justify-between">
+         <div className="flex-1">
             <Label htmlFor="startTime">Start Date</Label>
             <Popover>
                <PopoverTrigger asChild>
@@ -23,8 +16,8 @@ function DateSelector({ setValue, getValues, register }) {
                      variant={"outline"}
                      className="w-full pl-3 text-left font-normal"
                   >
-                     {startDate ? (
-                        startDate.toLocaleDateString()
+                     {dates?.startDate ? (
+                        dates.startDate.toLocaleDateString()
                      ) : (
                         <span>Pick a Start</span>
                      )}
@@ -34,10 +27,9 @@ function DateSelector({ setValue, getValues, register }) {
                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                      mode="single"
-                     selected={startDate}
+                     selected={dates?.startDate}
                      onSelect={(e) => {
-                        setStartdate(e);
-                        setEnddate(null);
+                        setDates({ startDate: e, endDate: null });
                      }}
                      disabled={(date) => date < new Date().setHours(0, 0, 0, 0)}
                      initialFocus
@@ -45,33 +37,39 @@ function DateSelector({ setValue, getValues, register }) {
                </PopoverContent>
             </Popover>
          </div>
-         <div>
-            <Label htmlFor="startTime">End Date</Label>
-            <Popover>
-               <PopoverTrigger asChild>
-                  <Button
-                     variant={"outline"}
-                     className="w-full pl-3 text-left font-normal"
-                  >
-                     {endDate ? (
-                        endDate.toLocaleDateString()
-                     ) : (
-                        <span>Pick a End</span>
-                     )}
-                     <CalendarIcon className="h-4 w-4 ml-1 first-letter:opacity-50" />
-                  </Button>
-               </PopoverTrigger>
-               <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                     mode="single"
-                     selected={startDate}
-                     onSelect={(e) => setEnddate(e)}
-                     disabled={(date) => date < startDate.setHours(0, 0, 0, 0)}
-                     initialFocus
-                  />
-               </PopoverContent>
-            </Popover>
-         </div>
+         {type !== "todo" && (
+            <div className="flex-1">
+               <Label htmlFor="startTime">End Date</Label>
+               <Popover>
+                  <PopoverTrigger asChild>
+                     <Button
+                        variant={"outline"}
+                        className="w-full pl-3 text-left font-normal"
+                     >
+                        {dates?.endDate ? (
+                           dates.endDate.toLocaleDateString()
+                        ) : (
+                           <span>Pick a End</span>
+                        )}
+                        <CalendarIcon className="h-4 w-4 ml-1 first-letter:opacity-50" />
+                     </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                     <Calendar
+                        mode="single"
+                        selected={dates?.endDate}
+                        onSelect={(e) => {
+                           setDates((prev) => ({ ...prev, endDate: e }));
+                        }}
+                        disabled={(date) =>
+                           date < dates?.startDate?.setHours(0, 0, 0, 0)
+                        }
+                        initialFocus
+                     />
+                  </PopoverContent>
+               </Popover>
+            </div>
+         )}
       </div>
    );
 }

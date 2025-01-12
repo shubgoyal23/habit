@@ -77,23 +77,19 @@ const addHabit = asyncHandler(async (req, res) => {
       endDate = new Date(endDate).getTime() / 1000;
       endDate = Math.ceil(endDate) + 86399;
    }
-   switch (repeatMode) {
+   switch (repeat.name) {
       case "days":
-         repeat = repeat;
          break;
       case "dates":
-         for (let i = 0; i < repeat.length; i++) {
-            repeat[i] = Math.ceil(new Date(repeat[i]).getTime() / 1000);
+         for (let i = 0; i < repeat.value.length; i++) {
+            repeat.value[i] = Math.ceil(
+               new Date(repeat.value[i]).getTime() / 1000
+            );
          }
          break;
       case "hours":
-         repeat = repeat;
          break;
    }
-   let rep = {
-      name: repeatMode,
-      value: repeat,
-   };
    if (habitType == "negative") {
       notify = false;
    }
@@ -102,7 +98,7 @@ const addHabit = asyncHandler(async (req, res) => {
       name: name,
       startDate: startDate,
       endDate: endDate,
-      repeat: rep,
+      repeat: repeat,
       habitType: habitType,
       description: description,
       duration: duration,
@@ -129,22 +125,24 @@ const addHabit = asyncHandler(async (req, res) => {
 
 // edit a habit
 const editHabit = asyncHandler(async (req, res) => {
-   const {
+   let {
       id,
-      startTime,
-      endTime,
-      duration,
-      endDate,
       name,
       description,
-      point,
+      duration,
+      startTime,
+      endTime,
+      startDate,
+      endDate,
       repeat,
       place,
       how,
       ifthen,
-      notify,
+      point,
       habitType,
-   } = req.body; // habit id
+      notify,
+      repeatMode,
+   } = req.body;
    if (!id) {
       throw new ApiError(401, "Habit Id is Reqired");
    }
@@ -153,54 +151,73 @@ const editHabit = asyncHandler(async (req, res) => {
    if (!habit || habit.userId == req.user._id) {
       throw new ApiError(403, "Habit with Id not found for this user");
    }
-
+   if (!name) {
+      throw new ApiError(401, "Name Feild is Reqired");
+   }
+   if (!habitType) {
+      throw new ApiError(401, "Habit Type is Reqired");
+   }
    if (startTime) {
-      const [hours, minutes] = GetTimeFormated(startTime);
-      startTime = GetTimeEpoch(hours, minutes, req.user.timezone);
-   } else {
-      startTime = habit.startTime;
+      const [hr, min] = GetTimeFormated(startTime);
+      startTime = GetTimeEpoch(hr, min, req.user.timeZone);
    }
    if (endTime) {
-      const [hours, minutes] = GetTimeFormated(endTime);
-      endTime = GetTimeEpoch(hours, minutes, req.user.timezone);
+      const [hr, min] = GetTimeFormated(endTime);
+      endTime = GetTimeEpoch(hr, min, req.user.timeZone);
       if (endTime < startTime) {
          endTime += 86400;
       }
    }
-   if (endDate) {
-      const dat = new Date(endDate);
-      endDate = Date.UTC(
-         dat.getUTCFullYear(),
-         dat.getUTCMonth(),
-         dat.getUTCDate(),
-         23,
-         59,
-         59,
-         59
-      );
-   }
    if (startTime && endTime) {
       duration = Math.floor((endTime - startTime) / 60);
+   }
+   if (startDate) {
+      startDate = new Date(startDate).getTime() / 1000;
+      startDate = Math.ceil(startDate);
+   }
+   if (endDate) {
+      endDate = new Date(endDate).getTime() / 1000;
+      endDate = Math.ceil(endDate) + 86399;
+   }
+   switch (repeat.name) {
+      case "days":
+         break;
+      case "dates":
+         for (let i = 0; i < repeat.value.length; i++) {
+            repeat.value[i] = Math.ceil(
+               new Date(repeat.value[i]).getTime() / 1000
+            );
+         }
+         break;
+      case "hours":
+         break;
+   }
+   if (habitType == "negative") {
+      notify = false;
    }
    const updatedHabit = await Habit.findByIdAndUpdate(
       id,
       {
+         userId: req.user._id,
          name: name,
+         startDate: startDate,
+         endDate: endDate,
+         repeat: repeat,
+         habitType: habitType,
          description: description,
          duration: duration,
          startTime: startTime,
          endTime: endTime,
-         endDate: endDate,
          place: place,
          how: how,
          ifthen: ifthen,
          point: point,
-         repeat: repeat,
-         habitType: habitType,
+         daysCompleted: [],
          notify: notify,
       },
       { new: true }
    );
+
    if (!updatedHabit) {
       throw new ApiError(401, "Habit Update Failed, try again later");
    }

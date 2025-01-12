@@ -23,14 +23,13 @@ import {
    SelectValue,
 } from "../ui/select";
 
-function Repeat({ getValues, setValue }) {
+function Repeat({ getValues, setValue, timesobj }) {
    const [repeatisOpen, setRepeatIsOpen] = useState(false);
    const [repeatMode, setRepeatMode] = useState("days");
    const [repeat, setRepeat] = useState([0, 1, 2, 3, 4, 5, 6]);
    const days = ["S", "M", "T", "W", "T", "F", "S"];
    const [dates, setDates] = useState([]);
    const [hr, setHr] = useState(null);
-   const startDate = getValues("startDate") || new Date();
    const handleSelect = (selectedDates) => {
       setDates(selectedDates);
    };
@@ -140,7 +139,8 @@ function Repeat({ getValues, setValue }) {
                            <Calendar
                               mode="multiple"
                               disabled={(date) =>
-                                 date < startDate.setHours(0, 0, 0, 0)
+                                 date <
+                                 timesobj?.startDate?.setHours(0, 0, 0, 0)
                               }
                               selected={dates}
                               onSelect={handleSelect}
@@ -178,7 +178,7 @@ function Repeat({ getValues, setValue }) {
                </Label>
                {repeatMode == "hours" ? (
                   <div className="">
-                     {!getValues("startTime") && !getValues("endTime") ? (
+                     {!timesobj?.startTime || !timesobj?.endTime ? (
                         <span className="text-xs text-red-500">
                            Please Select Start and End Time First
                         </span>
