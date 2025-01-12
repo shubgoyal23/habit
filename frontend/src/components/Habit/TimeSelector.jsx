@@ -2,31 +2,28 @@ import React, { useEffect, useState } from "react";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 
-function TimeSelector({ setValue, getValues, register, errors }) {
+function TimeSelector({ times, setTimes }) {
    const [timeEdit, setTimeEdit] = useState(true);
-   const [localError, setLocalError] = useState(null);
 
    useEffect(() => {
-      const sTime = getValues("startTime");
-      const eTime = getValues("endTime");
-      const durr = getValues("duration");
       switch (timeEdit?.type) {
          case "startTime":
-            if (eTime) {
-               const start = timeEdit?.val?.split(":");
+            times.startTime = timeEdit?.val;
+            if (times?.endTime) {
+               const start = times?.startTime?.split(":");
                const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
-               const end = eTime.split(":");
+               const end = times?.endTime?.split(":");
                const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
                if (startDate > endDate) {
                   endDate.setDate(endDate.getDate() + 1);
                }
                const diff = endDate.getTime() - startDate.getTime();
                const dur = Math.round(diff / 60000);
-               setValue("duration", dur);
-            } else if (durr) {
-               const start = sTime.split(":");
+               setTimes({ ...times, duration: dur });
+            } else if (times?.duration) {
+               const start = times?.startTime?.split(":");
                const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
-               const dur = 60000 * durr;
+               const dur = 60000 * times?.duration;
                const end = new Date(startDate.getTime() + dur);
                let h = end.getHours();
                let m = end.getMinutes();
@@ -36,25 +33,27 @@ function TimeSelector({ setValue, getValues, register, errors }) {
                if (m < 10) {
                   m = "0" + m;
                }
-               setValue("endTime", `${h}:${m}`);
+               setTimes({ ...times, endTime: `${h}:${m}` });
             }
             break;
          case "endTime":
-            if (sTime) {
-               const start = sTime.split(":");
+            times.endTime = timeEdit?.val;
+            if (times?.startTime) {
+               const start = times?.startTime?.split(":");
                const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
-               const end = timeEdit?.val?.split(":");
+               const end = times?.endTime?.split(":");
                const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
                if (startDate > endDate) {
                   endDate.setDate(endDate.getDate() + 1);
                }
                const diff = endDate.getTime() - startDate.getTime();
                const dur = Math.round(diff / 60000);
-               setValue("duration", dur);
+               // setValue("duration", dur);
+               setTimes({ ...times, duration: dur });
             } else if (durr) {
-               const end = eTime.split(":");
+               const end = times?.endTime?.split(":");
                const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
-               const dur = 60000 * durr;
+               const dur = 60000 * times?.duration;
                const start = new Date(endDate.getTime() - dur);
                let h = start.getHours();
                let m = start.getMinutes();
@@ -64,14 +63,16 @@ function TimeSelector({ setValue, getValues, register, errors }) {
                if (m < 10) {
                   m = "0" + m;
                }
-               setValue("startTime", `${h}:${m}`);
+               // setValue("startTime", `${h}:${m}`);
+               setTimes({ ...times, startTime: `${h}:${m}` });
             }
             break;
          case "duration":
-            if (sTime) {
-               const start = sTime.split(":");
+            times.duration = timeEdit?.val;
+            if (times?.startTime) {
+               const start = times?.startTime?.split(":");
                const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
-               const dur = timeEdit?.val * 60000;
+               const dur = times?.duration * 60000;
                const end = new Date(startDate.getTime() + dur);
                let h = end.getHours();
                let m = end.getMinutes();
@@ -81,11 +82,12 @@ function TimeSelector({ setValue, getValues, register, errors }) {
                if (m < 10) {
                   m = "0" + m;
                }
-               setValue("endTime", `${h}:${m}`);
-            } else if (eTime) {
-               const end = eTime.split(":");
+               // setValue("endTime", `${h}:${m}`);
+               setTimes({ ...times, endTime: `${h}:${m}` });
+            } else if (times?.endTime) {
+               const end = times?.endTime?.split(":");
                const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
-               const dur = 60000 * durr;
+               const dur = 60000 * times?.duration;
                const start = new Date(endDate.getTime() - dur);
                let h = start.getHours();
                let m = start.getMinutes();
@@ -95,20 +97,16 @@ function TimeSelector({ setValue, getValues, register, errors }) {
                if (m < 10) {
                   m = "0" + m;
                }
-               setValue("startTime", `${h}:${m}`);
+               // setValue("startTime", `${h}:${m}`);
+               setTimes({ ...times, startTime: `${h}:${m}` });
             }
             break;
          default:
             break;
       }
       return;
-   }, [timeEdit]);
-   
-   useEffect(() => {
-      if (errors.startTime) {
-         setLocalError(errors.startTime);
-      }
-   }, [errors]);
+   }, [timeEdit, setTimeEdit]);
+
    return (
       <div className="grid grid-cols-3 gap-2 items-center justify-between">
          <div>
@@ -117,14 +115,16 @@ function TimeSelector({ setValue, getValues, register, errors }) {
                id="startTime"
                placeholder="1:00 PM"
                type="time"
-               className={localError ? "border-red-500 border-2" : ""}
-               {...register("startTime", { required: true })}
+               className={
+                  times?.error?.startTime ? "border-red-500 border-2" : ""
+               }
+               value={times?.startTime}
                onChange={(e) => {
                   setTimeEdit({
                      type: "startTime",
                      val: e.target.value,
                   });
-                  setLocalError(null);
+                  setTimes({ ...times, error: {}, startTime: e.target.value });
                }}
             />
          </div>
@@ -134,13 +134,14 @@ function TimeSelector({ setValue, getValues, register, errors }) {
                id="endTime"
                placeholder="1:00 PM"
                type="time"
-               {...register("endTime")}
-               onChange={(e) =>
+               value={times?.endTime}
+               onChange={(e) => {
                   setTimeEdit({
                      type: "endTime",
                      val: e.target.value,
-                  })
-               }
+                  });
+                  setTimes({ ...times, error: {}, endTime: e.target.value });
+               }}
             />
          </div>
          <div>
@@ -151,7 +152,7 @@ function TimeSelector({ setValue, getValues, register, errors }) {
                type="number"
                min="0"
                max="1440"
-               {...register("duration")}
+               value={times?.duration}
                onChange={(e) => {
                   let num = Number(e.target.value);
                   if (num > 1440) {
@@ -165,6 +166,7 @@ function TimeSelector({ setValue, getValues, register, errors }) {
                      type: "duration",
                      val: e.target.value,
                   });
+                  setTimes({ ...times, error: {}, duration: e.target.value });
                }}
             />
          </div>

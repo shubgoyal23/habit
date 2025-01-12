@@ -37,7 +37,7 @@ function MarkSteak({ row }) {
 
    useEffect(() => {
       const date = new Date();
-      let check = data.daysCompleted.find((item) => {
+      let check = data.daysCompleted?.find((item) => {
          const checkDate = new Date(item);
          if (
             checkDate.getDate() === date.getDate() &&

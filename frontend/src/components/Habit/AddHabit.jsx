@@ -32,6 +32,7 @@ import { TiTick } from "react-icons/ti";
 import Repeat from "./Repeat";
 import DateSelector from "./DateSelector";
 import TimeSelector from "./TimeSelector";
+import { EpochToDate, EpochToTime } from "@/lib/helpers";
 
 export default function AddHabit() {
    const user = useSelector((state) => state.auth.loggedin);
@@ -51,20 +52,30 @@ export default function AddHabit() {
    const [isOpen, setIsOpen] = useState(false);
    const [notify, setNotify] = useState(true);
    const [type, setType] = useState("regular");
+   const [dates, setDates] = useState({});
+   const [times, setTimes] = useState({});
+   const [repeat, setRepeat] = useState({});
 
    useEffect(() => {
       if (id && id !== "new") {
          const data = userData.find((item) => item._id === id);
          if (data) {
+            setDates({
+               startDate: EpochToDate(data.startDate * 1000),
+               endDate: EpochToDate(data.endDate * 1000),
+            });
+            setTimes({
+               startTime: EpochToTime(data.startTime * 1000),
+               endTime: EpochToTime(data.endTime * 1000),
+               duration: data.duration,
+            });
+            setRepeat(data.frequency);
             setValue("name", data.name);
             setValue("description", data.description);
             setValue("startDate", data.startDate); // can be set from current time or start date
             setValue("endDate", data.endDate); // cant we less then start date
-            setValue("frequency", data.startTime); // daily, weekly, monthly, yearly, few times a day, few times a week, few times a month
             setValue("notify", data.notify);
-            setValue("startTime", data.startTime); // can be set any time
-            setValue("endTime", data.endTime); // cannot be less then start time
-            setValue("duration", data.time);
+            setValue("duration", data.duration);
             setValue("place", data.place);
             setValue("how", data.how);
             setValue("ifthen", data.ifthen);
@@ -81,8 +92,22 @@ export default function AddHabit() {
    }, []);
 
    const onSubmit = (data) => {
+      if (!times?.startTime && type != "negative") {
+         setTimes({
+            ...times,
+            error: { startTime: true },
+         });
+         toast.error("Please select start Time");
+         return;
+      }
       data.notify = notify;
       data.habitType = type;
+      data.repeat = { name: data.repeatMode, value: data.repeat };
+      data.startDate = dates.startDate;
+      data.endDate = dates.endDate;
+      data.startTime = times.startTime;
+      data.endTime = times.endTime;
+      data.duration = times.duration;
       if (id === "new") {
          data.notify = notify;
          const addHAbit = axios.post(
@@ -119,7 +144,7 @@ export default function AddHabit() {
          addHAbit
             .then((data) => {
                dispatch(editHabit(data.data.data));
-               // navigate("/habit");
+               navigate("/habit");
             })
             .catch((err) => console.log(err));
       }
@@ -188,25 +213,16 @@ export default function AddHabit() {
                      />
                   </div>
                   {/* start date and end date */}
-                  <DateSelector
-                     getValues={getValues}
-                     setValue={setValue}
-                     register={register}
-                  />
+                  <DateSelector dates={dates} setDates={setDates} type={type} />
                   {/* start time, end time, duration */}
                   {type !== "negative" && (
-                     <TimeSelector
-                        errors={errors}
-                        getValues={getValues}
-                        setValue={setValue}
-                        register={register}
-                     />
+                     <TimeSelector times={times} setTimes={setTimes} />
                   )}
 
                   {/* repeat */}
                   {type == "regular" && (
                      <Repeat
-                        register={register}
+                        timesobj={times}
                         getValues={getValues}
                         setValue={setValue}
                      />
