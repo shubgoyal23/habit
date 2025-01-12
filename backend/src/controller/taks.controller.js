@@ -7,7 +7,7 @@ import { Redisclient as RedisConn } from "../db/redis.js";
 // format time of type 13:00, return hours and minutes
 const GetTimeFormated = (data) => {
    let startTime = data?.split(":");
-   if (startTime.length() < 2) {
+   if (startTime.length < 2) {
       return;
    }
    let hours = Number(startTime[0]);
@@ -32,7 +32,7 @@ const listHabit = asyncHandler(async (req, res) => {
 
 // create a new habit and add it to the list
 const addHabit = asyncHandler(async (req, res) => {
-   const {
+   let {
       name,
       description,
       duration,
@@ -47,6 +47,7 @@ const addHabit = asyncHandler(async (req, res) => {
       point,
       habitType,
       notify,
+      repeatMode,
    } = req.body;
    if (!name) {
       throw new ApiError(401, "Name Feild is Reqired");
@@ -56,48 +57,52 @@ const addHabit = asyncHandler(async (req, res) => {
    }
    if (startTime) {
       const [hr, min] = GetTimeFormated(startTime);
-      startTime = GetTimeEpoch(hr, min, req.user.timezone);
+      startTime = GetTimeEpoch(hr, min, req.user.timeZone);
    }
    if (endTime) {
       const [hr, min] = GetTimeFormated(endTime);
-      endTime = GetTimeEpoch(hr, min, req.user.timezone);
+      endTime = GetTimeEpoch(hr, min, req.user.timeZone);
       if (endTime < startTime) {
          endTime += 86400;
       }
    }
-   if (startDate) {
-      const dat = new Date(startDate);
-      startDate = Date.UTC(
-         dat.getUTCFullYear(),
-         dat.getUTCMonth(),
-         dat.getUTCDate(),
-         0,
-         0,
-         0,
-         0
-      );
-   }
-   if (endDate) {
-      const dat = new Date(endDate);
-      endDate = Date.UTC(
-         dat.getUTCFullYear(),
-         dat.getUTCMonth(),
-         dat.getUTCDate(),
-         23,
-         59,
-         59,
-         59
-      );
-   }
    if (startTime && endTime) {
       duration = Math.floor((endTime - startTime) / 60);
+   }
+   if (startDate) {
+      startDate = new Date(startDate).getTime() / 1000;
+      startDate = Math.ceil(startDate);
+   }
+   if (endDate) {
+      endDate = new Date(endDate).getTime() / 1000;
+      endDate = Math.ceil(endDate) + 86399;
+   }
+   switch (repeatMode) {
+      case "days":
+         repeat = repeat;
+         break;
+      case "dates":
+         for (let i = 0; i < repeat.length; i++) {
+            repeat[i] = Math.ceil(new Date(repeat[i]).getTime() / 1000);
+         }
+         break;
+      case "hours":
+         repeat = repeat;
+         break;
+   }
+   let rep = {
+      name: repeatMode,
+      value: repeat,
+   };
+   if (habitType == "negative") {
+      notify = false;
    }
    const createUserHabit = await Habit.create({
       userId: req.user._id,
       name: name,
       startDate: startDate,
       endDate: endDate,
-      repeat: repeat,
+      repeat: rep,
       habitType: habitType,
       description: description,
       duration: duration,
@@ -216,7 +221,7 @@ const DeleteHabit = asyncHandler(async (req, res) => {
    if (!del) {
       throw new ApiError(401, "Habit Deletion Failed, try again later");
    }
-   
+
    await RedisConn.SREM(
       "habitLists",
       `${del._id.toString()}:${req.user._id.toString()}`
