@@ -19,9 +19,6 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { addHabit, editHabit } from "@/store/HabitSlice";
 import { conf } from "@/conf/conf";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { Calendar } from "../ui/calendar";
-import { CalendarIcon } from "@radix-ui/react-icons";
 import {
    Collapsible,
    CollapsibleContent,
@@ -32,7 +29,9 @@ import { Checkbox } from "../ui/checkbox";
 import { HiArrowPathRoundedSquare } from "react-icons/hi2";
 import { AiOutlineStop } from "react-icons/ai";
 import { TiTick } from "react-icons/ti";
-import { IoIosArrowForward } from "react-icons/io";
+import Repeat from "./Repeat";
+import DateSelector from "./DateSelector";
+import TimeSelector from "./TimeSelector";
 
 export default function AddHabit() {
    const user = useSelector((state) => state.auth.loggedin);
@@ -41,114 +40,17 @@ export default function AddHabit() {
    const navigate = useNavigate();
 
    const userData = useSelector((state) => state.habit) || [];
-   const { register, handleSubmit, setValue, getValues } = useForm();
-   const [timeEdit, setTimeEdit] = useState(null);
-   const [startDate, setStartdate] = useState(new Date());
-   const [endDate, setEnddate] = useState(new Date());
-   const [isOpen, setIsOpen] = useState(false);
-   const [repeatisOpen, setRepeatIsOpen] = useState(false);
-   const [notify, setNotify] = useState(true);
-   const [repeat, setRepeat] = useState([0, 1, 2, 3, 4, 5, 6]);
-   const [type, setType] = useState("regular");
-   const days = ["S", "M", "T", "W", "T", "F", "S"];
+   const {
+      register,
+      handleSubmit,
+      setValue,
+      getValues,
+      formState: { errors },
+   } = useForm();
 
-   useEffect(() => {
-      const sTime = getValues("startTime");
-      const eTime = getValues("endTime");
-      const durr = getValues("duration");
-      switch (timeEdit?.type) {
-         case "startTime":
-            if (eTime) {
-               const start = timeEdit?.val?.split(":");
-               const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
-               const end = eTime.split(":");
-               const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
-               if (startDate > endDate) {
-                  endDate.setDate(endDate.getDate() + 1);
-               }
-               const diff = endDate.getTime() - startDate.getTime();
-               const dur = Math.round(diff / 60000);
-               setValue("duration", dur);
-            } else if (durr) {
-               const start = sTime.split(":");
-               const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
-               const dur = 60000 * durr;
-               const end = new Date(startDate.getTime() + dur);
-               let h = end.getHours();
-               let m = end.getMinutes();
-               if (h < 10) {
-                  h = "0" + h;
-               }
-               if (m < 10) {
-                  m = "0" + m;
-               }
-               setValue("endTime", `${h}:${m}`);
-            }
-            break;
-         case "endTime":
-            if (sTime) {
-               const start = sTime.split(":");
-               const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
-               const end = timeEdit?.val?.split(":");
-               const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
-               if (startDate > endDate) {
-                  endDate.setDate(endDate.getDate() + 1);
-               }
-               const diff = endDate.getTime() - startDate.getTime();
-               const dur = Math.round(diff / 60000);
-               setValue("duration", dur);
-            } else if (durr) {
-               const end = eTime.split(":");
-               const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
-               const dur = 60000 * durr;
-               const start = new Date(endDate.getTime() - dur);
-               let h = start.getHours();
-               let m = start.getMinutes();
-               if (h < 10) {
-                  h = "0" + h;
-               }
-               if (m < 10) {
-                  m = "0" + m;
-               }
-               setValue("startTime", `${h}:${m}`);
-            }
-            break;
-         case "duration":
-            if (sTime) {
-               const start = sTime.split(":");
-               const startDate = new Date(2025, 0, 1, start[0], start[1], 0);
-               const dur = timeEdit?.val * 60000;
-               const end = new Date(startDate.getTime() + dur);
-               let h = end.getHours();
-               let m = end.getMinutes();
-               if (h < 10) {
-                  h = "0" + h;
-               }
-               if (m < 10) {
-                  m = "0" + m;
-               }
-               setValue("endTime", `${h}:${m}`);
-            } else if (eTime) {
-               const end = eTime.split(":");
-               const endDate = new Date(2025, 0, 1, end[0], end[1], 0);
-               const dur = 60000 * durr;
-               const start = new Date(endDate.getTime() - dur);
-               let h = start.getHours();
-               let m = start.getMinutes();
-               if (h < 10) {
-                  h = "0" + h;
-               }
-               if (m < 10) {
-                  m = "0" + m;
-               }
-               setValue("startTime", `${h}:${m}`);
-            }
-            break;
-         default:
-            break;
-      }
-      return;
-   }, [timeEdit]);
+   const [isOpen, setIsOpen] = useState(false);
+   const [notify, setNotify] = useState(true);
+   const [type, setType] = useState("regular");
 
    useEffect(() => {
       if (id && id !== "new") {
@@ -179,6 +81,8 @@ export default function AddHabit() {
    }, []);
 
    const onSubmit = (data) => {
+      data.notify = notify;
+      data.habitType = type;
       if (id === "new") {
          data.notify = notify;
          const addHAbit = axios.post(
@@ -215,12 +119,11 @@ export default function AddHabit() {
          addHAbit
             .then((data) => {
                dispatch(editHabit(data.data.data));
-               navigate("/habit");
+               // navigate("/habit");
             })
             .catch((err) => console.log(err));
       }
    };
-
    return (
       <div className="w-full flex justify-center items-start">
          <Card className="mx-auto max-w-sm">
@@ -234,140 +137,6 @@ export default function AddHabit() {
             </CardHeader>
             <CardContent>
                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-                  {/* habit name */}
-                  <div className="">
-                     <Label htmlFor="name">Habit Name</Label>
-                     <Input
-                        id="name"
-                        placeholder="Read Book"
-                        required
-                        type="text"
-                        {...register("name")}
-                     />
-                  </div>
-                  {/* start date and end date */}
-                  <div className="grid grid-cols-2 gap-2 items-center justify-between">
-                     <div>
-                        <Label htmlFor="startTime">Start Date</Label>
-                        <Popover>
-                           <PopoverTrigger asChild>
-                              <Button
-                                 variant={"outline"}
-                                 className="w-full pl-3 text-left font-normal"
-                              >
-                                 {startDate ? (
-                                    startDate.toLocaleDateString()
-                                 ) : (
-                                    <span>Pick a Start</span>
-                                 )}
-                                 <CalendarIcon className="h-4 w-4 ml-1 first-letter:opacity-50" />
-                              </Button>
-                           </PopoverTrigger>
-                           <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                 mode="single"
-                                 selected={startDate}
-                                 onSelect={(e) => {
-                                    setStartdate(e);
-                                    setEnddate(null);
-                                 }}
-                                 disabled={(date) =>
-                                    date < new Date().setHours(0, 0, 0, 0)
-                                 }
-                                 initialFocus
-                              />
-                           </PopoverContent>
-                        </Popover>
-                     </div>
-                     <div>
-                        <Label htmlFor="startTime">End Date</Label>
-                        <Popover>
-                           <PopoverTrigger asChild>
-                              <Button
-                                 variant={"outline"}
-                                 className="w-full pl-3 text-left font-normal"
-                              >
-                                 {endDate ? (
-                                    endDate.toLocaleDateString()
-                                 ) : (
-                                    <span>Pick a End</span>
-                                 )}
-                                 <CalendarIcon className="h-4 w-4 ml-1 first-letter:opacity-50" />
-                              </Button>
-                           </PopoverTrigger>
-                           <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                 mode="single"
-                                 selected={startDate}
-                                 onSelect={(e) => setEnddate(e)}
-                                 disabled={(date) =>
-                                    date < startDate.setHours(0, 0, 0, 0)
-                                 }
-                                 initialFocus
-                              />
-                           </PopoverContent>
-                        </Popover>
-                     </div>
-                  </div>
-                  {/* start time, end time, duration */}
-                  <div className="grid grid-cols-3 gap-2 items-center justify-between">
-                     <div>
-                        <Label htmlFor="startTime">Start Time</Label>
-                        <Input
-                           id="startTime"
-                           placeholder="1:00 PM"
-                           type="time"
-                           {...register("startTime", { required: true })}
-                           onChange={(e) =>
-                              setTimeEdit({
-                                 type: "startTime",
-                                 val: e.target.value,
-                              })
-                           }
-                        />
-                     </div>
-                     <div>
-                        <Label htmlFor="endTime">End Time</Label>
-                        <Input
-                           id="endTime"
-                           placeholder="1:00 PM"
-                           type="time"
-                           {...register("endTime")}
-                           onChange={(e) =>
-                              setTimeEdit({
-                                 type: "endTime",
-                                 val: e.target.value,
-                              })
-                           }
-                        />
-                     </div>
-                     <div>
-                        <Label htmlFor="time">Duration</Label>
-                        <Input
-                           id="time"
-                           placeholder="60 min"
-                           type="number"
-                           min="0"
-                           max="1440"
-                           {...register("duration")}
-                           onChange={(e) => {
-                              let num = Number(e.target.value);
-                              if (num > 1440) {
-                                 num = 1440;
-                              }
-                              if (num < 0) {
-                                 num = 0;
-                              }
-                              e.target.value = num;
-                              setTimeEdit({
-                                 type: "duration",
-                                 val: e.target.value,
-                              });
-                           }}
-                        />
-                     </div>
-                  </div>
-
                   {/* habit type */}
                   <div>
                      <Label htmlFor="type">Habit Type</Label>
@@ -405,61 +174,43 @@ export default function AddHabit() {
                         </span>
                      </div>
                   </div>
+                  {/* habit name */}
+                  <div>
+                     <Label htmlFor="name">Habit Name</Label>
+                     <Input
+                        id="name"
+                        placeholder="Read Book"
+                        type="text"
+                        className={
+                           errors?.name ? "border-red-500 border-2" : ""
+                        }
+                        {...register("name", { required: true })}
+                     />
+                  </div>
+                  {/* start date and end date */}
+                  <DateSelector
+                     getValues={getValues}
+                     setValue={setValue}
+                     register={register}
+                  />
+                  {/* start time, end time, duration */}
+                  {type !== "negative" && (
+                     <TimeSelector
+                        errors={errors}
+                        getValues={getValues}
+                        setValue={setValue}
+                        register={register}
+                     />
+                  )}
 
                   {/* repeat */}
-                  <Collapsible
-                     open={repeatisOpen}
-                     onOpenChange={setRepeatIsOpen}
-                     className=""
-                  >
-                     <div className="flex items-center justify-between">
-                        <CollapsibleTrigger asChild>
-                           <Button
-                              variant="outline"
-                              className="w-full flex justify-between hover:bg-none mb-2"
-                           >
-                              <span>Repeat</span>
-                              <span className="flex justify-center items-center gap-1">
-                                 Everyday
-                                 <IoIosArrowForward className="h-3 w-3" />
-                              </span>
-                           </Button>
-                        </CollapsibleTrigger>
-                     </div>
-                     <CollapsibleContent className="space-y-2 mt-2">
-                        <div className="">
-                           <Label htmlFor="description">
-                              Specific Days in Week
-                           </Label>
-                           <div className="grid grid-cols-7 gap-1 pt-1">
-                              {days.map((day, index) => (
-                                 <span
-                                    key={index}
-                                    className={`${
-                                       repeat.includes(index)
-                                          ? "bg-violet-800"
-                                          : "bg-gray-500"
-                                    } p-1 rounded-md cursor-pointer flex flex-col font-bold justify-center items-center text-sm`}
-                                    onClick={() => {
-                                       if (repeat.includes(index)) {
-                                          if (repeat.length === 1) {
-                                             return;
-                                          }
-                                          setRepeat(
-                                             repeat.filter((d) => d !== index)
-                                          );
-                                       } else {
-                                          setRepeat([...repeat, index]);
-                                       }
-                                    }}
-                                 >
-                                    {day}
-                                 </span>
-                              ))}
-                           </div>
-                        </div>
-                     </CollapsibleContent>
-                  </Collapsible>
+                  {type == "regular" && (
+                     <Repeat
+                        register={register}
+                        getValues={getValues}
+                        setValue={setValue}
+                     />
+                  )}
 
                   {/* optional fields */}
                   <Collapsible
@@ -542,18 +293,20 @@ export default function AddHabit() {
                      </CollapsibleContent>
                   </Collapsible>
 
-                  <div className="flex items-center justify-start">
-                     <Checkbox
-                        id="notify"
-                        checked={notify}
-                        onClick={() => {
-                           setNotify((prev) => !prev);
-                        }}
-                     />
-                     <Label htmlFor="notify" className="ml-2">
-                        Send reminder to do the task
-                     </Label>
-                  </div>
+                  {type !== "negative" && (
+                     <div className="flex items-center justify-start">
+                        <Checkbox
+                           id="notify"
+                           checked={notify}
+                           onClick={() => {
+                              setNotify((prev) => !prev);
+                           }}
+                        />
+                        <Label htmlFor="notify" className="ml-2">
+                           Send reminder to do the task
+                        </Label>
+                     </div>
+                  )}
                   <Button
                      className="w-full bg-violet-800 text-white text-bold hover:bg-violet-900 shadow-md dark:shadow-gray-800 shadow-gray-300"
                      type="submit"

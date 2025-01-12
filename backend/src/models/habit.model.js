@@ -4,8 +4,7 @@ const RepeatSchema = new mongoose.Schema(
    {
       name: {
          type: String,
-         enum: ["daily", "weekly", "monthly", "yearly"],
-         default: "daily",
+         enum: ["days", "dates", "hours"],
       },
       value: [Number], // -1 for daily once, or time like 1300 if repeat is many times on a day, 0 - 6 for weekly starting from sunday, 1-31 for monthly, 1-365 for yearly
    },
@@ -36,7 +35,7 @@ const HabitSchema = new mongoose.Schema(
       isActive: Boolean,
       habitType: {
          type: String, // regular habit is daily , negative is negative which will be marked completed by default and user has to mark it as undone if he wants , oneTime is oneTime like todo
-         enum: ["regular", "negative", "oneTime"],
+         enum: ["regular", "negative", "todo"],
          default: "regular",
       },
    },
