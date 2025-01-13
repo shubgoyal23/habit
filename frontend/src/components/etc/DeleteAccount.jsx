@@ -111,7 +111,7 @@ function DeleteAccount() {
                </form>
                <CardFooter className="pt-3 justify-center">
                   Create an New Habit
-                  <Link className="text-blue-500 ml-1" to={"/habit"}>
+                  <Link className="text-blue-500 ml-1" to={"/habit-list"}>
                      Go To Habit page
                   </Link>
                </CardFooter>

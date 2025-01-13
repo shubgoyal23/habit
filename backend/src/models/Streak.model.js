@@ -6,7 +6,12 @@ const StreakSchema = new mongoose.Schema({
       ref: "streaks",
       index: true,
    },
-   Epoch: Number,
+   dateStamp: String,
+   currentStreak: Number,
+   isfreeze: {
+      type: Boolean,
+      default: false,
+   },
 });
 
-export const Steak = mongoose.model("Steak", StreakSchema);
+export const Streak = mongoose.model("Streak", StreakSchema);
