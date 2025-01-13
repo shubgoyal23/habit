@@ -168,7 +168,6 @@ function Habit() {
       let list = [];
       for (let i = 0; i < habitList.length; i++) {
          let h = { ...habitList[i] };
-         console.log(h)
          if (h.startTime) {
             h.startTime = EpochToTime(h.startTime * 1000);
          }
