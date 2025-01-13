@@ -44,6 +44,7 @@ function Action({ row }) {
       const data = {
          ...habit,
          name: `${habit.name}-copy`,
+         startDate: new Date(),
       };
       const addHAbit = axios.post(
          `${conf.BACKEND_URL}/api/v1/steak/habit`,
@@ -60,7 +61,7 @@ function Action({ row }) {
       addHAbit
          .then((data) => {
             dispatch(addHabit(data.data.data));
-            navigate(`/habit`);
+            navigate(`/habit-list`);
          })
          .catch((err) => console.log(err));
    };
