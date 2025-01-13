@@ -71,10 +71,16 @@ const addHabit = asyncHandler(async (req, res) => {
       duration = Math.floor((endTime - startTime) / 60);
    }
    if (startDate) {
+      if (typeof startDate == "number") {
+         startDate = startDate * 1000
+      }
       startDate = new Date(startDate).getTime() / 1000;
       startDate = Math.ceil(startDate);
    }
    if (endDate) {
+      if (typeof endDate == "number") {
+         endDate = endDate * 1000
+      }
       endDate = new Date(endDate).getTime() / 1000;
       endDate = Math.ceil(endDate) + 86399;
    }

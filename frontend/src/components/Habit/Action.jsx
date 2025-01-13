@@ -44,6 +44,7 @@ function Action({ row }) {
       const data = {
          ...habit,
          name: `${habit.name}-copy`,
+         startDate: new Date(),
       };
       const addHAbit = axios.post(
          `${conf.BACKEND_URL}/api/v1/steak/habit`,
