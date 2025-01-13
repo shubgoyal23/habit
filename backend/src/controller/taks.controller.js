@@ -3,6 +3,8 @@ import { ApiResponse } from "../utils/ApiResposne.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Habit } from "../models/habit.model.js";
 import { Redisclient as RedisConn } from "../db/redis.js";
+import { Streak } from "../models/Streak.model.js";
+import { User } from "../models/user.model.js";
 
 // format time of type 13:00, return hours and minutes
 const GetTimeFormated = (data) => {
@@ -47,7 +49,6 @@ const addHabit = asyncHandler(async (req, res) => {
       point,
       habitType,
       notify,
-      repeatMode,
    } = req.body;
    if (!name) {
       throw new ApiError(401, "Name Feild is Reqired");
@@ -118,6 +119,10 @@ const addHabit = asyncHandler(async (req, res) => {
       "habitLists",
       `${createUserHabit._id.toString()}:${req.user._id.toString()}`
    );
+   // save to user list
+   const add = await User.findByIdAndUpdate(req.user._id, {
+      $push: { habitsList: createUserHabit._id },
+   });
    return res
       .status(200)
       .json(new ApiResponse(200, createUserHabit, "Habit Added Successfully"));
@@ -229,15 +234,27 @@ const editHabit = asyncHandler(async (req, res) => {
 
 const DeleteHabit = asyncHandler(async (req, res) => {
    const { id } = req.body;
-
    if (!id) {
       throw new ApiError(401, "id is Reqired");
    }
-   const del = await Habit.findOneAndDelete({ _id: id, userId: req.user._id });
+   const check = req.user.habitsList.find((i) => i.toString() == id);
+   if (!check) {
+      throw new ApiError(401, "Habit with Id not found for this user");
+   }
 
+   const del = await Habit.findOneAndDelete({ _id: id, userId: req.user._id });
    if (!del) {
       throw new ApiError(401, "Habit Deletion Failed, try again later");
    }
+
+   const removeStreaks = await Streak.deleteMany({
+      habitId: id,
+   });
+
+   let habits = req.user.habitsList.filter((i) => i.toString() != id);
+   await User.findByIdAndUpdate(req.user._id, {
+      $set: { habitsList: habits },
+   });
 
    await RedisConn.SREM(
       "habitLists",
@@ -249,94 +266,115 @@ const DeleteHabit = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, {}, "Habit deleted Successfully"));
 });
 
-const addSteak = asyncHandler(async (req, res) => {
-   const { id, habitDate } = req.body;
+const addStreak = asyncHandler(async (req, res) => {
+   const { id } = req.body;
    if (!id) {
-      throw new ApiError(401, "Habit Id is required to mark completed");
+      throw new ApiError(
+         401,
+         "Habit Id and date is required to mark completed"
+      );
    }
-
-   const habit = await Habit.findById(id);
-   if (!habit || habit.userId.toString() !== req.user._id.toString()) {
+   const checkHabit = req.user.habitsList.find((i) => i.toString() == id);
+   if (!checkHabit) {
       throw new ApiError(401, "Habit with Id not found");
    }
+   const serverTime = new Date();
+   const serTimeOff = serverTime.getTimezoneOffset() * 60 * 1000;
+   const userTimeOff = req.user.timeZone * 60 * 1000;
 
-   const dateTemp = new Date(habitDate || Date.now());
-   const dateEpoch =
-      new Date(
-         dateTemp.getUTCFullYear(),
-         dateTemp.getUTCMonth(),
-         dateTemp.getUTCDate(),
-         0,
-         0,
-         0,
-         0
-      ).getTime() / 1000;
+   let servertime = new Date(serverTime - serTimeOff + userTimeOff);
+   let dateStamp = `${servertime.getFullYear()}-${servertime.getMonth()}-${servertime.getDate()}`;
 
-   let check = habit.daysCompleted.find((item) => {
-      if (
-         item.getDate() === date.getDate() &&
-         item.getMonth() === date.getMonth() &&
-         item.getFullYear() === date.getFullYear()
-      ) {
-         return item;
-      }
+   const check = await Streak.findOne({
+      habitId: id,
+      dateStamp: dateStamp,
    });
    if (check) {
-      throw new ApiError(401, "Steak is Already Marked Completed");
+      throw new ApiError(401, "Streak is Already Marked Completed");
    }
-   habit.daysCompleted.push(date);
-   await habit.save();
 
-   await RedisConn.SADD(
-      `habitDate:${date.getFullYear()}:${date.getMonth()}:${date.getDate()}`,
-      `${habit._id.toString()}:${req.user._id.toString()}`
+   let Oldservertime = new Date(
+      serverTime - serTimeOff + userTimeOff - 86400000
    );
+   let OlddateStamp = `${Oldservertime.getFullYear()}-${Oldservertime.getMonth()}-${Oldservertime.getDate()}`;
+   let currentS = 1;
+   const prevStreak = await Streak.findOne({
+      habitId: id,
+      dateStamp: OlddateStamp,
+   });
+   if (prevStreak) {
+      currentS = prevStreak.currentStreak + 1;
+   }
+   let streakAdd = await Streak.create({
+      userId: req.user._id,
+      habitId: id,
+      dateStamp: dateStamp,
+      currentStreak: currentS,
+   });
+   if (!streakAdd) {
+      throw new ApiError(401, "Streak Add Failed, try again later");
+   }
 
    return res
       .status(200)
-      .json(new ApiResponse(200, habit, "habit marked Completed"));
+      .json(new ApiResponse(200, streakAdd, "habit marked Completed"));
 });
 
-const removeSteak = asyncHandler(async (req, res) => {
-   const { id, date: habitDate } = req.body;
+const removeStreak = asyncHandler(async (req, res) => {
+   const { id } = req.body;
    if (!id) {
-      throw new ApiError(401, "Habit Id is required to add Steak");
+      throw new ApiError(401, "Habit Id is required to add Streak");
    }
 
-   const habit = await Habit.findById(id);
-   if (!habit || habit.userId.toString() !== req.user._id.toString()) {
+   const checkHabit = req.user.habitsList.find((i) => i.toString() == id);
+   if (!checkHabit) {
+      throw new ApiError(401, "Habit with Id not found");
+   }
+   const serverTime = new Date();
+   const serTimeOff = serverTime.getTimezoneOffset() * 60 * 1000;
+   const userTimeOff = req.user.timeZone * 60 * 1000;
+
+   let servertime = new Date(serverTime - serTimeOff + userTimeOff);
+   let dateStamp = `${servertime.getFullYear()}-${servertime.getMonth()}-${servertime.getDate()}`;
+
+   const remove = await Streak.findOneAndDelete({
+      habitId: id,
+      dateStamp: dateStamp,
+   });
+   if (!remove) {
+      throw new ApiError(401, "Streak Remove Failed, try again later");
+   }
+
+   return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "habit marked Pending"));
+});
+
+const getSteakList = asyncHandler(async (req, res) => {
+   const { id } = req.body;
+   if (!id) {
+      throw new ApiError(401, "Habit Id is required to get Streak list");
+   }
+   const checkHabit = req.user.habitsList.find((i) => i.toString() == id);
+   if (!checkHabit) {
       throw new ApiError(401, "Habit with Id not found");
    }
 
-   const dateTemp = new Date(habitDate || Date.now());
-   const date = new Date(
-      dateTemp.getUTCFullYear(),
-      dateTemp.getUTCMonth(),
-      dateTemp.getUTCDate(),
-      0,
-      0,
-      0,
-      0
-   );
-
-   let check = habit.daysCompleted.filter((item) => {
-      return (
-         item.getDate() !== date.getDate() ||
-         item.getMonth() !== date.getMonth() ||
-         item.getFullYear() !== date.getFullYear()
-      );
-   });
-
-   habit.daysCompleted = check;
-   await habit.save();
-   await RedisConn.SREM(
-      `habitDate:${date.getFullYear()}:${date.getMonth()}:${date.getDate()}`,
-      `${habit._id.toString()}:${req.user._id.toString()}`
-   );
-
+   const list = await Streak.find({ habitId: id }).limit(31)
+   if (!list) {
+      throw new ApiError(401, "Streak list not found");
+   }
    return res
       .status(200)
-      .json(new ApiResponse(200, habit, "habit marked Pending"));
+      .json(new ApiResponse(200, list, "streak list fetched successfully"));
 });
 
-export { listHabit, addHabit, DeleteHabit, editHabit, addSteak, removeSteak };
+export {
+   listHabit,
+   addHabit,
+   DeleteHabit,
+   editHabit,
+   addStreak,
+   removeStreak,
+   getSteakList,
+};

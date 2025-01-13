@@ -60,7 +60,7 @@ function Action({ row }) {
       addHAbit
          .then((data) => {
             dispatch(addHabit(data.data.data));
-            navigate(`/habit`);
+            navigate(`/habit-list`);
          })
          .catch((err) => console.log(err));
    };
