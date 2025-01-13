@@ -35,6 +35,11 @@ const userSchema = new mongoose.Schema(
       timeZone: Number,
       isActive: Boolean,
       phone: String,
+      habitSkip: {
+         type: Number,
+         default: 5,
+      },
+      habitsList: [mongoose.Schema.Types.ObjectId],
       phoneDetails: {
          deviceId: String, // device id
          model: String, // phone model

@@ -33,7 +33,7 @@ export default function Login() {
 
    useEffect(() => {
       if (isloggedin) {
-         navigate("/habit");
+         navigate("/habit-list");
       }
    }, [isloggedin]);
 
@@ -51,7 +51,7 @@ export default function Login() {
       login
          .then((data) => {
             dispatch(authlogin(data.data.data));
-            navigate("/habit");
+            navigate("/habit-list");
          })
          .catch((err) => console.log(err));
    };

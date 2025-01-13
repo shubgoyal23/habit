@@ -1,115 +1,236 @@
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResposne.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import { Streak } from "../models/streak.model.js";
+import { Habit } from "../models/habit.model.js";
 import { Redisclient as RedisConn } from "../db/redis.js";
+import { Streak } from "../models/Streak.model.js";
+import { User } from "../models/user.model.js";
 
+// format time of type 13:00, return hours and minutes
 const GetTimeFormated = (data) => {
-   let startTime = Number(data?.replace(":", ""));
-   if (!startTime) {
+   let startTime = data?.split(":");
+   if (startTime.length < 2) {
       return;
    }
-   let hours = Math.floor(startTime / 100);
-   let minutes = startTime % 100;
-   minutes = Math.floor(minutes / 5) * 5;
-   return { startTime, hours, minutes };
+   let hours = Number(startTime[0]);
+   let minutes = Number(startTime[1]);
+   return [hours, minutes];
+};
+
+// set time of hours and minutes in epoch format based on 1 jan 2025
+// input time is in user local time zone, alone with user time zone offset in minutes
+const GetTimeEpoch = (hr, min, userOffset) => {
+   const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0) / 1000; // get epoch in seconds
+   return epoch + userOffset * 60; // convert user offset in minutes to seconds
 };
 
 const listHabit = asyncHandler(async (req, res) => {
-   const list = await Streak.find({ userId: req.user._id });
+   const list = await Habit.find({ userId: req.user._id });
 
    return res
       .status(200)
       .json(new ApiResponse(200, list, "habit list fetched successfully"));
 });
 
+// create a new habit and add it to the list
 const addHabit = asyncHandler(async (req, res) => {
-   const { name } = req.body;
+   let {
+      name,
+      description,
+      duration,
+      startTime,
+      endTime,
+      startDate,
+      endDate,
+      repeat,
+      place,
+      how,
+      ifthen,
+      point,
+      habitType,
+      notify,
+   } = req.body;
    if (!name) {
       throw new ApiError(401, "Name Feild is Reqired");
    }
-
-   let { startTime, hours, minutes } = GetTimeFormated(req.body?.startTime);
-   // let endTime = req.body?.endTime?.replace(":", "")
-   if (!startTime) {
-      throw new ApiError(401, "Start Time Feild is Reqired");
+   if (!habitType) {
+      throw new ApiError(401, "Habit Type is Reqired");
    }
-   const add = await Streak.create({
+   if (startTime) {
+      const [hr, min] = GetTimeFormated(startTime);
+      startTime = GetTimeEpoch(hr, min, req.user.timeZone);
+   }
+   if (endTime) {
+      const [hr, min] = GetTimeFormated(endTime);
+      endTime = GetTimeEpoch(hr, min, req.user.timeZone);
+      if (endTime < startTime) {
+         endTime += 86400;
+      }
+   }
+   if (startTime && endTime) {
+      duration = Math.floor((endTime - startTime) / 60);
+   }
+   if (startDate) {
+      if (typeof startDate == "number") {
+         startDate = startDate * 1000
+      }
+      startDate = new Date(startDate).getTime() / 1000;
+      startDate = Math.ceil(startDate);
+   }
+   if (endDate) {
+      if (typeof endDate == "number") {
+         endDate = endDate * 1000
+      }
+      endDate = new Date(endDate).getTime() / 1000;
+      endDate = Math.ceil(endDate) + 86399;
+   }
+   switch (repeat.name) {
+      case "days":
+         break;
+      case "dates":
+         for (let i = 0; i < repeat.value.length; i++) {
+            repeat.value[i] = Math.ceil(
+               new Date(repeat.value[i]).getTime() / 1000
+            );
+         }
+         break;
+      case "hours":
+         break;
+   }
+   if (habitType == "negative") {
+      notify = false;
+   }
+   const createUserHabit = await Habit.create({
       userId: req.user._id,
       name: name,
-      startDate: new Date(),
-      description: req.body?.description,
-      duration: req.body?.duration,
-      startTime: req.body?.startTime,
-      endTime: req.body?.endTime,
-      place: req.body?.place,
-      how: req.body?.how,
-      ifthen: req.body?.ifthen,
-      point: req.body?.point,
+      startDate: startDate,
+      endDate: endDate,
+      repeat: repeat,
+      habitType: habitType,
+      description: description,
+      duration: duration,
+      startTime: startTime,
+      endTime: endTime,
+      place: place,
+      how: how,
+      ifthen: ifthen,
+      point: point,
       daysCompleted: [],
+      notify: notify,
    });
-   if (!add) {
+   if (!createUserHabit) {
       throw new ApiError(401, "Habit Creation Failed, try again later");
    }
    await RedisConn.sAdd(
-      "habitList",
-      `${add._id.toString()}:${req.user._id.toString()}`
+      "habitLists",
+      `${createUserHabit._id.toString()}:${req.user._id.toString()}`
    );
-   await RedisConn.sAdd(
-      `habitTime:${hours}:${minutes}`,
-      `${add._id.toString()}:${req.user._id.toString()}`
-   );
-
+   // save to user list
+   const add = await User.findByIdAndUpdate(req.user._id, {
+      $push: { habitsList: createUserHabit._id },
+   });
    return res
       .status(200)
-      .json(new ApiResponse(200, add, "Habit Added Successfully"));
+      .json(new ApiResponse(200, createUserHabit, "Habit Added Successfully"));
 });
 
+// edit a habit
 const editHabit = asyncHandler(async (req, res) => {
-   const { id } = req.body;
+   let {
+      id,
+      name,
+      description,
+      duration,
+      startTime,
+      endTime,
+      startDate,
+      endDate,
+      repeat,
+      place,
+      how,
+      ifthen,
+      point,
+      habitType,
+      notify,
+      repeatMode,
+   } = req.body;
    if (!id) {
-      throw new ApiError(401, "id is Reqired");
+      throw new ApiError(401, "Habit Id is Reqired");
    }
-   const habit = await Streak.findById(id);
+   const habit = await Habit.findById(id);
 
    if (!habit || habit.userId == req.user._id) {
-      throw new ApiError(403, "Habit not found");
+      throw new ApiError(403, "Habit with Id not found for this user");
    }
-   let { startTime, hours, minutes } = GetTimeFormated(req.body?.startTime);
-
-   delete req.body.id;
-   const updatedHabit = await Streak.findByIdAndUpdate(
+   if (!name) {
+      throw new ApiError(401, "Name Feild is Reqired");
+   }
+   if (!habitType) {
+      throw new ApiError(401, "Habit Type is Reqired");
+   }
+   if (startTime) {
+      const [hr, min] = GetTimeFormated(startTime);
+      startTime = GetTimeEpoch(hr, min, req.user.timeZone);
+   }
+   if (endTime) {
+      const [hr, min] = GetTimeFormated(endTime);
+      endTime = GetTimeEpoch(hr, min, req.user.timeZone);
+      if (endTime < startTime) {
+         endTime += 86400;
+      }
+   }
+   if (startTime && endTime) {
+      duration = Math.floor((endTime - startTime) / 60);
+   }
+   if (startDate) {
+      startDate = new Date(startDate).getTime() / 1000;
+      startDate = Math.ceil(startDate);
+   }
+   if (endDate) {
+      endDate = new Date(endDate).getTime() / 1000;
+      endDate = Math.ceil(endDate) + 86399;
+   }
+   switch (repeat.name) {
+      case "days":
+         break;
+      case "dates":
+         for (let i = 0; i < repeat.value.length; i++) {
+            repeat.value[i] = Math.ceil(
+               new Date(repeat.value[i]).getTime() / 1000
+            );
+         }
+         break;
+      case "hours":
+         break;
+   }
+   if (habitType == "negative") {
+      notify = false;
+   }
+   const updatedHabit = await Habit.findByIdAndUpdate(
       id,
       {
-         name: req.body?.name,
-         description: req.body?.description,
-         duration: req.body?.duration,
-         startTime: req.body?.startTime,
-         endTime: req.body?.endTime,
-         place: req.body?.place,
-         how: req.body?.how,
-         ifthen: req.body?.ifthen,
-         point: req.body?.point,
+         userId: req.user._id,
+         name: name,
+         startDate: startDate,
+         endDate: endDate,
+         repeat: repeat,
+         habitType: habitType,
+         description: description,
+         duration: duration,
+         startTime: startTime,
+         endTime: endTime,
+         place: place,
+         how: how,
+         ifthen: ifthen,
+         point: point,
+         daysCompleted: [],
+         notify: notify,
       },
       { new: true }
    );
+
    if (!updatedHabit) {
       throw new ApiError(401, "Habit Update Failed, try again later");
-   }
-   if (startTime) {
-      let {
-         startTime,
-         hours: oldHours,
-         minutes: oldMinutes,
-      } = GetTimeFormated(habit?.startTime);
-      await RedisConn.SREM(
-         `habitTime:${oldHours}:${oldMinutes}`,
-         `${habit._id.toString()}:${req.user._id.toString()}`
-      );
-      await RedisConn.sAdd(
-         `habitTime:${hours}:${minutes}`,
-         `${habit._id.toString()}:${req.user._id.toString()}`
-      );
    }
 
    return res
@@ -119,23 +240,30 @@ const editHabit = asyncHandler(async (req, res) => {
 
 const DeleteHabit = asyncHandler(async (req, res) => {
    const { id } = req.body;
-
    if (!id) {
       throw new ApiError(401, "id is Reqired");
    }
-   const del = await Streak.findByIdAndDelete(id);
+   const check = req.user.habitsList.find((i) => i.toString() == id);
+   if (!check) {
+      throw new ApiError(401, "Habit with Id not found for this user");
+   }
 
+   const del = await Habit.findOneAndDelete({ _id: id, userId: req.user._id });
    if (!del) {
       throw new ApiError(401, "Habit Deletion Failed, try again later");
    }
-   let { startTime, hours, minutes } = GetTimeFormated(del?.startTime);
+
+   const removeStreaks = await Streak.deleteMany({
+      habitId: id,
+   });
+
+   let habits = req.user.habitsList.filter((i) => i.toString() != id);
+   await User.findByIdAndUpdate(req.user._id, {
+      $set: { habitsList: habits },
+   });
 
    await RedisConn.SREM(
-      `habitTime:${hours}:${minutes}`,
-      `${del._id.toString()}:${req.user._id.toString()}`
-   );
-   await RedisConn.SREM(
-      "habitList",
+      "habitLists",
       `${del._id.toString()}:${req.user._id.toString()}`
    );
 
@@ -144,92 +272,115 @@ const DeleteHabit = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, {}, "Habit deleted Successfully"));
 });
 
-const addSteak = asyncHandler(async (req, res) => {
-   const { id, date: habitDate } = req.body;
+const addStreak = asyncHandler(async (req, res) => {
+   const { id } = req.body;
    if (!id) {
-      throw new ApiError(401, "Habit Id is required to add Steak");
+      throw new ApiError(
+         401,
+         "Habit Id and date is required to mark completed"
+      );
    }
-
-   const habit = await Streak.findById(id);
-   if (!habit || habit.userId.toString() !== req.user._id.toString()) {
+   const checkHabit = req.user.habitsList.find((i) => i.toString() == id);
+   if (!checkHabit) {
       throw new ApiError(401, "Habit with Id not found");
    }
-   const dateTemp = new Date(habitDate || Date.now());
-   const date = new Date(
-      dateTemp.getUTCFullYear(),
-      dateTemp.getUTCMonth(),
-      dateTemp.getUTCDate(),
-      0,
-      0,
-      0,
-      0
-   );
+   const serverTime = new Date();
+   const serTimeOff = serverTime.getTimezoneOffset() * 60 * 1000;
+   const userTimeOff = req.user.timeZone * 60 * 1000;
 
-   let check = habit.daysCompleted.find((item) => {
-      if (
-         item.getDate() === date.getDate() &&
-         item.getMonth() === date.getMonth() &&
-         item.getFullYear() === date.getFullYear()
-      ) {
-         return item;
-      }
+   let servertime = new Date(serverTime - serTimeOff + userTimeOff);
+   let dateStamp = `${servertime.getFullYear()}-${servertime.getMonth()}-${servertime.getDate()}`;
+
+   const check = await Streak.findOne({
+      habitId: id,
+      dateStamp: dateStamp,
    });
    if (check) {
-      throw new ApiError(401, "Steak is Already Marked Completed");
+      throw new ApiError(401, "Streak is Already Marked Completed");
    }
-   habit.daysCompleted.push(date);
-   await habit.save();
 
-   await RedisConn.SADD(
-      `habitDate:${date.getFullYear()}:${date.getMonth()}:${date.getDate()}`,
-      `${habit._id.toString()}:${req.user._id.toString()}`
+   let Oldservertime = new Date(
+      serverTime - serTimeOff + userTimeOff - 86400000
    );
+   let OlddateStamp = `${Oldservertime.getFullYear()}-${Oldservertime.getMonth()}-${Oldservertime.getDate()}`;
+   let currentS = 1;
+   const prevStreak = await Streak.findOne({
+      habitId: id,
+      dateStamp: OlddateStamp,
+   });
+   if (prevStreak) {
+      currentS = prevStreak.currentStreak + 1;
+   }
+   let streakAdd = await Streak.create({
+      userId: req.user._id,
+      habitId: id,
+      dateStamp: dateStamp,
+      currentStreak: currentS,
+   });
+   if (!streakAdd) {
+      throw new ApiError(401, "Streak Add Failed, try again later");
+   }
 
    return res
       .status(200)
-      .json(new ApiResponse(200, habit, "habit marked Completed"));
+      .json(new ApiResponse(200, streakAdd, "habit marked Completed"));
 });
 
-const removeSteak = asyncHandler(async (req, res) => {
-   const { id, date: habitDate } = req.body;
+const removeStreak = asyncHandler(async (req, res) => {
+   const { id } = req.body;
    if (!id) {
-      throw new ApiError(401, "Habit Id is required to add Steak");
+      throw new ApiError(401, "Habit Id is required to add Streak");
    }
 
-   const habit = await Streak.findById(id);
-   if (!habit || habit.userId.toString() !== req.user._id.toString()) {
+   const checkHabit = req.user.habitsList.find((i) => i.toString() == id);
+   if (!checkHabit) {
+      throw new ApiError(401, "Habit with Id not found");
+   }
+   const serverTime = new Date();
+   const serTimeOff = serverTime.getTimezoneOffset() * 60 * 1000;
+   const userTimeOff = req.user.timeZone * 60 * 1000;
+
+   let servertime = new Date(serverTime - serTimeOff + userTimeOff);
+   let dateStamp = `${servertime.getFullYear()}-${servertime.getMonth()}-${servertime.getDate()}`;
+
+   const remove = await Streak.findOneAndDelete({
+      habitId: id,
+      dateStamp: dateStamp,
+   });
+   if (!remove) {
+      throw new ApiError(401, "Streak Remove Failed, try again later");
+   }
+
+   return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "habit marked Pending"));
+});
+
+const getSteakList = asyncHandler(async (req, res) => {
+   const { id } = req.body;
+   if (!id) {
+      throw new ApiError(401, "Habit Id is required to get Streak list");
+   }
+   const checkHabit = req.user.habitsList.find((i) => i.toString() == id);
+   if (!checkHabit) {
       throw new ApiError(401, "Habit with Id not found");
    }
 
-   const dateTemp = new Date(habitDate || Date.now());
-   const date = new Date(
-      dateTemp.getUTCFullYear(),
-      dateTemp.getUTCMonth(),
-      dateTemp.getUTCDate(),
-      0,
-      0,
-      0,
-      0
-   );
-
-   let check = habit.daysCompleted.filter((item) => {
-      return (
-         item.getDate() !== date.getDate() ||
-         item.getMonth() !== date.getMonth() ||
-         item.getFullYear() !== date.getFullYear()
-      );
-   });
-
-   habit.daysCompleted = check;
-   await habit.save();
-   await RedisConn.SREM(
-      `habitDate:${date.getFullYear()}:${date.getMonth()}:${date.getDate()}`,
-      `${habit._id.toString()}:${req.user._id.toString()}`
-   );
-
+   const list = await Streak.find({ habitId: id }).limit(31)
+   if (!list) {
+      throw new ApiError(401, "Streak list not found");
+   }
    return res
       .status(200)
-      .json(new ApiResponse(200, habit, "habit marked Pending"));
+      .json(new ApiResponse(200, list, "streak list fetched successfully"));
 });
 
-export { listHabit, addHabit, DeleteHabit, editHabit, addSteak, removeSteak };
+export {
+   listHabit,
+   addHabit,
+   DeleteHabit,
+   editHabit,
+   addStreak,
+   removeStreak,
+   getSteakList,
+};

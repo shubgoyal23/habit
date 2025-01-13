@@ -28,6 +28,7 @@ import RowSelector from "./RowSelector";
 import FilterInput from "./FilterInput";
 import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
+import { EpochToTime } from "@/lib/helpers";
 
 const columns = [
    {
@@ -89,7 +90,7 @@ const columns = [
    },
    {
       accessorKey: "point",
-      header: "Point",
+      header: "Importance",
       cell: (prop) => <p>{prop.getValue()}</p>,
    },
    {
@@ -103,7 +104,7 @@ const columns = [
 function Habit() {
    const habitList = useSelector((state) => state.habit) || [];
    const user = useSelector((state) => state.auth.loggedin);
-   const [data, setData] = useState(habitList);
+   const [data, setData] = useState([]);
    const dispatch = useDispatch();
    const navigate = useNavigate();
 
@@ -137,7 +138,10 @@ function Habit() {
                id == "description" ||
                id == "place" ||
                id == "how" ||
-               id == "ifthen"
+               id == "ifthen" ||
+               id == "point" ||
+               id == "endTime" ||
+               id == "duration"
             ) {
                column.toggleVisibility(false);
             }
@@ -160,7 +164,28 @@ function Habit() {
    }, []);
 
    useEffect(() => {
-      setData(habitList);
+      if (!habitList) {
+         return;
+      }
+      let list = [];
+      for (let i = 0; i < habitList.length; i++) {
+         let h = { ...habitList[i] };
+         if (h.startTime) {
+            h.startTime = EpochToTime(h.startTime * 1000);
+         }
+         if (h.endTime) {
+            h.endTime = EpochToTime(h.endTime * 1000);
+         }
+         if (!h.duration) {
+            h.duration = 0;
+         }
+         if (h.startDate) {
+         }
+         if (h.endDate) {
+         }
+         list.push(h);
+      }
+      setData(list);
    }, [habitList]);
 
    return (

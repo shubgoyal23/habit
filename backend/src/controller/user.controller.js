@@ -1,11 +1,11 @@
 import { ConnectRedis, Redisclient } from "../db/redis.js";
-import { Streak } from "../models/streak.model.js";
 import { User } from "../models/user.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResposne.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
 import { SendOtp } from "../utils/Email.js";
+import { Habit } from "../models/habit.model.js";
 
 const generateAccessTokenAndRefresToken = async (id) => {
    try {
@@ -387,8 +387,8 @@ const DeleteUser = asyncHandler(async (req, res) => {
       throw new ApiError(403, "unauthorized user, Check email id and password");
    }
    await User.findByIdAndDelete(user._id);
-   let ids = await Streak.find({ userId: user._id }).select("_id");
-   await Streak.deleteMany({ userId: user._id });
+   let ids = await Habit.find({ userId: user._id }).select("_id");
+   await Habit.deleteMany({ userId: user._id });
 
    // remove from redis too
    let rmids = [];

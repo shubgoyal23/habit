@@ -21,6 +21,7 @@ import Privacy from "./components/etc/Privacy";
 import DeleteAccount from "./components/etc/DeleteAccount";
 import { VerifyOtp } from "./components/auth/VerifyOtp";
 import { ResetPage } from "./components/auth/Reset";
+import Profile from "./components/profile/Profile";
 
 const router = createBrowserRouter([
    {
@@ -53,7 +54,7 @@ const router = createBrowserRouter([
             element: <ResetPage />,
          },
          {
-            path: "/habit",
+            path: "/habit-list",
             element: <Habit />,
          },
          {
@@ -63,6 +64,10 @@ const router = createBrowserRouter([
          {
             path: "/steak",
             element: <SteakList />,
+         },
+         {
+            path: "/profile",
+            element: <Profile />,
          },
          {
             path: "/privacy-policy",
