@@ -125,7 +125,7 @@ export default function AddHabit() {
          addHAbit
             .then((data) => {
                dispatch(addHabit(data.data.data));
-               navigate(`/habit`);
+               navigate(`/habit-list`);
             })
             .catch((err) => console.log(err));
       } else {
@@ -144,7 +144,7 @@ export default function AddHabit() {
          addHAbit
             .then((data) => {
                dispatch(editHabit(data.data.data));
-               navigate("/habit");
+               navigate("/habit-list");
             })
             .catch((err) => console.log(err));
       }
@@ -332,7 +332,7 @@ export default function AddHabit() {
                </form>
                <CardFooter className="p-3 justify-center">
                   Return Back to Habit Page
-                  <Link className="text-blue-500 ml-1" to={"/habit"}>
+                  <Link className="text-blue-500 ml-1" to={"/habit-list"}>
                      Click Here
                   </Link>
                </CardFooter>
