@@ -139,7 +139,9 @@ function Habit() {
                id == "place" ||
                id == "how" ||
                id == "ifthen" ||
-               id == "point"
+               id == "point" ||
+               id == "endTime" ||
+               id == "duration"
             ) {
                column.toggleVisibility(false);
             }
