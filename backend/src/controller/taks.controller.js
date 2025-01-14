@@ -121,6 +121,7 @@ const addHabit = asyncHandler(async (req, res) => {
    if (!createUserHabit) {
       throw new ApiError(401, "Habit Creation Failed, try again later");
    }
+   await ConnectRedis()
    await RedisConn.sAdd(
       "habitLists",
       `${createUserHabit._id.toString()}:${req.user._id.toString()}`
@@ -261,7 +262,7 @@ const DeleteHabit = asyncHandler(async (req, res) => {
    await User.findByIdAndUpdate(req.user._id, {
       $set: { habitsList: habits },
    });
-
+   await ConnectRedis()
    await RedisConn.SREM(
       "habitLists",
       `${del._id.toString()}:${req.user._id.toString()}`

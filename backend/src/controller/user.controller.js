@@ -49,6 +49,7 @@ const registeruser = asyncHandler(async (req, res) => {
       timeZone,
       isActive: false,
    });
+   await ConnectRedis()
    await Redisclient.set(
       `OTP:${user._id.toString()}`,
       JSON.stringify({ email, otp: otpcheck, attempt: 3 })
@@ -79,7 +80,7 @@ const VerifyOtp = asyncHandler(async (req, res) => {
    if (!id || !otp || !type) {
       throw new ApiError(403, "unauthorise request");
    }
-
+   await ConnectRedis()
    const data = await Redisclient.get(`OTP:${id}`);
    if (!data) {
       throw new ApiError(400, "OTP expired");
@@ -99,6 +100,7 @@ const VerifyOtp = asyncHandler(async (req, res) => {
    if (finduser._id.toString() != id) {
       throw new ApiError(403, "User not found, check Email id or register one");
    }
+   await ConnectRedis()
    Redisclient.del(`OTP:${id}`);
    if (type == "register" || type == "verify-email") {
       await User.findOneAndUpdate({ email }, { isActive: true });
@@ -178,6 +180,7 @@ const ResendOtp = asyncHandler(async (req, res) => {
    if (!otpcheck) {
       throw new ApiError(500, "user verification failed");
    }
+   await ConnectRedis()
    await Redisclient.set(
       `OTP:${user._id.toString()}`,
       JSON.stringify({ email, otp: otpcheck, attempt: 3 })
@@ -396,6 +399,7 @@ const DeleteUser = asyncHandler(async (req, res) => {
    for (let i = 0; i < ids.length; i++) {
       rmids.push(`${ids[i]._id.toString()}:${user._id.toString()}`);
    }
+   await ConnectRedis()
    await Redisclient.SREM("habitList", rmids);
    return res
       .status(200)
