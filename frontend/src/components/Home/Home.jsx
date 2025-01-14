@@ -7,7 +7,7 @@ function Home() {
 
    useEffect(() => {
       if (!loggedin) {
-         // navigate("/login");
+         navigate("/login");
       } else {
          // navigate("/habit");
       }
