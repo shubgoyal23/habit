@@ -7,12 +7,10 @@ import { FaFire } from "react-icons/fa";
 import { FaHome } from "react-icons/fa";
 import { RxAvatar } from "react-icons/rx";
 import { IoIosAdd } from "react-icons/io";
-import Theme from "../Theme";
 
 function Navbar() {
    const loggedin = useSelector((state) => state.auth.loggedin);
    const [menu, setMenu] = useState([]);
-   const [mobileNav, setMobileNav] = useState(false);
 
    useEffect(() => {
       !loggedin
@@ -72,7 +70,6 @@ function Navbar() {
                         </NavLink>
                      </li>
                   ))}
-                  <Theme />
                </ul>
             </nav>
          </div>

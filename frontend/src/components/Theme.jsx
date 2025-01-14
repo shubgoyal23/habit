@@ -1,51 +1,49 @@
-import React, { useEffect, useState } from "react";
-import { CiBrightnessDown as Moon, CiBrightnessUp as Sun } from "react-icons/ci";
+// import { setTheme } from "@/store/ThemeSlice";
+// import React, { useEffect, useState } from "react";
+// import {
+//    CiBrightnessDown as Moon,
+//    CiBrightnessUp as Sun,
+// } from "react-icons/ci";
+// import { useDispatch, useSelector } from "react-redux";
 
-function Theme() {
-   const [mode, setMode] = useState("");
+// function Theme() {
+//    const userTheme = useSelector((state) => state.userTheme);
+//    const dispatch = useDispatch();
 
-   function themeswitch(theme) {
-      if (
-         theme === "dark" ||
-         (theme === "system" &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches)
-      ) {
-         document.documentElement.classList.add("dark");
-         localStorage.setItem("theme", "dark");
-         setMode("dark");
-      } else {
-         document.documentElement.classList.remove("dark");
-         localStorage.setItem("theme", "light");
-         setMode("light");
-      }
-   }
+//    function themeswitch(theme) {
+//       if (
+//          theme === "dark" ||
+//          (theme === "system" &&
+//             window.matchMedia("(prefers-color-scheme: dark)").matches)
+//       ) {
+//          document.documentElement.classList.add("dark");
+//          dispatch(setTheme("dark"));
+//          localStorage.setItem("theme", "dark");
+//       } else {
+//          dispatch(setTheme("light"));
+//       }
+//    }
 
-   useEffect(() => {
-      let theme = localStorage.getItem("theme");
-      if (theme) {
-         themeswitch(theme);
-      } else {
-         themeswitch("system");
-      }
-   }, []);
+//    useEffect(() => {
+//       themeswitch(userTheme);
+//    }, []);
 
-   const handleThemeChange = () => {
-      const newMode = mode === "dark" ? "light" : "dark";
-      themeswitch(newMode);
-      setMode(newMode);
-   };
+//    const handleThemeChange = () => {
+//       const newMode = mode === "dark" ? "light" : "dark";
+//       themeswitch(newMode);
+//       setMode(newMode);
+//    };
 
-   return (
-      <>
-         <button
-            className="text-2xl font-medium py-2 px-2 flex justify-center items-center"
-            onClick={handleThemeChange}
-         >
-            {mode === "dark" ? <Sun /> : <Moon />}
-            {/* <span className="md:hidden ml-2">{mode}</span> */}
-         </button>
-      </>
-   );
-}
+//    return (
+//       <>
+//          <button
+//             className=" flex items-center gap-3"
+//             onClick={handleThemeChange}
+//          >
+//             {mode === "dark" ? <Sun /> : <Moon />}
+//          </button>
+//       </>
+//    );
+// }
 
-export default Theme;
+// export default Theme;

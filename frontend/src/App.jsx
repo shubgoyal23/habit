@@ -22,6 +22,7 @@ import DeleteAccount from "./components/etc/DeleteAccount";
 import { VerifyOtp } from "./components/auth/VerifyOtp";
 import { ResetPage } from "./components/auth/Reset";
 import Profile from "./components/profile/Profile";
+import { setTheme } from "./store/ThemeSlice";
 
 const router = createBrowserRouter([
    {
@@ -113,6 +114,7 @@ export default function App() {
    };
    useEffect(() => {
       checkUser();
+      dispatch(setTheme(localStorage.getItem("theme")));
    }, []);
    return loading ? (
       <Loader />
