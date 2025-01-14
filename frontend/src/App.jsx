@@ -3,26 +3,23 @@ import Layout from "./Layout";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login as authlogin } from "./store/AuthSlice";
-import { useEffect, useState } from "react";
-import {
-   Login,
-   Register,
-   Habit,
-   AddHabit,
-   SteakList,
-   Home,
-   Logout,
-} from "./components/index";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Login, Register, Logout } from "./components/index";
 import ErrorPage from "./components/Error/ErrorHandler";
 import Loader from "./components/Loading/Loading";
 import { conf } from "./conf/conf";
 
-import Privacy from "./components/etc/Privacy";
-import DeleteAccount from "./components/etc/DeleteAccount";
 import { VerifyOtp } from "./components/auth/VerifyOtp";
 import { ResetPage } from "./components/auth/Reset";
-import Profile from "./components/profile/Profile";
 import { setTheme } from "./store/ThemeSlice";
+
+const Privacy = lazy(() => import("./components/etc/Privacy"));
+const DeleteAccount = lazy(() => import("./components/etc/DeleteAccount"));
+const Profile = lazy(() => import("./components/profile/Profile"));
+const Habit = lazy(() => import("./components/Habit/Habit"));
+const SteakList = lazy(() => import("./components/Steak/SteakList"));
+const AddHabit = lazy(() => import("./components/Habit/AddHabit"));
+const Home = lazy(() => import("./components/Home/Home"));
 
 const router = createBrowserRouter([
    {
@@ -32,7 +29,11 @@ const router = createBrowserRouter([
       children: [
          {
             path: "/",
-            element: <Home />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Home />
+               </Suspense>
+            ),
          },
          {
             path: "/login",
@@ -56,27 +57,51 @@ const router = createBrowserRouter([
          },
          {
             path: "/habit-list",
-            element: <Habit />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Habit />
+               </Suspense>
+            ),
          },
          {
             path: "/habit/:id",
-            element: <AddHabit />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <AddHabit />
+               </Suspense>
+            ),
          },
          {
             path: "/steak",
-            element: <SteakList />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <SteakList />
+               </Suspense>
+            ),
          },
          {
             path: "/profile",
-            element: <Profile />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Profile />
+               </Suspense>
+            ),
          },
          {
             path: "/privacy-policy",
-            element: <Privacy />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Privacy />
+               </Suspense>
+            ),
          },
          {
             path: "/close-account",
-            element: <DeleteAccount />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <DeleteAccount />
+               </Suspense>
+            ),
          },
       ],
    },
