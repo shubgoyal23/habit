@@ -30,13 +30,6 @@ app.use((req, res, next) => {
          res.status(500).json(new ApiResponse(500, {}, "Internal Server Error"))
       );
 });
-app.use((req, res, next) => {
-   ConnectRedis()
-      .then(() => next())
-      .catch(() =>
-         res.status(500).json(new ApiResponse(500, {}, "Internal Server Error"))
-      );
-});
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/steak", steakRouter);
 
