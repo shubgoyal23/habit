@@ -2,7 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResposne.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Habit } from "../models/habit.model.js";
-import { Redisclient as RedisConn } from "../db/redis.js";
+import { ConnectRedis, Redisclient as RedisConn } from "../db/redis.js";
 import { Streak } from "../models/Streak.model.js";
 import { User } from "../models/user.model.js";
 
