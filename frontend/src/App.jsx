@@ -11,7 +11,6 @@ import { conf } from "./conf/conf";
 
 import { VerifyOtp } from "./components/auth/VerifyOtp";
 import { ResetPage } from "./components/auth/Reset";
-import Profile from "./components/profile/Profile";
 import { SetTokenToAxios, setTokenToStorageAndAxios } from "./lib/apphelper";
 import { setTheme } from "./store/ThemeSlice";
 

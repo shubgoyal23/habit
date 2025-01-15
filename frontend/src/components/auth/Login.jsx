@@ -45,7 +45,6 @@ export default function Login() {
       if (isloggedin) {
          navigate("/habit-list");
       }
-      fcm();
    }, [isloggedin]);
 
    const onSubmit = (data) => {
@@ -63,6 +62,7 @@ export default function Login() {
          .then((data) => {
             dispatch(authlogin(data.data.data));
             setTokenToStorageAndAxios(data.data.data); // for app
+            fcm();
             navigate("/habit-list");
          })
          .catch((err) => console.log(err));
