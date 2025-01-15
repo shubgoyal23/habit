@@ -2,7 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResposne.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { Habit } from "../models/habit.model.js";
-import { Redisclient as RedisConn } from "../db/redis.js";
+import { ConnectRedis, Redisclient as RedisConn } from "../db/redis.js";
 import { Streak } from "../models/Streak.model.js";
 import { User } from "../models/user.model.js";
 
@@ -21,7 +21,9 @@ const GetTimeFormated = (data) => {
 // input time is in user local time zone, alone with user time zone offset in minutes
 const GetTimeEpoch = (hr, min, userOffset) => {
    const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0) / 1000; // get epoch in seconds
-   return epoch + userOffset * 60; // convert user offset in minutes to seconds
+   const time = Number(epoch + userOffset * 60);
+   console.log(typeof time);
+   return time; // convert user offset in minutes to seconds
 };
 
 const listHabit = asyncHandler(async (req, res) => {
@@ -72,14 +74,14 @@ const addHabit = asyncHandler(async (req, res) => {
    }
    if (startDate) {
       if (typeof startDate == "number") {
-         startDate = startDate * 1000
+         startDate = startDate * 1000;
       }
       startDate = new Date(startDate).getTime() / 1000;
       startDate = Math.ceil(startDate);
    }
    if (endDate) {
       if (typeof endDate == "number") {
-         endDate = endDate * 1000
+         endDate = endDate * 1000;
       }
       endDate = new Date(endDate).getTime() / 1000;
       endDate = Math.ceil(endDate) + 86399;
@@ -121,6 +123,7 @@ const addHabit = asyncHandler(async (req, res) => {
    if (!createUserHabit) {
       throw new ApiError(401, "Habit Creation Failed, try again later");
    }
+   await ConnectRedis();
    await RedisConn.sAdd(
       "habitLists",
       `${createUserHabit._id.toString()}:${req.user._id.toString()}`
@@ -261,7 +264,7 @@ const DeleteHabit = asyncHandler(async (req, res) => {
    await User.findByIdAndUpdate(req.user._id, {
       $set: { habitsList: habits },
    });
-
+   await ConnectRedis();
    await RedisConn.SREM(
       "habitLists",
       `${del._id.toString()}:${req.user._id.toString()}`
@@ -366,7 +369,7 @@ const getSteakList = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Habit with Id not found");
    }
 
-   const list = await Streak.find({ habitId: id }).limit(31)
+   const list = await Streak.find({ habitId: id }).limit(31);
    if (!list) {
       throw new ApiError(401, "Streak list not found");
    }
