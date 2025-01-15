@@ -22,6 +22,7 @@ import DeleteAccount from "./components/etc/DeleteAccount";
 import { VerifyOtp } from "./components/auth/VerifyOtp";
 import { ResetPage } from "./components/auth/Reset";
 import Profile from "./components/profile/Profile";
+import { SetTokenToAxios, setTokenToStorageAndAxios } from "./lib/apphelper";
 
 const router = createBrowserRouter([
    {
@@ -85,32 +86,39 @@ export default function App() {
    const dispatch = useDispatch();
    const [loading, setLoading] = useState(true);
    const checkUser = async () => {
-      axios
+      SetTokenToAxios();
+      let storeData = null;
+      await axios
          .get(`${conf.BACKEND_URL}/api/v1/users/current`, {
             withCredentials: true,
-            headers: {
-               accessToken: localStorage.getItem("accessToken"),
-            },
          })
          .then((data) => {
-            dispatch(authlogin(data?.data?.data));
-            setLoading(false);
+            storeData = data?.data?.data;
          })
-         .catch((err) =>
-            axios
-               .get(`${conf.BACKEND_URL}/api/v1/users/renew-token`, {
-                  withCredentials: true,
-                  headers: {
-                     refreshToken: localStorage.getItem("refreshToken"),
-                  },
-               })
-               .then((data) => {
-                  dispatch(authlogin(data?.data?.data));
-                  setLoading(false);
-               })
-               .catch((err) => setLoading(false))
-         );
+         .catch((err) => console.log(err));
+
+      if (!storeData) {
+         await axios
+            .get(`${conf.BACKEND_URL}/api/v1/users/renew-token`, {
+               withCredentials: true,
+            })
+            .then((data) => {
+               storeData = data?.data?.data;
+            })
+            .catch((err) => console.log(err));
+      }
+
+      if (!storeData) {
+         setLoading(false);
+         return;
+      }
+      dispatch(authlogin(storeData));
+      if (storeData?.refreshToken) {
+         setTokenToStorageAndAxios(storeData);
+      }
+      setLoading(false);
    };
+
    useEffect(() => {
       checkUser();
    }, []);
