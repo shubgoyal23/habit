@@ -11,6 +11,7 @@ node_modules
 dist
 dist-ssr
 android
+assets
 *.local
 
 # Editor directories and files
