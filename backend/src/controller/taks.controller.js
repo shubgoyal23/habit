@@ -21,7 +21,9 @@ const GetTimeFormated = (data) => {
 // input time is in user local time zone, alone with user time zone offset in minutes
 const GetTimeEpoch = (hr, min, userOffset) => {
    const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0) / 1000; // get epoch in seconds
-   return Number(epoch + userOffset * 60); // convert user offset in minutes to seconds
+   const time = Number(epoch + userOffset * 60);
+   console.log(typeof time);
+   return time; // convert user offset in minutes to seconds
 };
 
 const listHabit = asyncHandler(async (req, res) => {
