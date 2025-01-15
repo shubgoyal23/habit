@@ -45,7 +45,6 @@ export default function Login() {
       if (isloggedin) {
          navigate("/habit-list");
       }
-      fcm();
    }, [isloggedin]);
 
    const onSubmit = (data) => {

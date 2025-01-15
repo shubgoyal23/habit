@@ -27,7 +27,6 @@ const Habit = lazy(() => import("./components/Habit/Habit"));
 const SteakList = lazy(() => import("./components/Steak/SteakList"));
 const AddHabit = lazy(() => import("./components/Habit/AddHabit"));
 const Home = lazy(() => import("./components/Home/Home"));
-import { SetTokenToAxios, setTokenToStorageAndAxios } from "./lib/apphelper";
 
 const router = createBrowserRouter([
    {
