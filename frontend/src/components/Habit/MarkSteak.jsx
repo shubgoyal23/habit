@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import { Input } from "../ui/input";
 import axios from "axios";
-import { editHabit } from "@/store/HabitSlice";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { conf } from "@/conf/conf";
 import { MdOutlineRadioButtonUnchecked, MdCheckCircle } from "react-icons/md";
+import { addSteak } from "@/store/StreakSlice";
 
 function MarkSteak({ row }) {
    const streakList = useSelector((state) => state.streak) || [];
@@ -30,7 +29,7 @@ function MarkSteak({ row }) {
       request
          .then((data) => {
             setmarked((prev) => !prev);
-            dispatch(editHabit(data.data.data));
+            dispatch(addSteak(data.data.data));
          })
          .catch((err) => console.log(err));
    };
@@ -38,13 +37,12 @@ function MarkSteak({ row }) {
    useEffect(() => {
       if (!streakList || !data) return;
       const indexDate = new Date();
-      const indexStamp = `${indexDate.getFullYear()}-${indexDate.getMonth()}-${indexDate.getDate()}`;
-      let check = streakList[data._id]?.find((items) => {
-         const dateStamp = items.dateStamp;
-         if (indexStamp == dateStamp) {
-            return items;
-         }
-      });
+      const indexStamp = `${indexDate.getMonth()}-${indexDate.getFullYear()}`;
+      if (!streakList[indexStamp]) return;
+      if (!streakList[indexStamp][data?._id]) return;
+      let check = streakList[indexStamp][data._id]?.daysCompleted.includes(
+         indexDate.getDate()
+      );
       if (check) {
          setmarked(true);
       } else {
