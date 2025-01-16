@@ -394,6 +394,27 @@ const listStreak = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, list, "streak list fetched successfully"));
 });
+const getSteakListAll = asyncHandler(async (req, res) => {
+   const { ids } = req.body;
+   if (!id) {
+      throw new ApiError(401, "Habit Ids is required to get Streak list");
+   }
+   for (let i = 0; i < ids.length; i++) {
+      const checkHabit = req.user.habitsList.find(
+         (i) => i.toString() == ids[i]
+      );
+      if (!checkHabit) {
+         throw new ApiError(401, "Habit with Id not found");
+      }
+   }
+   const list = await Streak.find({ habitId: { $in: ids } });
+   if (!list) {
+      throw new ApiError(401, "Streak list not found");
+   }
+   return res
+      .status(200)
+      .json(new ApiResponse(200, list, "streak list fetched successfully"));
+});
 
 const getTodaysHabits = asyncHandler(async (req, res) => {
    let dateToday = new Date();
@@ -434,4 +455,5 @@ export {
    removeStreak,
    listStreak,
    getTodaysHabits,
+   getSteakListAll,
 };
