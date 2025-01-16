@@ -10,6 +10,7 @@ import {
    removeStreak,
    getSteakList,
    getTodaysHabits,
+   getSteakListAll,
 } from "../controller/taks.controller.js";
 
 const router = Router();
@@ -22,6 +23,7 @@ router.route("/habit").post(verifyJwt, addHabit);
 router.route("/habit-d").post(verifyJwt, DeleteHabit);
 router.route("/habit").patch(verifyJwt, editHabit);
 router.route("/streak-list").post(verifyJwt, getSteakList);
+router.route("/streak-list-all").post(verifyJwt, getSteakListAll);
 router.route("/habits-today").get(verifyJwt, getTodaysHabits);
 
 export default router;

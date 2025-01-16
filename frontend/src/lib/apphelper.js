@@ -30,4 +30,17 @@ const clearToken = async () => {
    axios.defaults.headers.common["refreshtoken"] = "";
 };
 
-export { setTokenToStorageAndAxios, SetTokenToAxios, clearToken };
+const SetTheme = async (theme) => {
+   await setToken("theme", theme);
+};
+const getTheme = async () => {
+   return await getToken("theme");
+};
+
+export {
+   setTokenToStorageAndAxios,
+   SetTokenToAxios,
+   clearToken,
+   SetTheme,
+   getTheme,
+};

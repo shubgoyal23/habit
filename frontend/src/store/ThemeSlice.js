@@ -1,3 +1,4 @@
+import { SetTheme as SetThemeLocal } from "@/lib/apphelper";
 import { createSlice } from "@reduxjs/toolkit";
 
 const themeSlice = createSlice({
@@ -15,7 +16,7 @@ const themeSlice = createSlice({
                : document.documentElement.classList.remove("dark");
             action.payload = "system";
          }
-         localStorage.setItem("theme", action.payload);
+         SetThemeLocal(action.payload);
          return action.payload;
       },
    },
