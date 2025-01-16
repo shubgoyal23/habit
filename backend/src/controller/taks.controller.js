@@ -312,41 +312,30 @@ const addStreak = asyncHandler(async (req, res) => {
    const userTimeOff = req.user.timeZone * 60 * 1000;
 
    let servertime = new Date(serverTime - serTimeOff + userTimeOff);
-   let dateStamp = `${servertime.getFullYear()}-${servertime.getMonth()}-${servertime.getDate()}`;
+   // let dateStamp = `${servertime.getFullYear()}-${servertime.getMonth()}-${servertime.getDate()}`;
 
-   const check = await Streak.findOne({
-      habitId: id,
-      dateStamp: dateStamp,
-   });
-   if (check) {
-      throw new ApiError(401, "Streak is Already Marked Completed");
-   }
-
-   let Oldservertime = new Date(
-      serverTime - serTimeOff + userTimeOff - 86400000
+   const check = await Streak.findOneAndUpdate(
+      {
+         habitId: id,
+         userId: req.user._id,
+         month: servertime.getMonth(),
+         year: servertime.getFullYear(),
+      },
+      {
+         $addToSet: { daysCompleted: serverTime.getDate() },
+      },
+      {
+         upsert: true,
+         new: true,
+      }
    );
-   let OlddateStamp = `${Oldservertime.getFullYear()}-${Oldservertime.getMonth()}-${Oldservertime.getDate()}`;
-   let currentS = 1;
-   const prevStreak = await Streak.findOne({
-      habitId: id,
-      dateStamp: OlddateStamp,
-   });
-   if (prevStreak) {
-      currentS = prevStreak.currentStreak + 1;
-   }
-   let streakAdd = await Streak.create({
-      userId: req.user._id,
-      habitId: id,
-      dateStamp: dateStamp,
-      currentStreak: currentS,
-   });
-   if (!streakAdd) {
-      throw new ApiError(401, "Streak Add Failed, try again later");
+   if (!check) {
+      throw new ApiError(401, "Streak is Already Marked Completed");
    }
 
    return res
       .status(200)
-      .json(new ApiResponse(200, streakAdd, "habit marked Completed"));
+      .json(new ApiResponse(200, check, "habit marked Completed"));
 });
 
 const removeStreak = asyncHandler(async (req, res) => {
@@ -362,14 +351,22 @@ const removeStreak = asyncHandler(async (req, res) => {
    const serverTime = new Date();
    const serTimeOff = serverTime.getTimezoneOffset() * 60 * 1000;
    const userTimeOff = req.user.timeZone * 60 * 1000;
-
    let servertime = new Date(serverTime - serTimeOff + userTimeOff);
-   let dateStamp = `${servertime.getFullYear()}-${servertime.getMonth()}-${servertime.getDate()}`;
 
-   const remove = await Streak.findOneAndDelete({
-      habitId: id,
-      dateStamp: dateStamp,
-   });
+   const remove = await Streak.findOneAndUpdate(
+      {
+         habitId: id,
+         userId: req.user._id,
+         month: servertime.getMonth(),
+         year: servertime.getFullYear(),
+      },
+      {
+         $pull: { daysCompleted: serverTime.getDate() },
+      },
+      {
+         new: true,
+      }
+   );
    if (!remove) {
       throw new ApiError(401, "Streak Remove Failed, try again later");
    }
@@ -390,6 +387,27 @@ const getSteakList = asyncHandler(async (req, res) => {
    }
 
    const list = await Streak.find({ habitId: id }).limit(31);
+   if (!list) {
+      throw new ApiError(401, "Streak list not found");
+   }
+   return res
+      .status(200)
+      .json(new ApiResponse(200, list, "streak list fetched successfully"));
+});
+const getSteakListAll = asyncHandler(async (req, res) => {
+   const { ids } = req.body;
+   if (!id) {
+      throw new ApiError(401, "Habit Ids is required to get Streak list");
+   }
+   for (let i = 0; i < ids.length; i++) {
+      const checkHabit = req.user.habitsList.find(
+         (i) => i.toString() == ids[i]
+      );
+      if (!checkHabit) {
+         throw new ApiError(401, "Habit with Id not found");
+      }
+   }
+   const list = await Streak.find({ habitId: { $in: ids } });
    if (!list) {
       throw new ApiError(401, "Streak list not found");
    }
@@ -437,4 +455,5 @@ export {
    removeStreak,
    getSteakList,
    getTodaysHabits,
+   getSteakListAll,
 };

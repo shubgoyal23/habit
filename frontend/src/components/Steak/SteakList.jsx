@@ -44,17 +44,12 @@ function Steak() {
    const streakList = useSelector((state) => state.streak) || [];
    const [month, setMonth] = useState(new Date().getMonth());
    const [year, setYear] = useState(new Date().getFullYear());
-   const [showEdit, setShowEdit] = useState(false);
-   const [editData, setShowEditData] = useState({});
 
    useEffect(() => {
       if (!user) {
          navigate("/login");
          return;
       }
-      toast("Double Click on Mark to Edit it!", {
-         icon: "🖱️",
-      });
       if (habitList.length > 0) {
          return;
       }

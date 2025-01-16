@@ -11,8 +11,13 @@ import { conf } from "./conf/conf";
 
 import { VerifyOtp } from "./components/auth/VerifyOtp";
 import { ResetPage } from "./components/auth/Reset";
-import { SetTokenToAxios, setTokenToStorageAndAxios } from "./lib/apphelper";
+import {
+   getTheme,
+   SetTokenToAxios,
+   setTokenToStorageAndAxios,
+} from "./lib/apphelper";
 import { setTheme } from "./store/ThemeSlice";
+import { addListHabits } from "./store/HabitSlice";
 
 const Privacy = lazy(() => import("./components/etc/Privacy"));
 const DeleteAccount = lazy(() => import("./components/etc/DeleteAccount"));
@@ -111,6 +116,32 @@ const router = createBrowserRouter([
 export default function App() {
    const dispatch = useDispatch();
    const [loading, setLoading] = useState(true);
+
+   const LoadDateIntoApp = async () => {
+      let habitList = [];
+      let steakList = [];
+      await axios
+         .get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
+            withCredentials: true,
+         })
+         .then((data) => {
+            habitList = data?.data?.data.map(item => item._id);
+            dispatch(addListHabits(data?.data?.data));
+         })
+         .catch((err) => console.log(err));
+      axios
+         .post(
+            `${conf.BACKEND_URL}/api/v1/steak/streak-list-all`,
+            { ids: habitList },
+            {
+               withCredentials: true,
+            }
+         )
+         .then((data) => {
+            dispatch(addSteakList(data?.data?.data));
+         })
+         .catch((err) => console.log(err));
+   };
    const checkUser = async () => {
       SetTokenToAxios();
       let storeData = null;
@@ -143,11 +174,12 @@ export default function App() {
          setTokenToStorageAndAxios(storeData);
       }
       setLoading(false);
+      LoadDateIntoApp();
    };
 
    useEffect(() => {
+      dispatch(setTheme(getTheme("theme")));
       checkUser();
-      dispatch(setTheme(localStorage.getItem("theme")));
    }, []);
    return loading ? (
       <Loader />

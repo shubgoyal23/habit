@@ -1,14 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RxAvatar } from "react-icons/rx";
 import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
 import axios from "axios";
+import MarkSteak from "../Habit/MarkSteak";
+import { addListHabits } from "@/store/HabitSlice";
 function Home() {
    const loggedin = useSelector((state) => state.auth.loggedin);
    const user = useSelector((state) => state.auth.userDate);
    const navigate = useNavigate();
+   const dispatch = useDispatch();
    const dateToday = new Date().toDateString().split(" ");
    const [habitList, setHabitList] = useState([]);
 
@@ -48,17 +51,20 @@ function Home() {
                {dateToday[1]} {dateToday[2]}
             </h2>
          </div>
-         <div className="w-full flex-col justify-between items-center m-0 mt-6 px-2 py-4 bg-white/10 rounded-lg shadow-top-lg">
+         <div className="w-full flex-col justify-between items-center m-0 mt-6 px-2 py-4 rounded-lg shadow-top-lg">
             <h2 className="m-0 text-lg underline underline-offset-4">
                Todays Tasks
             </h2>
-            <ul className="m-0 p-2">
+            <div className="">
                {habitList.map((item) => (
-                  <li className="text-sm my-3">
-                     <Link to={`/habit/${item._id}`}>{item.name}</Link>
-                  </li>
+                  <div className="space-y-1 p-2 pl-3 flex justify-start items-center gap-5">
+                     <MarkSteak row={{ original: item }} />
+                     <div className="flex flex-1 items-center justify-start bg-white/10 rounded-lg py-4 px-2">
+                        <span>{item.name}</span>
+                     </div>
+                  </div>
                ))}
-            </ul>
+            </div>
          </div>
       </div>
    );
