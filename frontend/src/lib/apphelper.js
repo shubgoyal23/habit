@@ -15,7 +15,6 @@ const setTokenToStorageAndAxios = async (dataRec) => {
 };
 
 const SetTokenToAxios = async () => {
-   console.log("SetTokenToAxios");
    if (!Capacitor.isNativePlatform()) return;
    let accessToken = await getToken("accessToken");
    let refreshToken = await getToken("refreshToken");
@@ -23,4 +22,12 @@ const SetTokenToAxios = async () => {
    axios.defaults.headers.common["accessToken"] = accessToken;
 };
 
-export { setTokenToStorageAndAxios, SetTokenToAxios };
+const clearToken = async () => {
+   if (!Capacitor.isNativePlatform()) return;
+   await setToken("accesstoken", "");
+   await setToken("refreshtoken", "");
+   axios.defaults.headers.common["accesstoken"] = "";
+   axios.defaults.headers.common["refreshtoken"] = "";
+};
+
+export { setTokenToStorageAndAxios, SetTokenToAxios, clearToken };

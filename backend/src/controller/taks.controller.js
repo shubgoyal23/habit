@@ -34,6 +34,23 @@ const listHabit = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, list, "habit list fetched successfully"));
 });
 
+// this will return date in epoch format based on 12:00 pm in utc for that date
+const GetUTCDateEpoch = (date) => {
+   if (!date) return;
+   let dateNew = new Date(date);
+   let utcDate =
+      Date.UTC(
+         dateNew.getFullYear(),
+         dateNew.getMonth(),
+         dateNew.getDate(),
+         12,
+         0,
+         0,
+         0
+      ) / 1000;
+   return Math.ceil(utcDate);
+};
+
 // create a new habit and add it to the list
 const addHabit = asyncHandler(async (req, res) => {
    let {
@@ -73,31 +90,29 @@ const addHabit = asyncHandler(async (req, res) => {
       duration = Math.floor((endTime - startTime) / 60);
    }
    if (startDate) {
-      if (typeof startDate == "number") {
-         startDate = startDate * 1000;
-      }
-      startDate = new Date(startDate).getTime() / 1000;
-      startDate = Math.ceil(startDate);
+      startDate = GetUTCDateEpoch(startDate);
    }
    if (endDate) {
-      if (typeof endDate == "number") {
-         endDate = endDate * 1000;
-      }
-      endDate = new Date(endDate).getTime() / 1000;
-      endDate = Math.ceil(endDate) + 86399;
+      endDate = GetUTCDateEpoch(endDate);
+   }
+   if (habitType == "todo") {
+      repeat = {
+         name: "todo",
+         value: [],
+      };
    }
    switch (repeat.name) {
       case "days":
          break;
       case "dates":
          for (let i = 0; i < repeat.value.length; i++) {
-            repeat.value[i] = Math.ceil(
-               new Date(repeat.value[i]).getTime() / 1000
-            );
+            repeat.value[i] = GetUTCDateEpoch(repeat.value[i]);
          }
          break;
       case "hours":
          break;
+      case "todo":
+         repeat.value = [];
    }
    if (habitType == "negative") {
       notify = false;
@@ -186,24 +201,29 @@ const editHabit = asyncHandler(async (req, res) => {
       duration = Math.floor((endTime - startTime) / 60);
    }
    if (startDate) {
-      startDate = new Date(startDate).getTime() / 1000;
-      startDate = Math.ceil(startDate);
+      startDate = GetUTCDateEpoch(startDate);
    }
    if (endDate) {
-      endDate = new Date(endDate).getTime() / 1000;
-      endDate = Math.ceil(endDate) + 86399;
+      endDate = GetUTCDateEpoch(endDate);
+   }
+   if (habitType == "todo") {
+      repeat = {
+         name: "todo",
+         value: [],
+      };
    }
    switch (repeat.name) {
       case "days":
          break;
       case "dates":
          for (let i = 0; i < repeat.value.length; i++) {
-            repeat.value[i] = Math.ceil(
-               new Date(repeat.value[i]).getTime() / 1000
-            );
+            repeat.value[i] = GetUTCDateEpoch(repeat.value[i]);
          }
          break;
       case "hours":
+         break;
+      case "todo":
+         repeat.value = [];
          break;
    }
    if (habitType == "negative") {
@@ -378,6 +398,36 @@ const getSteakList = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, list, "streak list fetched successfully"));
 });
 
+const getTodaysHabits = asyncHandler(async (req, res) => {
+   let dateToday = new Date();
+   let dateTodayEpoch = GetUTCDateEpoch(dateToday);
+   const list = await Habit.find({
+      userId: req.user._id,
+      startDate: { $lte: dateTodayEpoch },
+      endDate: { $gte: dateTodayEpoch },
+   });
+   if (!list) {
+      throw new ApiError(401, "Habit list not found");
+   }
+   let finalList = [];
+   for (let i = 0; i < list.length; i++) {
+      if (list[i].repeat.name == "days") {
+         if (list[i].repeat.value.includes(dateToday.getUTCDay())) {
+            finalList.push(list[i]);
+         }
+      } else if (list[i].repeat.name == "dates") {
+         if (list[i].repeat.value.includes(dateTodayEpoch)) {
+            finalList.push(list[i]);
+         }
+      } else if (list[i].repeat.name == "todo") {
+         finalList.push(list[i]);
+      }
+   }
+   return res
+      .status(200)
+      .json(new ApiResponse(200, finalList, "Habit list fetched successfully"));
+});
+
 export {
    listHabit,
    addHabit,
@@ -386,4 +436,5 @@ export {
    addStreak,
    removeStreak,
    getSteakList,
+   getTodaysHabits,
 };
