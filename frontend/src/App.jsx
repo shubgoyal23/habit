@@ -18,6 +18,7 @@ import {
 } from "./lib/apphelper";
 import { setTheme } from "./store/ThemeSlice";
 import { addListHabits } from "./store/HabitSlice";
+import { addSteakList } from "./store/StreakSlice";
 
 const Privacy = lazy(() => import("./components/etc/Privacy"));
 const DeleteAccount = lazy(() => import("./components/etc/DeleteAccount"));
@@ -118,27 +119,32 @@ export default function App() {
    const [loading, setLoading] = useState(true);
 
    const LoadDateIntoApp = async () => {
-      let habitList = [];
-      let steakList = [];
-      await axios
-         .get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
+      const habitreq = await axios.get(
+         `${conf.BACKEND_URL}/api/v1/steak/habit`,
+         {
             withCredentials: true,
-         })
+         }
+      );
+      const steakList = await axios.post(
+         `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
+         { month: new Date().getMonth(), year: new Date().getFullYear() },
+         {
+            withCredentials: true,
+         }
+      );
+
+      habitreq
          .then((data) => {
-            habitList = data?.data?.data.map(item => item._id);
             dispatch(addListHabits(data?.data?.data));
          })
          .catch((err) => console.log(err));
-      axios
-         .post(
-            `${conf.BACKEND_URL}/api/v1/steak/streak-list-all`,
-            { ids: habitList },
-            {
-               withCredentials: true,
-            }
-         )
+
+      steakList
          .then((data) => {
-            dispatch(addSteakList(data?.data?.data));
+            let list = data?.data?.data;
+            for (let i = 0; i < list.length; i++) {
+               dispatch(addSteakList(list[i]));
+            }
          })
          .catch((err) => console.log(err));
    };

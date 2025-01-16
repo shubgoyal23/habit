@@ -26,14 +26,6 @@ const GetTimeEpoch = (hr, min, userOffset) => {
    return time; // convert user offset in minutes to seconds
 };
 
-const listHabit = asyncHandler(async (req, res) => {
-   const list = await Habit.find({ userId: req.user._id });
-
-   return res
-      .status(200)
-      .json(new ApiResponse(200, list, "habit list fetched successfully"));
-});
-
 // this will return date in epoch format based on 12:00 pm in utc for that date
 const GetUTCDateEpoch = (date) => {
    if (!date) return;
@@ -89,12 +81,10 @@ const addHabit = asyncHandler(async (req, res) => {
    if (startTime && endTime) {
       duration = Math.floor((endTime - startTime) / 60);
    }
-   if (startDate) {
-      startDate = GetUTCDateEpoch(startDate);
-   }
-   if (endDate) {
-      endDate = GetUTCDateEpoch(endDate);
-   }
+
+   startDate = GetUTCDateEpoch(startDate || new Date());
+   endDate = GetUTCDateEpoch(endDate || new Date(2099, 0, 1, 12, 0, 0));
+
    if (habitType == "todo") {
       repeat = {
          name: "todo",
@@ -373,41 +363,31 @@ const removeStreak = asyncHandler(async (req, res) => {
 
    return res
       .status(200)
-      .json(new ApiResponse(200, {}, "habit marked Pending"));
+      .json(new ApiResponse(200, remove, "habit marked Pending"));
 });
 
-const getSteakList = asyncHandler(async (req, res) => {
-   const { id } = req.body;
-   if (!id) {
-      throw new ApiError(401, "Habit Id is required to get Streak list");
-   }
-   const checkHabit = req.user.habitsList.find((i) => i.toString() == id);
-   if (!checkHabit) {
-      throw new ApiError(401, "Habit with Id not found");
-   }
+const listHabit = asyncHandler(async (req, res) => {
+   const list = await Habit.find({ userId: req.user._id });
 
-   const list = await Streak.find({ habitId: id }).limit(31);
-   if (!list) {
-      throw new ApiError(401, "Streak list not found");
-   }
    return res
       .status(200)
-      .json(new ApiResponse(200, list, "streak list fetched successfully"));
+      .json(new ApiResponse(200, list, "habit list fetched successfully"));
 });
-const getSteakListAll = asyncHandler(async (req, res) => {
-   const { ids } = req.body;
-   if (!id) {
-      throw new ApiError(401, "Habit Ids is required to get Streak list");
+
+const listStreak = asyncHandler(async (req, res) => {
+   let { month, year } = req.body;
+   if (!month) {
+      month = new Date().getMonth();
    }
-   for (let i = 0; i < ids.length; i++) {
-      const checkHabit = req.user.habitsList.find(
-         (i) => i.toString() == ids[i]
-      );
-      if (!checkHabit) {
-         throw new ApiError(401, "Habit with Id not found");
-      }
+   if (!year) {
+      year = new Date().getFullYear();
    }
-   const list = await Streak.find({ habitId: { $in: ids } });
+   const list = await Streak.find({
+      userId: req.user._id,
+      active: true,
+      month: month,
+      year: year,
+   });
    if (!list) {
       throw new ApiError(401, "Streak list not found");
    }
@@ -453,7 +433,6 @@ export {
    editHabit,
    addStreak,
    removeStreak,
-   getSteakList,
+   listStreak,
    getTodaysHabits,
-   getSteakListAll,
 };

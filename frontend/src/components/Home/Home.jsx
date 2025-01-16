@@ -6,7 +6,6 @@ import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
 import axios from "axios";
 import MarkSteak from "../Habit/MarkSteak";
-import { addListHabits } from "@/store/HabitSlice";
 function Home() {
    const loggedin = useSelector((state) => state.auth.loggedin);
    const user = useSelector((state) => state.auth.userDate);
@@ -41,7 +40,7 @@ function Home() {
    return (
       <div>
          <div className="w-full flex justify-between items-center m-0 px-2 mt-4">
-            <h2 className="m-0 text-lg font-bold">Hello, {user.firstName}!</h2>
+            <h2 className="m-0 text-lg font-bold">Hello, {user?.firstName}!</h2>
             <Link to="/profile" className="">
                <RxAvatar className="w-6 h-6" />
             </Link>
