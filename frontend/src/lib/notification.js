@@ -5,6 +5,10 @@ import { conf } from "@/conf/conf";
 import { Capacitor } from "@capacitor/core";
 
 export const RegisterForNotifications = async () => {
+   if (!Capacitor.isNativePlatform()) {
+      console.log("Push notifications are only available on native platforms.");
+      return;
+   }
    try {
       const permissionResult = await PushNotifications.requestPermissions();
       if (permissionResult.receive === "granted") {

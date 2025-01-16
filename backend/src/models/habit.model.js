@@ -4,7 +4,7 @@ const RepeatSchema = new mongoose.Schema(
    {
       name: {
          type: String,
-         enum: ["days", "dates", "hours"],
+         enum: ["days", "dates", "hours", "todo"],
       },
       value: [Number], // -1 for daily once, or time like 1300 if repeat is many times on a day, 0 - 6 for weekly starting from sunday, 1-31 for monthly, 1-365 for yearly
    },

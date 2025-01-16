@@ -1,6 +1,6 @@
 {
   "appId": "com.proteinslice.habit",
-  "appName": "habit-tracker",
+  "appName": "Habit Tracker",
   "webDir": "dist",
   "plugins": {
     "FirebaseMessaging": {
