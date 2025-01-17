@@ -18,7 +18,7 @@ import {
 } from "./lib/apphelper";
 import { setTheme } from "./store/ThemeSlice";
 import { addListHabits } from "./store/HabitSlice";
-import { addSteakList } from "./store/StreakSlice";
+import { addSteak } from "./store/StreakSlice";
 
 const Privacy = lazy(() => import("./components/etc/Privacy"));
 const DeleteAccount = lazy(() => import("./components/etc/DeleteAccount"));
@@ -132,21 +132,17 @@ export default function App() {
             withCredentials: true,
          }
       );
+      const {data: hData} = habitreq?.data;
+      if (hData?.length > 0) {
+         dispatch(addListHabits(hData));
+      }
 
-      habitreq
-         .then((data) => {
-            dispatch(addListHabits(data?.data?.data));
-         })
-         .catch((err) => console.log(err));
-
-      steakList
-         .then((data) => {
-            let list = data?.data?.data;
-            for (let i = 0; i < list.length; i++) {
-               dispatch(addSteakList(list[i]));
-            }
-         })
-         .catch((err) => console.log(err));
+      const {data: sData} = steakList?.data;
+      if (sData?.length > 0) {
+         for (let i = 0; i < sData.length; i++) {
+            dispatch(addSteak(sData[i]));
+         }
+      }
    };
    const checkUser = async () => {
       SetTokenToAxios();
