@@ -12,10 +12,9 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { addListHabits } from "@/store/HabitSlice";
-import toast from "react-hot-toast";
 import { conf } from "@/conf/conf";
 import { IoIosArrowForward } from "react-icons/io";
-import { addSteakList } from "@/store/StreakSlice";
+import { addSteak } from "@/store/StreakSlice";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { SlClose } from "react-icons/sl";
 import { PiFireFill } from "react-icons/pi";
@@ -44,17 +43,12 @@ function Steak() {
    const streakList = useSelector((state) => state.streak) || [];
    const [month, setMonth] = useState(new Date().getMonth());
    const [year, setYear] = useState(new Date().getFullYear());
-   const [showEdit, setShowEdit] = useState(false);
-   const [editData, setShowEditData] = useState({});
 
    useEffect(() => {
       if (!user) {
          navigate("/login");
          return;
       }
-      toast("Double Click on Mark to Edit it!", {
-         icon: "🖱️",
-      });
       if (habitList.length > 0) {
          return;
       }
@@ -69,21 +63,22 @@ function Steak() {
    }, []);
 
    useEffect(() => {
-      for (let i = 0; i < habitList.length; i++) {
-         axios
-            .post(
-               `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
-               { id: habitList[i]._id },
-               {
-                  withCredentials: true,
-               }
-            )
-            .then((data) => {
-               dispatch(addSteakList(data?.data?.data));
-            })
-            .catch((err) => console.log(err));
-      }
-   }, [habitList]);
+      if (streakList[`${month}-${year}`]) return;
+      axios
+         .post(
+            `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
+            { month, year },
+            {
+               withCredentials: true,
+            }
+         )
+         .then((data) => {
+            for (let i = 0; i < data?.data?.data.length; i++) {
+               dispatch(addSteak(data?.data?.data[i]));
+            }
+         })
+         .catch((err) => console.log(err));
+   }, [month, year]);
 
    const daysInMonth = (m) => {
       const days = [31, 28, 31, 30, 31, 31, 30, 31, 30, 31, 30, 31];
@@ -100,8 +95,8 @@ function Steak() {
    };
 
    const checkDate = (data, index) => {
+      if (!streakList[`${month}-${year}`]) return null;
       const indexDate = new Date(year, month, index + 1);
-      const indexStamp = `${indexDate.getFullYear()}-${indexDate.getMonth()}-${indexDate.getDate()}`;
       const StartDate = new Date(data.startDate * 1000);
       if (indexDate > DateToday) {
          return null;
@@ -120,14 +115,20 @@ function Steak() {
       if (indexDate < StartDate) {
          return null;
       }
-      let check = streakList[data._id]?.find((items) => {
-         const dateStamp = items.dateStamp;
-         if (indexStamp == dateStamp) {
-            return items;
-         }
-      });
+      if (!streakList[`${month}-${year}`][data?._id])
+         return (
+            <div className="size-6 m-auto flex justify-center items-center">
+               <SlClose className="size-6 text-red-500" />
+            </div>
+         );
+      let check = streakList[`${month}-${year}`][
+         data._id
+      ]?.daysCompleted.includes(index + 1);
+      let checkFreez = streakList[`${month}-${year}`][
+         data._id
+      ]?.daysCompleted.includes(index + 101);
 
-      if (check?.isfreeze) {
+      if (checkFreez) {
          return (
             <div className="size-6 m-auto flex justify-center items-center">
                <PiFireFill className="size-6 text-blue-500" />

@@ -6,6 +6,7 @@ import { addListHabits } from "../../store/HabitSlice";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { conf } from "@/conf/conf";
+import { clearToken } from "@/lib/apphelper";
 
 function Logout() {
    const dispatch = useDispatch();
@@ -22,12 +23,13 @@ function Logout() {
             `${err.response?.data?.message || "Something went wrong"}`,
       });
       logout
-         .then(() => {
+         .catch((err) => console.log(err))
+         .finally(() => {
             dispatch(authlogout());
             dispatch(addListHabits([]));
-         })
-         .catch((err) => console.log(err))
-         .finally(() => navigate("/"));
+            clearToken();
+            navigate("/");
+         });
    }, []);
    return <div>LoggingOut...</div>;
 }

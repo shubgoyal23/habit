@@ -4,19 +4,17 @@ const streakSlice = createSlice({
    name: "streak",
    initialState: {},
    reducers: {
-      addSteakList(state, action) {
-         state[action.payload[0].habitId] = action.payload;
-      },
       addSteak(state, action) {
-         state[action.payload.habitId].push(action.payload);
-      },
-      removeStreak(state, action) {
-         state[action.payload.habitId] = state[action.payload.habitId].filter(
-            (item) => item._id !== action.payload._id
-         );
+         let data = action.payload;
+         if (!state[`${data.month}-${data.year}`]) {
+            state[`${data.month}-${data.year}`] = {};
+            state[`${data.month}-${data.year}`][data.habitId] = data;
+         } else {
+            state[`${data.month}-${data.year}`][data.habitId] = data;
+         }
       },
    },
 });
 
-export const { addSteakList, addSteak, removeStreak } = streakSlice.actions;
+export const { addSteak } = streakSlice.actions;
 export default streakSlice.reducer;

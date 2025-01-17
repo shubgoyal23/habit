@@ -248,7 +248,7 @@ const refreshToken = asyncHandler(async (req, res) => {
    );
 
    const user = await User.findById(decodedToken._id)?.select(
-      "_id firstName lastName refreshToken"
+      "_id firstName lastName refreshToken accessToken"
    );
 
    if (!user && !(user.refreshToken === token)) {

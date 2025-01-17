@@ -147,6 +147,7 @@ function Habit() {
             }
          }
       }
+      if (habitList.length > 0) return
       let request = axios.get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
          withCredentials: true,
       });

@@ -19,6 +19,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { login as authlogin } from "../../store/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { conf } from "@/conf/conf";
+import { setTokenToStorageAndAxios } from "@/lib/apphelper";
+import {
+   RegisterForNotifications,
+   sendFcmTokenToServer,
+} from "@/lib/notification";
 
 export default function Login() {
    const [showPass, setShowPass] = useState(false);
@@ -30,6 +35,11 @@ export default function Login() {
       handleSubmit,
       formState: { errors },
    } = useForm();
+
+   const fcm = async () => {
+      await RegisterForNotifications();
+      await sendFcmTokenToServer();
+   };
 
    useEffect(() => {
       if (isloggedin) {
@@ -51,6 +61,8 @@ export default function Login() {
       login
          .then((data) => {
             dispatch(authlogin(data.data.data));
+            setTokenToStorageAndAxios(data.data.data); // for app
+            fcm();
             navigate("/habit-list");
          })
          .catch((err) => console.log(err));
@@ -100,15 +112,21 @@ export default function Login() {
                   </div>
                   <div className="w-full pt-4">
                      <Button className="w-full" type="submit">
-                        Login 
+                        Login
                      </Button>
                   </div>
                </form>
                <CardFooter className="p-0 pt-1 justify-between">
-                  <Link className="text-gray-500 hover:text-blue-500 ml-1" to={"/reset?id=verify-email"}>
+                  <Link
+                     className="text-gray-500 hover:text-blue-500 ml-1"
+                     to={"/reset?id=verify-email"}
+                  >
                      Verify Email
                   </Link>
-                  <Link className="text-gray-500 hover:text-blue-500 ml-1" to={"/reset?id=forgot-password"}>
+                  <Link
+                     className="text-gray-500 hover:text-blue-500 ml-1"
+                     to={"/reset?id=forgot-password"}
+                  >
                      Forget Password
                   </Link>
                </CardFooter>
