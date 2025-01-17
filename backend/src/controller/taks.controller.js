@@ -22,7 +22,6 @@ const GetTimeFormated = (data) => {
 const GetTimeEpoch = (hr, min, userOffset) => {
    const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0) / 1000; // get epoch in seconds
    const time = Number(epoch + userOffset * 60);
-   console.log(typeof time);
    return time; // convert user offset in minutes to seconds
 };
 
