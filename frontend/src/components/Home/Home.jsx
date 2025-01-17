@@ -37,7 +37,7 @@ function Home() {
             </h2>
          </div>
          <div className="w-full flex-col justify-between items-center m-0 mt-6 px-2 py-4 rounded-lg shadow-top-lg">
-            <h2 className="m-0 text-lg underline underline-offset-4">
+            <h2 className="m-0 text-lg underline underline-offset-4 text-center">
                Todays Tasks
             </h2>
             <div className="">
