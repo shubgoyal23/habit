@@ -169,7 +169,7 @@ export default function AddHabit() {
                         <span
                            className={`${
                               type === "regular"
-                                 ? "bg-violet-800"
+                                 ? "bg-green-600"
                                  : "bg-gray-500"
                            } p-1 rounded-md cursor-pointer flex flex-col justify-center items-center text-xs`}
                            onClick={() => setType("regular")}
@@ -180,9 +180,9 @@ export default function AddHabit() {
                         <span
                            className={`${
                               type === "negative"
-                                 ? "bg-violet-800"
+                                 ? "bg-red-600"
                                  : "bg-gray-500"
-                           } p-1 rounded-md  cursor-pointer flex flex-col justify-center items-center text-xs`}
+                           } p-1 rounded-md h-16 cursor-pointer flex flex-col justify-center items-center text-xs`}
                            onClick={() => setType("negative")}
                         >
                            <AiOutlineStop className="h-6 w-6" />
@@ -190,7 +190,7 @@ export default function AddHabit() {
                         </span>
                         <span
                            className={`${
-                              type === "todo" ? "bg-violet-800" : "bg-gray-500"
+                              type === "todo" ? "bg-blue-800" : "bg-gray-500"
                            } p-1 rounded-md  cursor-pointer flex flex-col justify-center items-center text-xs`}
                            onClick={() => setType("todo")}
                         >

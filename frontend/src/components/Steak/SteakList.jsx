@@ -12,10 +12,9 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { addListHabits } from "@/store/HabitSlice";
-import toast from "react-hot-toast";
 import { conf } from "@/conf/conf";
 import { IoIosArrowForward } from "react-icons/io";
-import { addSteakList } from "@/store/StreakSlice";
+import { addSteak } from "@/store/StreakSlice";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { SlClose } from "react-icons/sl";
 import { PiFireFill } from "react-icons/pi";
@@ -75,7 +74,7 @@ function Steak() {
          )
          .then((data) => {
             for (let i = 0; i < data?.data?.data.length; i++) {
-               dispatch(addSteakList(data?.data?.data[i]));
+               dispatch(addSteak(data?.data?.data[i]));
             }
          })
          .catch((err) => console.log(err));

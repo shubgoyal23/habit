@@ -7,6 +7,7 @@ import { FaFire } from "react-icons/fa";
 import { FaHome } from "react-icons/fa";
 import { IoIosAdd } from "react-icons/io";
 import { FaIdCard, FaRightToBracket } from "react-icons/fa6";
+import { RxAvatar } from "react-icons/rx";
 
 function Navbar() {
    const loggedin = useSelector((state) => state.auth.loggedin);
@@ -57,7 +58,7 @@ function Navbar() {
          </div>
          <div className={`flex-1 items-center w-full`}>
             <nav className="w-full">
-               <ul className="flex items-center justify-between w-full text-xs md:text-base text-gray-700 dark:text-gray-200">
+               <ul className="flex items-center justify-evenly md:justify-end md:gap-3 w-full text-xs md:text-base text-gray-700 dark:text-gray-200">
                   {menu.map((item) => (
                      <li key={item.title}>
                         <NavLink
@@ -73,6 +74,11 @@ function Navbar() {
                         </NavLink>
                      </li>
                   ))}
+                  {loggedin && (
+                     <Link to="/profile" className="hidden md:flex">
+                        <RxAvatar className="w-6 h-6" />
+                     </Link>
+                  )}
                </ul>
             </nav>
          </div>
