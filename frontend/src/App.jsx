@@ -119,30 +119,29 @@ export default function App() {
    const [loading, setLoading] = useState(true);
 
    const LoadDateIntoApp = async () => {
-      const habitreq = await axios.get(
-         `${conf.BACKEND_URL}/api/v1/steak/habit`,
-         {
+      let habitList = [];
+      let steakList = [];
+      await axios
+         .get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
             withCredentials: true,
-         }
-      );
-      const steakList = await axios.post(
-         `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
-         { month: new Date().getMonth(), year: new Date().getFullYear() },
-         {
-            withCredentials: true,
-         }
-      );
-      const {data: hData} = habitreq?.data;
-      if (hData?.length > 0) {
-         dispatch(addListHabits(hData));
-      }
-
-      const {data: sData} = steakList?.data;
-      if (sData?.length > 0) {
-         for (let i = 0; i < sData.length; i++) {
-            dispatch(addSteak(sData[i]));
-         }
-      }
+         })
+         .then((data) => {
+            habitList = data?.data?.data.map(item => item._id);
+            dispatch(addListHabits(data?.data?.data));
+         })
+         .catch((err) => console.log(err));
+      axios
+         .post(
+            `${conf.BACKEND_URL}/api/v1/steak/streak-list-all`,
+            { ids: habitList },
+            {
+               withCredentials: true,
+            }
+         )
+         .then((data) => {
+            dispatch(addSteakList(data?.data?.data));
+         })
+         .catch((err) => console.log(err));
    };
    const checkUser = async () => {
       SetTokenToAxios();
