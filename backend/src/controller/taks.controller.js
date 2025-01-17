@@ -22,17 +22,25 @@ const GetTimeFormated = (data) => {
 const GetTimeEpoch = (hr, min, userOffset) => {
    const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0) / 1000; // get epoch in seconds
    const time = Number(epoch + userOffset * 60);
-   console.log(typeof time);
    return time; // convert user offset in minutes to seconds
 };
 
-const listHabit = asyncHandler(async (req, res) => {
-   const list = await Habit.find({ userId: req.user._id });
-
-   return res
-      .status(200)
-      .json(new ApiResponse(200, list, "habit list fetched successfully"));
-});
+// this will return date in epoch format based on 12:00 pm in utc for that date
+const GetUTCDateEpoch = (date) => {
+   if (!date) return;
+   let dateNew = new Date(date);
+   let utcDate =
+      Date.UTC(
+         dateNew.getFullYear(),
+         dateNew.getMonth(),
+         dateNew.getDate(),
+         12,
+         0,
+         0,
+         0
+      ) / 1000;
+   return Math.ceil(utcDate);
+};
 
 // create a new habit and add it to the list
 const addHabit = asyncHandler(async (req, res) => {
@@ -72,32 +80,28 @@ const addHabit = asyncHandler(async (req, res) => {
    if (startTime && endTime) {
       duration = Math.floor((endTime - startTime) / 60);
    }
-   if (startDate) {
-      if (typeof startDate == "number") {
-         startDate = startDate * 1000;
-      }
-      startDate = new Date(startDate).getTime() / 1000;
-      startDate = Math.ceil(startDate);
-   }
-   if (endDate) {
-      if (typeof endDate == "number") {
-         endDate = endDate * 1000;
-      }
-      endDate = new Date(endDate).getTime() / 1000;
-      endDate = Math.ceil(endDate) + 86399;
+
+   startDate = GetUTCDateEpoch(startDate || new Date());
+   endDate = GetUTCDateEpoch(endDate || new Date(2099, 0, 1, 12, 0, 0));
+
+   if (habitType == "todo") {
+      repeat = {
+         name: "todo",
+         value: [],
+      };
    }
    switch (repeat.name) {
       case "days":
          break;
       case "dates":
          for (let i = 0; i < repeat.value.length; i++) {
-            repeat.value[i] = Math.ceil(
-               new Date(repeat.value[i]).getTime() / 1000
-            );
+            repeat.value[i] = GetUTCDateEpoch(repeat.value[i]);
          }
          break;
       case "hours":
          break;
+      case "todo":
+         repeat.value = [];
    }
    if (habitType == "negative") {
       notify = false;
@@ -186,24 +190,29 @@ const editHabit = asyncHandler(async (req, res) => {
       duration = Math.floor((endTime - startTime) / 60);
    }
    if (startDate) {
-      startDate = new Date(startDate).getTime() / 1000;
-      startDate = Math.ceil(startDate);
+      startDate = GetUTCDateEpoch(startDate);
    }
    if (endDate) {
-      endDate = new Date(endDate).getTime() / 1000;
-      endDate = Math.ceil(endDate) + 86399;
+      endDate = GetUTCDateEpoch(endDate);
+   }
+   if (habitType == "todo") {
+      repeat = {
+         name: "todo",
+         value: [],
+      };
    }
    switch (repeat.name) {
       case "days":
          break;
       case "dates":
          for (let i = 0; i < repeat.value.length; i++) {
-            repeat.value[i] = Math.ceil(
-               new Date(repeat.value[i]).getTime() / 1000
-            );
+            repeat.value[i] = GetUTCDateEpoch(repeat.value[i]);
          }
          break;
       case "hours":
+         break;
+      case "todo":
+         repeat.value = [];
          break;
    }
    if (habitType == "negative") {
@@ -292,41 +301,30 @@ const addStreak = asyncHandler(async (req, res) => {
    const userTimeOff = req.user.timeZone * 60 * 1000;
 
    let servertime = new Date(serverTime - serTimeOff + userTimeOff);
-   let dateStamp = `${servertime.getFullYear()}-${servertime.getMonth()}-${servertime.getDate()}`;
+   // let dateStamp = `${servertime.getFullYear()}-${servertime.getMonth()}-${servertime.getDate()}`;
 
-   const check = await Streak.findOne({
-      habitId: id,
-      dateStamp: dateStamp,
-   });
-   if (check) {
-      throw new ApiError(401, "Streak is Already Marked Completed");
-   }
-
-   let Oldservertime = new Date(
-      serverTime - serTimeOff + userTimeOff - 86400000
+   const check = await Streak.findOneAndUpdate(
+      {
+         habitId: id,
+         userId: req.user._id,
+         month: servertime.getMonth(),
+         year: servertime.getFullYear(),
+      },
+      {
+         $addToSet: { daysCompleted: serverTime.getDate() },
+      },
+      {
+         upsert: true,
+         new: true,
+      }
    );
-   let OlddateStamp = `${Oldservertime.getFullYear()}-${Oldservertime.getMonth()}-${Oldservertime.getDate()}`;
-   let currentS = 1;
-   const prevStreak = await Streak.findOne({
-      habitId: id,
-      dateStamp: OlddateStamp,
-   });
-   if (prevStreak) {
-      currentS = prevStreak.currentStreak + 1;
-   }
-   let streakAdd = await Streak.create({
-      userId: req.user._id,
-      habitId: id,
-      dateStamp: dateStamp,
-      currentStreak: currentS,
-   });
-   if (!streakAdd) {
-      throw new ApiError(401, "Streak Add Failed, try again later");
+   if (!check) {
+      throw new ApiError(401, "Streak is Already Marked Completed");
    }
 
    return res
       .status(200)
-      .json(new ApiResponse(200, streakAdd, "habit marked Completed"));
+      .json(new ApiResponse(200, check, "habit marked Completed"));
 });
 
 const removeStreak = asyncHandler(async (req, res) => {
@@ -342,40 +340,89 @@ const removeStreak = asyncHandler(async (req, res) => {
    const serverTime = new Date();
    const serTimeOff = serverTime.getTimezoneOffset() * 60 * 1000;
    const userTimeOff = req.user.timeZone * 60 * 1000;
-
    let servertime = new Date(serverTime - serTimeOff + userTimeOff);
-   let dateStamp = `${servertime.getFullYear()}-${servertime.getMonth()}-${servertime.getDate()}`;
 
-   const remove = await Streak.findOneAndDelete({
-      habitId: id,
-      dateStamp: dateStamp,
-   });
+   const remove = await Streak.findOneAndUpdate(
+      {
+         habitId: id,
+         userId: req.user._id,
+         month: servertime.getMonth(),
+         year: servertime.getFullYear(),
+      },
+      {
+         $pull: { daysCompleted: serverTime.getDate() },
+      },
+      {
+         new: true,
+      }
+   );
    if (!remove) {
       throw new ApiError(401, "Streak Remove Failed, try again later");
    }
 
    return res
       .status(200)
-      .json(new ApiResponse(200, {}, "habit marked Pending"));
+      .json(new ApiResponse(200, remove, "habit marked Pending"));
 });
 
-const getSteakList = asyncHandler(async (req, res) => {
-   const { id } = req.body;
-   if (!id) {
-      throw new ApiError(401, "Habit Id is required to get Streak list");
-   }
-   const checkHabit = req.user.habitsList.find((i) => i.toString() == id);
-   if (!checkHabit) {
-      throw new ApiError(401, "Habit with Id not found");
-   }
+const listHabit = asyncHandler(async (req, res) => {
+   const list = await Habit.find({ userId: req.user._id });
 
-   const list = await Streak.find({ habitId: id }).limit(31);
+   return res
+      .status(200)
+      .json(new ApiResponse(200, list, "habit list fetched successfully"));
+});
+
+const listStreak = asyncHandler(async (req, res) => {
+   let { month, year } = req.body;
+   if (!month) {
+      month = new Date().getMonth();
+   }
+   if (!year) {
+      year = new Date().getFullYear();
+   }
+   const list = await Streak.find({
+      userId: req.user._id,
+      active: true,
+      month: month,
+      year: year,
+   });
    if (!list) {
       throw new ApiError(401, "Streak list not found");
    }
    return res
       .status(200)
       .json(new ApiResponse(200, list, "streak list fetched successfully"));
+});
+
+const getTodaysHabits = asyncHandler(async (req, res) => {
+   let dateToday = new Date();
+   let dateTodayEpoch = GetUTCDateEpoch(dateToday);
+   const list = await Habit.find({
+      userId: req.user._id,
+      startDate: { $lte: dateTodayEpoch },
+      endDate: { $gte: dateTodayEpoch },
+   });
+   if (!list) {
+      throw new ApiError(401, "Habit list not found");
+   }
+   let finalList = [];
+   for (let i = 0; i < list.length; i++) {
+      if (list[i].repeat.name == "days") {
+         if (list[i].repeat.value.includes(dateToday.getUTCDay())) {
+            finalList.push(list[i]);
+         }
+      } else if (list[i].repeat.name == "dates") {
+         if (list[i].repeat.value.includes(dateTodayEpoch)) {
+            finalList.push(list[i]);
+         }
+      } else if (list[i].repeat.name == "todo") {
+         finalList.push(list[i]);
+      }
+   }
+   return res
+      .status(200)
+      .json(new ApiResponse(200, finalList, "Habit list fetched successfully"));
 });
 
 export {
@@ -385,5 +432,6 @@ export {
    editHabit,
    addStreak,
    removeStreak,
-   getSteakList,
+   listStreak,
+   getTodaysHabits,
 };

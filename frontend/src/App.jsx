@@ -11,7 +11,14 @@ import { conf } from "./conf/conf";
 
 import { VerifyOtp } from "./components/auth/VerifyOtp";
 import { ResetPage } from "./components/auth/Reset";
+import {
+   getTheme,
+   SetTokenToAxios,
+   setTokenToStorageAndAxios,
+} from "./lib/apphelper";
 import { setTheme } from "./store/ThemeSlice";
+import { addListHabits } from "./store/HabitSlice";
+import { addSteak } from "./store/StreakSlice";
 
 const Privacy = lazy(() => import("./components/etc/Privacy"));
 const DeleteAccount = lazy(() => import("./components/etc/DeleteAccount"));
@@ -110,36 +117,71 @@ const router = createBrowserRouter([
 export default function App() {
    const dispatch = useDispatch();
    const [loading, setLoading] = useState(true);
+
+   const LoadDateIntoApp = async () => {
+      const habitreq = await axios.get(
+         `${conf.BACKEND_URL}/api/v1/steak/habit`,
+         {
+            withCredentials: true,
+         }
+      );
+      const steakList = await axios.post(
+         `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
+         { month: new Date().getMonth(), year: new Date().getFullYear() },
+         {
+            withCredentials: true,
+         }
+      );
+      const {data: hData} = habitreq?.data;
+      if (hData?.length > 0) {
+         dispatch(addListHabits(hData));
+      }
+
+      const {data: sData} = steakList?.data;
+      if (sData?.length > 0) {
+         for (let i = 0; i < sData.length; i++) {
+            dispatch(addSteak(sData[i]));
+         }
+      }
+   };
    const checkUser = async () => {
-      axios
+      SetTokenToAxios();
+      let storeData = null;
+      await axios
          .get(`${conf.BACKEND_URL}/api/v1/users/current`, {
             withCredentials: true,
-            headers: {
-               accessToken: localStorage.getItem("accessToken"),
-            },
          })
          .then((data) => {
-            dispatch(authlogin(data?.data?.data));
-            setLoading(false);
+            storeData = data?.data?.data;
          })
-         .catch((err) =>
-            axios
-               .get(`${conf.BACKEND_URL}/api/v1/users/renew-token`, {
-                  withCredentials: true,
-                  headers: {
-                     refreshToken: localStorage.getItem("refreshToken"),
-                  },
-               })
-               .then((data) => {
-                  dispatch(authlogin(data?.data?.data));
-                  setLoading(false);
-               })
-               .catch((err) => setLoading(false))
-         );
+         .catch((err) => console.log(err));
+
+      if (!storeData) {
+         await axios
+            .get(`${conf.BACKEND_URL}/api/v1/users/renew-token`, {
+               withCredentials: true,
+            })
+            .then((data) => {
+               storeData = data?.data?.data;
+            })
+            .catch((err) => console.log(err));
+      }
+
+      if (!storeData) {
+         setLoading(false);
+         return;
+      }
+      dispatch(authlogin(storeData));
+      if (storeData?.refreshToken) {
+         setTokenToStorageAndAxios(storeData);
+      }
+      setLoading(false);
+      LoadDateIntoApp();
    };
+
    useEffect(() => {
+      dispatch(setTheme(getTheme("theme")));
       checkUser();
-      dispatch(setTheme(localStorage.getItem("theme")));
    }, []);
    return loading ? (
       <Loader />
