@@ -43,7 +43,7 @@ export default function Login() {
 
    useEffect(() => {
       if (isloggedin) {
-         navigate("/habit-list");
+         navigate("/");
       }
    }, [isloggedin]);
 
