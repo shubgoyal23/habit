@@ -16,6 +16,7 @@ const setTokenToStorageAndAxios = async (dataRec) => {
 };
 
 const SetTokenToAxios = async () => {
+   console.log("SetTokenToAxios");
    if (!Capacitor.isNativePlatform()) return;
    let accessToken = await getToken("accesstoken");
    let refreshToken = await getToken("refreshtoken");
