@@ -119,32 +119,33 @@ export default function App() {
    const [loading, setLoading] = useState(true);
 
    const LoadDateIntoApp = async () => {
-      let habitList = [];
-      let steakList = [];
-      await axios
-         .get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
+const habitreq = await axios.get(
+         `${conf.BACKEND_URL}/api/v1/steak/habit`,
+         {
             withCredentials: true,
-         })
-         .then((data) => {
-            habitList = data?.data?.data.map(item => item._id);
-            dispatch(addListHabits(data?.data?.data));
-         })
-         .catch((err) => console.log(err));
-      axios
-         .post(
-            `${conf.BACKEND_URL}/api/v1/steak/streak-list-all`,
-            { ids: habitList },
-            {
-               withCredentials: true,
-            }
-         )
-         .then((data) => {
-            dispatch(addSteakList(data?.data?.data));
-         })
-         .catch((err) => console.log(err));
+         }
+      );
+      const steakList = await axios.post(
+         `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
+         { month: new Date().getMonth(), year: new Date().getFullYear() },
+         {
+            withCredentials: true,
+         }
+      );
+      const { data: hData } = habitreq?.data;
+      if (hData?.length > 0) {
+         dispatch(addListHabits(hData));
+      }
+
+      const { data: sData } = steakList?.data;
+      if (sData?.length > 0) {
+         for (let i = 0; i < sData.length; i++) {
+            dispatch(addSteak(sData[i]));
+         }
+      }
    };
    const checkUser = async () => {
-      SetTokenToAxios();
+      await SetTokenToAxios();
       let storeData = null;
       await axios
          .get(`${conf.BACKEND_URL}/api/v1/users/current`, {
@@ -172,7 +173,7 @@ export default function App() {
       }
       dispatch(authlogin(storeData));
       if (storeData?.refreshToken) {
-         setTokenToStorageAndAxios(storeData);
+         await setTokenToStorageAndAxios(storeData);
       }
       setLoading(false);
       LoadDateIntoApp();
