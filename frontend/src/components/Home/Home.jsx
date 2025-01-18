@@ -36,7 +36,7 @@ function Home() {
                {dateToday[1]} {dateToday[2]}
             </h2>
          </div>
-         <div className="w-full flex-col justify-between items-center m-0 mt-6 px-2 py-4 rounded-lg shadow-top-lg">
+         <div className="w-full flex-col justify-between items-center m-0 mt-6 px-2 py-4 rounded-lg">
             <h2 className="m-0 text-lg underline underline-offset-4 text-center">
                Todays Tasks
             </h2>
