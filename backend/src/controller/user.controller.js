@@ -49,7 +49,7 @@ const registeruser = asyncHandler(async (req, res) => {
       timeZone,
       isActive: false,
    });
-   await ConnectRedis()
+   await ConnectRedis();
    await Redisclient.set(
       `OTP:${user._id.toString()}`,
       JSON.stringify({ email, otp: otpcheck, attempt: 3 })
@@ -80,7 +80,7 @@ const VerifyOtp = asyncHandler(async (req, res) => {
    if (!id || !otp || !type) {
       throw new ApiError(403, "unauthorise request");
    }
-   await ConnectRedis()
+   await ConnectRedis();
    const data = await Redisclient.get(`OTP:${id}`);
    if (!data) {
       throw new ApiError(400, "OTP expired");
@@ -100,7 +100,7 @@ const VerifyOtp = asyncHandler(async (req, res) => {
    if (finduser._id.toString() != id) {
       throw new ApiError(403, "User not found, check Email id or register one");
    }
-   await ConnectRedis()
+   await ConnectRedis();
    Redisclient.del(`OTP:${id}`);
    if (type == "register" || type == "verify-email") {
       await User.findOneAndUpdate({ email }, { isActive: true });
@@ -108,7 +108,13 @@ const VerifyOtp = asyncHandler(async (req, res) => {
 
    return res
       .status(200)
-      .json(new ApiResponse(200, {_id: id, email, type}, "Verification successfully"));
+      .json(
+         new ApiResponse(
+            200,
+            { _id: id, email, type },
+            "Verification successfully"
+         )
+      );
 });
 const loginUser = asyncHandler(async (req, res) => {
    const { email, password } = req.body;
@@ -180,7 +186,7 @@ const ResendOtp = asyncHandler(async (req, res) => {
    if (!otpcheck) {
       throw new ApiError(500, "user verification failed");
    }
-   await ConnectRedis()
+   await ConnectRedis();
    await Redisclient.set(
       `OTP:${user._id.toString()}`,
       JSON.stringify({ email, otp: otpcheck, attempt: 3 })
@@ -192,7 +198,7 @@ const ResendOtp = asyncHandler(async (req, res) => {
       .json(
          new ApiResponse(
             200,
-            {_id:user._id},
+            { _id: user._id },
             "An Email to verify your account has been send to your email id"
          )
       );
@@ -237,8 +243,8 @@ const currentUser = asyncHandler(async (req, res) => {
 });
 
 const refreshToken = asyncHandler(async (req, res) => {
-   const token = req.cookies.refreshToken || req.headers.refreshtoken;
-
+   let token = req.cookies.refreshToken || req.headers.refreshtoken;
+   token = token.replace("Bearer ", "");
    if (!token) {
       throw new ApiError(401, "RefreshToken not found");
    }
@@ -399,7 +405,7 @@ const DeleteUser = asyncHandler(async (req, res) => {
    for (let i = 0; i < ids.length; i++) {
       rmids.push(`${ids[i]._id.toString()}:${user._id.toString()}`);
    }
-   await ConnectRedis()
+   await ConnectRedis();
    await Redisclient.SREM("habitList", rmids);
    return res
       .status(200)
@@ -418,5 +424,5 @@ export {
    setFcmToken,
    DeleteUser,
    VerifyOtp,
-   ResendOtp
+   ResendOtp,
 };
