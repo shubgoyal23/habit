@@ -36,7 +36,8 @@ export default function Login() {
       formState: { errors },
    } = useForm();
 
-   const fcm = async () => {
+   const AppSpecific = async (data) => {
+      await setTokenToStorageAndAxios(data); // for app
       await RegisterForNotifications();
       await sendFcmTokenToServer();
    };
@@ -61,9 +62,8 @@ export default function Login() {
       login
          .then((data) => {
             dispatch(authlogin(data.data.data));
-            setTokenToStorageAndAxios(data.data.data); // for app
-            fcm();
-            navigate("/habit-list");
+            AppSpecific(data.data.data);
+            navigate("/");
          })
          .catch((err) => console.log(err));
    };

@@ -132,12 +132,12 @@ export default function App() {
             withCredentials: true,
          }
       );
-      const {data: hData} = habitreq?.data;
+      const { data: hData } = habitreq?.data;
       if (hData?.length > 0) {
          dispatch(addListHabits(hData));
       }
 
-      const {data: sData} = steakList?.data;
+      const { data: sData } = steakList?.data;
       if (sData?.length > 0) {
          for (let i = 0; i < sData.length; i++) {
             dispatch(addSteak(sData[i]));
@@ -145,7 +145,7 @@ export default function App() {
       }
    };
    const checkUser = async () => {
-      SetTokenToAxios();
+      await SetTokenToAxios();
       let storeData = null;
       await axios
          .get(`${conf.BACKEND_URL}/api/v1/users/current`, {
@@ -173,7 +173,7 @@ export default function App() {
       }
       dispatch(authlogin(storeData));
       if (storeData?.refreshToken) {
-         setTokenToStorageAndAxios(storeData);
+         await setTokenToStorageAndAxios(storeData);
       }
       setLoading(false);
       LoadDateIntoApp();
