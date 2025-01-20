@@ -119,7 +119,7 @@ export default function App() {
    const [loading, setLoading] = useState(true);
 
    const LoadDateIntoApp = async () => {
-const habitreq = await axios.get(
+      const habitreq = await axios.get(
          `${conf.BACKEND_URL}/api/v1/steak/habit`,
          {
             withCredentials: true,
@@ -179,8 +179,13 @@ const habitreq = await axios.get(
       LoadDateIntoApp();
    };
 
+   const themeSet = async () => {
+      const theme = await getTheme("theme");
+      dispatch(setTheme(theme));
+   };
+
    useEffect(() => {
-      dispatch(setTheme(getTheme("theme")));
+      themeSet()
       checkUser();
    }, []);
    return loading ? (
