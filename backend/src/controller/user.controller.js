@@ -6,6 +6,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import jwt from "jsonwebtoken";
 import { SendOtp } from "../utils/Email.js";
 import { Habit } from "../models/habit.model.js";
+import { Device } from "../models/device.mdel.js";
 
 const generateAccessTokenAndRefresToken = async (id) => {
    try {
@@ -412,6 +413,45 @@ const DeleteUser = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, {}, "User deleted successfully"));
 });
 
+const RegisterDevice = asyncHandler(async (req, res) => {
+   const {
+      deviceId,
+      model,
+      platform,
+      os,
+      osVersion,
+      manufacturer,
+      isVirtual,
+      webViewVersion,
+      androidSDKVersion,
+      userid,
+   } = req.body;
+
+   if (!deviceId) {
+      throw new ApiError(401, "deviceId is required");
+   }
+   await Device.findByIdAndUpdate(
+      deviceId,
+      {
+         $set: {
+            model,
+            platform,
+            os,
+            osVersion,
+            manufacturer,
+            isVirtual,
+            webViewVersion,
+            androidSDKVersion,
+            userid,
+         },
+      },
+      { new: true, upsert: true }
+   );
+   return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "deviceId updated successfully"));
+});
+
 export {
    registeruser,
    loginUser,
@@ -425,4 +465,5 @@ export {
    DeleteUser,
    VerifyOtp,
    ResendOtp,
+   RegisterDevice,
 };
