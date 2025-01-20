@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { login as authlogin } from "../../store/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { conf } from "@/conf/conf";
-import { setTokenToStorageAndAxios } from "@/lib/apphelper";
+import { logDeviceInfo, setTokenToStorageAndAxios } from "@/lib/apphelper";
 import {
    RegisterForNotifications,
    sendFcmTokenToServer,
