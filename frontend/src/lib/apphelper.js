@@ -7,11 +7,15 @@ const setTokenToStorageAndAxios = async (dataRec) => {
    if (!Capacitor.isNativePlatform()) return;
    if (dataRec?.accessToken) {
       await setToken("accesstoken", dataRec?.accessToken);
-      axios.defaults.headers.common["Accesstoken"] = `Bearer ${dataRec?.accessToken}`;
+      axios.defaults.headers.common[
+         "Accesstoken"
+      ] = `Bearer ${dataRec?.accessToken}`;
    }
    if (dataRec?.refreshToken) {
       await setToken("refreshtoken", dataRec?.refreshToken);
-      axios.defaults.headers.common["Refreshtoken"] = `Bearer ${dataRec?.refreshToken}`;
+      axios.defaults.headers.common[
+         "Refreshtoken"
+      ] = `Bearer ${dataRec?.refreshToken}`;
    }
 };
 
@@ -39,8 +43,25 @@ const getTheme = async () => {
 };
 
 const logDeviceInfo = async () => {
+   if (!Capacitor.isNativePlatform()) return;
    const deviceId = await Device.getId();
    const info = await Device.getInfo();
+   let device = {};
+   device.deviceId = deviceId?.identifier;
+   device.model = info.model;
+   device.platform = info.platform;
+   device.os = info.operatingSystem;
+   device.osVersion = info.osVersion;
+   device.manufacturer = info.manufacturer;
+   device.isVirtual = info.isVirtual;
+   device.webViewVersion = info.webViewVersion;
+   device.androidSDKVersion = info.androidSDKVersion;
+   return device;
+};
+
+const GetDeviceId = async () => {
+   if (!Capacitor.isNativePlatform()) return;
+   return await Device.getId();
 };
 export {
    setTokenToStorageAndAxios,
@@ -49,4 +70,5 @@ export {
    SetTheme,
    getTheme,
    logDeviceInfo,
+   GetDeviceId,
 };

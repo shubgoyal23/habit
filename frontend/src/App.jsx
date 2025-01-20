@@ -176,17 +176,20 @@ export default function App() {
          await setTokenToStorageAndAxios(storeData);
       }
       setLoading(false);
-      LoadDateIntoApp();
+      return storeData;
    };
 
-   const themeSet = async () => {
+   const asyncTasks = async () => {
       const theme = await getTheme("theme");
       dispatch(setTheme(theme));
+      const loggedIn = await checkUser();
+      if (loggedIn) {
+         await LoadDateIntoApp();
+      }
    };
 
    useEffect(() => {
-      themeSet()
-      checkUser();
+      asyncTasks();
    }, []);
    return loading ? (
       <Loader />

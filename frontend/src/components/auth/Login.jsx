@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { login as authlogin } from "../../store/AuthSlice";
 import { useNavigate } from "react-router-dom";
 import { conf } from "@/conf/conf";
-import { setTokenToStorageAndAxios } from "@/lib/apphelper";
+import { logDeviceInfo, setTokenToStorageAndAxios } from "@/lib/apphelper";
 import {
    RegisterForNotifications,
    sendFcmTokenToServer,
@@ -40,6 +40,20 @@ export default function Login() {
       await setTokenToStorageAndAxios(data); // for app
       await RegisterForNotifications();
       await sendFcmTokenToServer();
+      const device = await logDeviceInfo();
+      if (data) {
+         device.userid = data._id;
+         await axios
+            .post(`${conf.BACKEND_URL}/api/v1/users/device`, device, {
+               withCredentials: true,
+            })
+            .then((data) => {
+               if (data.statusCode == 200) {
+                  setToken("deviceRegistered", `yes:${device._id}`);
+               }
+            })
+            .catch((err) => console.log(err));
+      }
    };
 
    useEffect(() => {
