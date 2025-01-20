@@ -430,8 +430,8 @@ const RegisterDevice = asyncHandler(async (req, res) => {
    if (!deviceId) {
       throw new ApiError(401, "deviceId is required");
    }
-   await Device.findByIdAndUpdate(
-      deviceId,
+   await Device.findOneAndUpdate(
+      {deviceId: deviceId},
       {
          $set: {
             model,
