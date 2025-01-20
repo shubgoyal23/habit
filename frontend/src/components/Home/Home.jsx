@@ -47,7 +47,7 @@ function Home() {
                      className="space-y-1 p-2 pl-3 flex justify-start items-center gap-5"
                   >
                      <MarkSteak row={{ original: item }} />
-                     <div className="flex flex-1 items-center justify-start bg-white/10 rounded-lg py-4 px-2">
+                     <div className="flex flex-1 items-center justify-start bg-black/10 dark:bg-white/10 rounded-lg py-4 px-2">
                         <span>{item.name}</span>
                      </div>
                   </div>

@@ -16,7 +16,6 @@ const setTokenToStorageAndAxios = async (dataRec) => {
 };
 
 const SetTokenToAxios = async () => {
-   console.log("SetTokenToAxios");
    if (!Capacitor.isNativePlatform()) return;
    let accessToken = await getToken("accesstoken");
    let refreshToken = await getToken("refreshtoken");
@@ -36,7 +35,7 @@ const SetTheme = async (theme) => {
    await setToken("theme", theme);
 };
 const getTheme = async () => {
-   return await getToken("theme");
+   return getToken("theme");
 };
 
 const logDeviceInfo = async () => {
