@@ -26,9 +26,10 @@ const GetTimeEpoch = (hr, min, userOffset) => {
 };
 
 // this will return date in epoch format based on 12:00 pm in utc for that date
-const GetUTCDateEpoch = (date) => {
+const GetUTCDateEpoch = (date, userOffset) => {
    if (!date) return;
-   let dateNew = new Date(date);
+   let userDate = new Date(date).getTime() - userOffset * 60 * 1000;
+   let dateNew = new Date(userDate);
    let utcDate =
       Date.UTC(
          dateNew.getFullYear(),
@@ -81,8 +82,8 @@ const addHabit = asyncHandler(async (req, res) => {
       duration = Math.floor((endTime - startTime) / 60);
    }
 
-   startDate = GetUTCDateEpoch(startDate || new Date());
-   endDate = GetUTCDateEpoch(endDate || new Date(2099, 0, 1, 12, 0, 0));
+   startDate = GetUTCDateEpoch(startDate || new Date(), req.user.timeZone);
+   endDate = GetUTCDateEpoch(endDate || new Date(2099, 0, 1, 12, 0, 0), req.user.timeZone);
 
    if (habitType == "todo") {
       repeat = {
@@ -95,7 +96,7 @@ const addHabit = asyncHandler(async (req, res) => {
          break;
       case "dates":
          for (let i = 0; i < repeat.value.length; i++) {
-            repeat.value[i] = GetUTCDateEpoch(repeat.value[i]);
+            repeat.value[i] = GetUTCDateEpoch(repeat.value[i], req.user.timeZone);
          }
          break;
       case "hours":
@@ -190,10 +191,10 @@ const editHabit = asyncHandler(async (req, res) => {
       duration = Math.floor((endTime - startTime) / 60);
    }
    if (startDate) {
-      startDate = GetUTCDateEpoch(startDate);
+      startDate = GetUTCDateEpoch(startDate, req.user.timeZone);
    }
    if (endDate) {
-      endDate = GetUTCDateEpoch(endDate);
+      endDate = GetUTCDateEpoch(endDate, req.user.timeZone);
    }
    if (habitType == "todo") {
       repeat = {
@@ -206,7 +207,7 @@ const editHabit = asyncHandler(async (req, res) => {
          break;
       case "dates":
          for (let i = 0; i < repeat.value.length; i++) {
-            repeat.value[i] = GetUTCDateEpoch(repeat.value[i]);
+            repeat.value[i] = GetUTCDateEpoch(repeat.value[i], req.user.timeZone);
          }
          break;
       case "hours":
@@ -418,7 +419,7 @@ const getSteakListAll = asyncHandler(async (req, res) => {
 
 const getTodaysHabits = asyncHandler(async (req, res) => {
    let dateToday = new Date();
-   let dateTodayEpoch = GetUTCDateEpoch(dateToday);
+   let dateTodayEpoch = GetUTCDateEpoch(dateToday, req.user.timeZone);
    const list = await Habit.find({
       userId: req.user._id,
       startDate: { $lte: dateTodayEpoch },
