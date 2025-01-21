@@ -27,7 +27,6 @@ const userSchema = new mongoose.Schema(
       },
       username: {
          type: String,
-         required: true,
          unique: true,
       },
       refreshToken: String,
@@ -40,16 +39,6 @@ const userSchema = new mongoose.Schema(
          default: 5,
       },
       habitsList: [mongoose.Schema.Types.ObjectId],
-      phoneDetails: {
-         deviceId: String, // device id
-         model: String, // phone model
-         os: String, // operating system
-         osVersion: String, // os version
-         appVersion: String, // app version
-         manufacturer: String, // phone manufacturer
-         memUsed: Number, // memory used by app
-         lan: String, // phone language
-      },
    },
    { timestamps: true }
 );

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"time"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -71,6 +73,6 @@ type Habit struct {
 	Notify      bool               `bson:"notify" json:"notify"`                               // Notification setting
 	IsActive    bool               `bson:"isActive" json:"isActive"`                           // Whether the habit is active
 	HabitType   string             `bson:"habitType" json:"habitType"`                         // Habit type: regular, negative, or oneTime
-	CreatedAt   int64              `bson:"createdAt,omitempty" json:"createdAt,omitempty"`     // Timestamp when created
-	UpdatedAt   int64              `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`     // Timestamp when updated
+	CreatedAt   time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`     // Timestamp when created
+	UpdatedAt   time.Time          `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`     // Timestamp when updated
 }

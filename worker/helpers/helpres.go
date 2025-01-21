@@ -26,3 +26,10 @@ func GetUserDetails(userid primitive.ObjectID) (user models.User, err error) {
 	AllUsers[userid] = user
 	return
 }
+
+// // return epoch of 1 jan 2025 of time given
+// func GetUtcEpoch(epoch int64) int64 {
+// 	t := time.Unix(epoch, 0)
+// 	netTime := time.Date(2025, time.January, 1, t.UTC().Hour(), t.UTC().Minute(), 0, 0, time.UTC).Unix()
+// 	return netTime
+// }

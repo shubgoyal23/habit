@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM, syscall.SIGQUIT)
 
@@ -28,8 +27,7 @@ func main() {
 		panic(err)
 	}
 	helpers.InitVariables()
-	go helpers.DoEveryHour()
-	go helpers.DoEveryMinute()
+	go helpers.RunNoficationWorker()
 
 	<-stop
 	fmt.Println("shutting down...")
