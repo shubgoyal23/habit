@@ -3,6 +3,8 @@ package helpers
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
@@ -12,7 +14,16 @@ import (
 var firebaseApp *firebase.App
 
 func InitFirebase() error {
-	opt := option.WithCredentialsFile("/home/shubham/personal/github/habit_notify/serviceAccountKey.json")
+	currentDir, err := os.Getwd()
+	if err != nil {
+		fmt.Println("Error getting current directory:", err)
+		return err
+	}
+
+	// Construct the path dynamically
+	serviceAccountPath := filepath.Join(currentDir, "serviceAccountKey.json")
+
+	opt := option.WithCredentialsFile(serviceAccountPath)
 	config := &firebase.Config{ProjectID: "habit-tracker-898ef"}
 	app, err := firebase.NewApp(context.Background(), config, opt)
 	if err != nil {
@@ -76,7 +87,7 @@ func SendNotificationToMany(tokens []string, title string, body string, image st
 	return nil
 }
 
-func SendHabitNotification(user UserNotification) error {
+func SendHabitNotification(user *UserNotification) error {
 	client, err := firebaseApp.Messaging(context.Background())
 	if err != nil {
 		return err
