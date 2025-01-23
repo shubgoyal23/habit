@@ -27,12 +27,18 @@ func InitVariables() {
 func RunNoficationWorker() {
 	go FilerAndSendNotifications()
 	go GetHabitRecords()
+	go ClearOldRecords()
 	for range time.Tick(time.Duration(Duration_Notify) * time.Second) {
 		GetHabitRecords()
 	}
 }
 
 func FilerAndSendNotifications() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("FilerAndSendNotifications crashed: ", err)
+		}
+	}()
 	utcTime := time.Now().UTC()
 	timeEpoch := time.Date(2025, time.January, 1, utcTime.Hour(), utcTime.Minute(), 0, 0, time.UTC).Unix() + 180 // to send notification 5 minutes ahead of current time
 	for range time.Tick(1 * time.Minute) {
@@ -54,10 +60,16 @@ func FilerAndSendNotifications() {
 				continue
 			}
 		}
+		NotifyMap.Delete(timeEpoch)
 	}
 }
 
 func GetHabitRecords() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("GetHabitRecords crashed: ", err)
+		}
+	}()
 	utcTime := time.Now().UTC().Add(time.Minute * 5) // 5 min ahead of current time
 	timeEpoch := time.Date(2025, time.January, 1, utcTime.Hour(), utcTime.Minute(), 0, 0, time.UTC).Unix()
 	query := bson.M{"startTime": bson.M{"$gte": timeEpoch, "$lt": timeEpoch + Duration_Notify}, "notify": true}
@@ -77,6 +89,7 @@ func GetHabitRecords() {
 		if err != nil {
 			continue
 		}
+		nofity := make([]int64, 0)
 		switch habitData.HabitType {
 		case "regular":
 		case "negative":
@@ -112,7 +125,13 @@ func GetHabitRecords() {
 				continue
 			}
 		case "hours":
-
+			rep := habitData.Repeat.Value[0] * 60
+			st := habitData.StartTime
+			ed := habitData.EndTime
+			for ed > st {
+				st = st + int64(rep)
+				nofity = append(nofity, st)
+			}
 		case "todo":
 			currentDate := utcTime.Day()
 			currentMonth := utcTime.Month()
@@ -136,14 +155,34 @@ func GetHabitRecords() {
 		}
 		userPayload.Notification = paylod
 		userPayload.Token = *userDetails.FCMToken
+		nofity = append(nofity, habitData.StartTime)
 
-		if val, ok := NotifyMap.Load(habitData.StartTime); !ok {
-			NotifyMap.Store(habitData.StartTime, []*UserNotification{userPayload})
-		} else {
-			val := val.([]*UserNotification)
-			val = append(val, userPayload)
-			NotifyMap.Store(habitData.StartTime, val)
+		for _, t := range nofity {
+			if val, ok := NotifyMap.Load(t); !ok {
+				NotifyMap.Store(t, []*UserNotification{userPayload})
+			} else {
+				val := val.([]*UserNotification)
+				val = append(val, userPayload)
+				NotifyMap.Store(t, val)
+			}
 		}
+	}
+}
 
+func ClearOldRecords() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("ClearOldRecords crashed: ", err)
+		}
+	}()
+
+	for t := range time.Tick(12 * time.Hour) {
+		utcTime := t.UTC().Add(time.Minute * -60).Unix()
+		NotifyMap.Range(func(key, value interface{}) bool {
+			if key.(int64) < utcTime {
+				NotifyMap.Delete(key)
+			}
+			return true
+		})
 	}
 }
