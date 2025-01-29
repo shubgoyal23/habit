@@ -83,7 +83,7 @@ const addHabit = asyncHandler(async (req, res) => {
    }
 
    startDate = GetUTCDateEpoch(startDate || new Date(), req?.user?.timeZone);
-   endDate = GetUTCDateEpoch(endDate || new Date().setFullYear(endDate.getFullYear() + 1), req?.user?.timeZone);
+   endDate = GetUTCDateEpoch(endDate || new Date().setFullYear(new Date().getFullYear() + 1), req?.user?.timeZone);
 
    if (habitType == "todo") {
       repeat = {
