@@ -224,3 +224,19 @@ func DelRedisKey(key string) error {
 	}
 	return nil
 }
+
+// this function round the List member
+func RedisLMove(key string) (res string, err error) {
+	rc := RedigoConn.Get()
+	defer rc.Close()
+	if _, er := rc.Do("PING"); er != nil {
+		// LogError("RoundSetMember", "Redis not connected", er)
+		return "", er
+	}
+	resp, err := redis.String(rc.Do("LMOVE", key, key, "RIGHT", "LEFT"))
+	if err != nil {
+		// LogError("RoundSetMember", fmt.Sprintf("cannot round in redis set key: %s with value: %s", key, val), err)
+		return "", err
+	}
+	return resp, nil
+}

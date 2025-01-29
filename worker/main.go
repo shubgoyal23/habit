@@ -27,6 +27,7 @@ func main() {
 		panic(err)
 	}
 	helpers.InitVariables()
+	helpers.InitImageHandler()
 	go helpers.RunNoficationWorker()
 
 	<-stop

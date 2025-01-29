@@ -29,6 +29,7 @@ func RunNoficationWorker() {
 	go GetHabitRecords()
 	go ClearOldRecords()
 	for range time.Tick(time.Duration(Duration_Notify) * time.Second) {
+		ChangeImage()
 		GetHabitRecords()
 	}
 }
@@ -155,7 +156,7 @@ func GetHabitRecords() {
 		paylod := &messaging.Notification{
 			Title:    fmt.Sprintf("Hey %s, It's Time for Your Habit: %s!", userName, habitName),
 			Body:     "You're just 5 minutes away from achieving your goal! Get ready and make today amazing. 💪",
-			ImageURL: "https://res.cloudinary.com/dkznkabup/image/upload/v1736139148/habit-tracker/qxo56br4qdlaiuittpco.webp",
+			ImageURL: ImageUrl,
 		}
 		userPayload.Notification = paylod
 		userPayload.Token = *userDetails.FCMToken
