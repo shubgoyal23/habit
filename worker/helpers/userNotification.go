@@ -40,9 +40,13 @@ func FilerAndSendNotifications() {
 		}
 	}()
 	utcTime := time.Now().UTC()
-	timeEpoch := time.Date(2025, time.January, 1, utcTime.Hour(), utcTime.Minute(), 0, 0, time.UTC).Unix() + 180 // to send notification 5 minutes ahead of current time
+	timeEpoch := time.Date(2025, time.January, 1, utcTime.Hour(), utcTime.Minute(), 0, 0, time.UTC).Add(time.Minute * 5).Unix() // 5 min ahead of current time
+	endEpoch := time.Date(2025, time.January, 1, 23, 59, 59, 59, time.UTC).Unix()
 	for range time.Tick(1 * time.Minute) {
 		timeEpoch = timeEpoch + 60
+		if timeEpoch > endEpoch {
+			timeEpoch = time.Date(2025, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
+		}
 
 		// check if timeEpoch is in map
 		res, ok := NotifyMap.Load(timeEpoch)
