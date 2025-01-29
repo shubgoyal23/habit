@@ -70,6 +70,8 @@ const addHabit = asyncHandler(async (req, res) => {
    if (startTime) {
       const [hr, min] = GetTimeFormated(startTime);
       startTime = GetTimeEpoch(hr, min, req.user.timeZone);
+   }else{
+      startTime = 0
    }
    if (endTime) {
       const [hr, min] = GetTimeFormated(endTime);
@@ -77,6 +79,8 @@ const addHabit = asyncHandler(async (req, res) => {
       if (endTime < startTime) {
          endTime += 86400;
       }
+   }else{
+      endTime = 0
    }
    if (startTime && endTime) {
       duration = Math.floor((endTime - startTime) / 60);
