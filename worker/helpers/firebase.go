@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/messaging"
@@ -105,6 +106,7 @@ func SendHabitNotification(user *UserNotification) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Successfully sent message:", str)
+	n := fmt.Sprintf("%s: %s", time.Now().Format("2006-01-02 15:04:05"), str)
+	InsertRedisListLPush("habit_notification", []string{n})
 	return nil
 }

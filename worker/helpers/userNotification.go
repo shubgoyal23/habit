@@ -47,6 +47,8 @@ func FilerAndSendNotifications() {
 		timeEpoch = timeEpoch + 60
 		if timeEpoch > endEpoch {
 			timeEpoch = time.Date(2025, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
+			n := fmt.Sprintf("%s: %d", time.Now().Format("2006-01-02 15:04:05"), timeEpoch)
+			InsertRedisListLPush("Time_change", []string{n})
 		}
 
 		// check if timeEpoch is in map
@@ -61,6 +63,8 @@ func FilerAndSendNotifications() {
 		}
 
 		for _, doc := range docs {
+			n := fmt.Sprintf("%s: %s", time.Now().Format("2006-01-02 15:04:05"), doc.Notification.Title)
+			InsertRedisListLPush("habit_notification_To_Send", []string{n})
 			if err := SendHabitNotification(doc); err != nil {
 				continue
 			}
