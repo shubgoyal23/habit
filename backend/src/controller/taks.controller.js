@@ -83,7 +83,10 @@ const addHabit = asyncHandler(async (req, res) => {
    }
 
    startDate = GetUTCDateEpoch(startDate || new Date(), req?.user?.timeZone);
-   endDate = GetUTCDateEpoch(endDate || new Date().setFullYear(new Date().getFullYear() + 1), req?.user?.timeZone);
+   endDate = GetUTCDateEpoch(
+      endDate || new Date().setFullYear(new Date().getFullYear() + 1),
+      req?.user?.timeZone
+   );
 
    if (habitType == "todo") {
       repeat = {
@@ -96,7 +99,10 @@ const addHabit = asyncHandler(async (req, res) => {
          break;
       case "dates":
          for (let i = 0; i < repeat.value.length; i++) {
-            repeat.value[i] = GetUTCDateEpoch(repeat.value[i], req?.user?.timeZone);
+            repeat.value[i] = GetUTCDateEpoch(
+               repeat.value[i],
+               req?.user?.timeZone
+            );
          }
          break;
       case "hours":
@@ -128,11 +134,13 @@ const addHabit = asyncHandler(async (req, res) => {
    if (!createUserHabit) {
       throw new ApiError(401, "Habit Creation Failed, try again later");
    }
-   await ConnectRedis();
-   await RedisConn.sAdd(
-      "habitLists",
-      `${createUserHabit._id.toString()}:${req.user._id.toString()}`
-   );
+   if (habitType != "negative") {
+      await ConnectRedis();
+      await RedisConn.sAdd(
+         "habitLists",
+         `${createUserHabit._id.toString()}:${req.user._id.toString()}`
+      );
+   }
    // save to user list
    const add = await User.findByIdAndUpdate(req.user._id, {
       $push: { habitsList: createUserHabit._id },
@@ -207,7 +215,10 @@ const editHabit = asyncHandler(async (req, res) => {
          break;
       case "dates":
          for (let i = 0; i < repeat.value.length; i++) {
-            repeat.value[i] = GetUTCDateEpoch(repeat.value[i], req?.user?.timeZone);
+            repeat.value[i] = GetUTCDateEpoch(
+               repeat.value[i],
+               req?.user?.timeZone
+            );
          }
          break;
       case "hours":
@@ -302,7 +313,6 @@ const addStreak = asyncHandler(async (req, res) => {
    const userTimeOff = req?.user?.timeZone * 60 * 1000;
 
    let servertime = new Date(serverTime - serTimeOff + userTimeOff);
-   // let dateStamp = `${servertime.getFullYear()}-${servertime.getMonth()}-${servertime.getDate()}`;
 
    const check = await Streak.findOneAndUpdate(
       {
@@ -322,6 +332,12 @@ const addStreak = asyncHandler(async (req, res) => {
    if (!check) {
       throw new ApiError(401, "Streak is Already Marked Completed");
    }
+
+   await ConnectRedis();
+   await RedisConn.SADD(
+      `habit_Completed_${servertime.getDate()}-${servertime.getMonth()}`,
+      id
+   );
 
    return res
       .status(200)
