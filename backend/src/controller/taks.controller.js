@@ -26,11 +26,11 @@ const GetTimeEpoch = (hr, min, userOffset = 0) => {
 };
 // set time of hours and minutes in epoch format based on 1 jan 2025, 22:00
 const GetTimeZoneEpoch = (userOffset = 0) => {
-   const epoch = Date.UTC(2025, 0, 1, 22, 0, 0, 0)
+   const epoch = Date.UTC(2025, 0, 1, 22, 0, 0, 0);
    const time = Number(epoch + userOffset * 60000);
    const finaltime = new Date(time);
-   finaltime.setUTCMinutes(0, 0, 0)
-   return Math.ceil(finaltime / 1000)
+   finaltime.setUTCMinutes(0, 0, 0);
+   return Math.ceil(finaltime / 1000);
 };
 
 // this will return date in epoch format based on 12:00 pm in utc for that date
@@ -145,7 +145,10 @@ const addHabit = asyncHandler(async (req, res) => {
    if (habitType != "negative") {
       let userE = GetTimeZoneEpoch(req?.user?.timeZone);
       await ConnectRedis();
-      await RedisConn.sAdd(`habitLists:${userE}`, createUserHabit._id.toString());
+      await RedisConn.sAdd(
+         `habitLists:${userE}`,
+         createUserHabit._id.toString()
+      );
    }
    // save to user list
    const add = await User.findByIdAndUpdate(req.user._id, {
@@ -340,10 +343,7 @@ const addStreak = asyncHandler(async (req, res) => {
    }
 
    await ConnectRedis();
-   await RedisConn.SADD(
-      `habitCompleted:${servertime.getDate()}-${servertime.getMonth()}`,
-      id
-   );
+   await RedisConn.SADD("habitCompleted", id);
 
    return res
       .status(200)
@@ -384,10 +384,7 @@ const removeStreak = asyncHandler(async (req, res) => {
    }
 
    await ConnectRedis();
-   await RedisConn.SREM(
-      `habit_Completed_${servertime.getDate()}-${servertime.getMonth()}`,
-      id
-   );
+   await RedisConn.SREM("habitCompleted", id);
 
    return res
       .status(200)
