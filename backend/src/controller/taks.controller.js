@@ -147,7 +147,7 @@ const addHabit = asyncHandler(async (req, res) => {
       await ConnectRedis();
       await RedisConn.sAdd(
          `habitLists:${userE}`,
-         createUserHabit._id.toString()
+         `${createUserHabit._id.toString()}:${req.user._id}`
       );
    }
    // save to user list
@@ -298,7 +298,7 @@ const DeleteHabit = asyncHandler(async (req, res) => {
    // remove habit from redis
    let userE = GetTimeZoneEpoch(req?.user?.timeZone);
    await ConnectRedis();
-   await RedisConn.SREM(`habitLists:${userE}`, id);
+   await RedisConn.SREM(`habitLists:${userE}`, `${id}:${req.user._id}`);
 
    return res
       .status(200)
@@ -341,9 +341,9 @@ const addStreak = asyncHandler(async (req, res) => {
    if (!check) {
       throw new ApiError(401, "Streak is Already Marked Completed");
    }
-
+   let dateCompleted = GetUTCDateEpoch(new Date(), req?.user?.timeZone);
    await ConnectRedis();
-   await RedisConn.SADD("habitCompleted", id);
+   await RedisConn.SADD(`habitCompleted:${dateCompleted}`, `${id}:${req.user._id}`);
 
    return res
       .status(200)
@@ -383,8 +383,9 @@ const removeStreak = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Streak Remove Failed, try again later");
    }
 
+   let dateCompleted = GetUTCDateEpoch(new Date(), req?.user?.timeZone);
    await ConnectRedis();
-   await RedisConn.SREM("habitCompleted", id);
+   await RedisConn.SREM(`habitCompleted:${dateCompleted}`, `${id}:${req.user._id}`);
 
    return res
       .status(200)
