@@ -27,9 +27,20 @@ func GetUserDetails(userid primitive.ObjectID) (user models.User, err error) {
 	return
 }
 
-// // return epoch of 1 jan 2025 of time given
-// func GetUtcEpoch(epoch int64) int64 {
-// 	t := time.Unix(epoch, 0)
-// 	netTime := time.Date(2025, time.January, 1, t.UTC().Hour(), t.UTC().Minute(), 0, 0, time.UTC).Unix()
-// 	return netTime
-// }
+func DoEveryDayTask() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("DoEveryDayTask crashed: ", err)
+		}
+	}()
+	for range time.Tick(24 * time.Hour) {
+		ChangeImageDaily()
+
+		utcTime := time.Now().UTC()
+		dateEpoch := time.Date(utcTime.Year(), utcTime.Month(), utcTime.Day()-2, 12, 0, 0, 0, time.UTC)
+		if err := DelRedisKey(fmt.Sprintf("habitCompleted:%d", dateEpoch.Unix())); err != nil {
+			continue
+		}
+	}
+
+}

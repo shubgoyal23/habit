@@ -104,9 +104,28 @@ func SendHabitNotification(user *UserNotification) error {
 	}
 	str, err := client.Send(context.Background(), message)
 	if err != nil {
+		n := fmt.Sprintf("%s: %s", time.Now().Format("2006-01-02 15:04:05"), err.Error())
+		InsertRedisListLPush("habit_notification_Error", []string{n})
 		return err
 	}
 	n := fmt.Sprintf("%s: %s", time.Now().Format("2006-01-02 15:04:05"), str)
+	InsertRedisListLPush("habit_notification", []string{n})
+	return nil
+}
+
+func SendNotificationBulk(message []*messaging.Message) error {
+	client, err := firebaseApp.Messaging(context.Background())
+	if err != nil {
+		return err
+	}
+	response, err := client.SendEach(context.Background(), message)
+	if err != nil {
+		n := fmt.Sprintf("%s: %s", time.Now().Format("2006-01-02 15:04:05"), err.Error())
+		InsertRedisListLPush("habit_notification_Error", []string{n})
+		return err
+	}
+	fmt.Println("Successfully sent message:", response)
+	n := fmt.Sprintf("%s: Batch success %d, failed %d", time.Now().Format("2006-01-02 15:04:05"), response.SuccessCount, response.FailureCount)
 	InsertRedisListLPush("habit_notification", []string{n})
 	return nil
 }

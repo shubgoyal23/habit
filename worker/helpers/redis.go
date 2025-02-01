@@ -160,7 +160,6 @@ func GetAllRedisSetMemeber(key string) ([]string, error) {
 	}
 	members, err := redis.Strings(rc.Do("SMEMBERS", key))
 	if err != nil {
-		// LogError("DeleteRedisSetMemeber", fmt.Sprintf("cannot delete in redis set key: %s with value: %s", key, val), err)
 		return nil, err
 	}
 	return members, nil
@@ -239,4 +238,40 @@ func RedisLMove(key string) (res string, err error) {
 		return "", err
 	}
 	return resp, nil
+}
+
+// checks if members of array exists in redis set
+func CheckRedisSetMemebers(key string, val []string) (fd []int, nf []int, err error) {
+	fd = make([]int, 0)
+	nf = make([]int, 0)
+	rc := RedigoConn.Get()
+	defer rc.Close()
+	if _, er := rc.Do("PING"); er != nil {
+		return fd, nf, er
+	}
+	if err := rc.Send("MULTI"); err != nil {
+		return fd, nf, err
+	}
+
+	for _, v := range val {
+		if err := rc.Send("SISMEMBER", key, v); err != nil {
+			return fd, nf, err
+		}
+	}
+
+	vals, err := redis.Values(rc.Do("EXEC"))
+	if err != nil {
+		return fd, nf, err
+	}
+
+	for i, v := range vals {
+		if val, ok := v.(int64); ok {
+			if val == 1 {
+				fd = append(fd, i)
+			} else {
+				nf = append(nf, i)
+			}
+		}
+	}
+	return fd, nf, nil
 }
