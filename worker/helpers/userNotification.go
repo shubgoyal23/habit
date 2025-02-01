@@ -3,6 +3,7 @@ package helpers
 import (
 	"fmt"
 	"habit_notify/models"
+	"strings"
 	"sync"
 	"time"
 
@@ -28,9 +29,11 @@ func RunNoficationWorker() {
 	go FilerAndSendNotifications()
 	go GetHabitRecords()
 	go ClearOldRecords()
+	go HabitNotDoneReminder()
+
 	for range time.Tick(time.Duration(Duration_Notify) * time.Second) {
-		ChangeImage()
 		GetHabitRecords()
+		ChangeImage()
 	}
 }
 
@@ -193,5 +196,54 @@ func ClearOldRecords() {
 			}
 			return true
 		})
+	}
+}
+
+// this function sends notification to user if habit is not done till 11 pm localtime
+func HabitNotDoneReminder() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("HabitNotDoneReminder crashed: ", err)
+		}
+	}()
+	for t := range time.Tick(1 * time.Hour) {
+		utcTime := t.UTC()
+		timeEpoch := time.Date(2025, time.January, 1, utcTime.Hour(), 0, 0, 0, time.UTC)
+		key := fmt.Sprintf("habitLists:%d", timeEpoch.Unix())
+		habits, err := GetAllRedisSetMemeber(key)
+		if err != nil {
+			continue
+		}
+		dateEpoch := time.Date(utcTime.Year(), utcTime.Month(), utcTime.Day(), 12, 0, 0, 0, time.UTC)
+		_, nf, err := CheckRedisSetMemebers(fmt.Sprintf("habitCompleted:%d", dateEpoch.Unix()), habits)
+		if err != nil {
+			continue
+		}
+		messages := make([]*messaging.Message, 0)
+		for _, v := range nf {
+			habitid := habits[v]
+			habitArr := strings.Split(habitid, ":")
+			userid, err := primitive.ObjectIDFromHex(habitArr[1])
+			if err != nil {
+				continue
+			}
+			userDetails, err := GetUserDetails(userid)
+			if err != nil {
+				continue
+			}
+			var message messaging.Message
+			message.Token = *userDetails.FCMToken
+			message.Notification = &messaging.Notification{
+				Title:    fmt.Sprintf("Hey %s, Don't Forget Your Tasks!", userDetails.FirstName),
+				Body:     "You have pending tasks for today. Complete them before the day ends to stay on track! 🚀",
+				ImageURL: ImageUrl,
+			}
+			messages = append(messages, &message)
+		}
+		if len(messages) > 0 {
+			if err := SendNotificationBulk(messages); err != nil {
+				println(err)
+			}
+		}
 	}
 }
