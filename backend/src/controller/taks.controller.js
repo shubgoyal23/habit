@@ -28,9 +28,9 @@ const GetTimeEpoch = (hr, min, userOffset = 0) => {
 const GetTimeZoneEpoch = (userOffset = 0) => {
    const epoch = Date.UTC(2025, 0, 1, 22, 0, 0, 0)
    const time = Number(epoch + userOffset * 60000);
-   const newDate = new Date(time);
-   const finaltime = Date.UTC(2025, 0, 1, newDate.getHours(), 0, 0, 0) / 1000
-   return Math.ceil(finaltime)
+   const finaltime = new Date(time);
+   finaltime.setUTCMinutes(0, 0, 0)
+   return Math.ceil(finaltime / 1000)
 };
 
 // this will return date in epoch format based on 12:00 pm in utc for that date
@@ -295,7 +295,7 @@ const DeleteHabit = asyncHandler(async (req, res) => {
    // remove habit from redis
    let userE = GetTimeZoneEpoch(req?.user?.timeZone);
    await ConnectRedis();
-   await RedisConn.SREM(`habitLists-${userE}`, createUserHabit._id.toString());
+   await RedisConn.SREM(`habitLists:${userE}`, id);
 
    return res
       .status(200)
