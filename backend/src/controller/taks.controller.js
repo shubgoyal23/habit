@@ -26,9 +26,11 @@ const GetTimeEpoch = (hr, min, userOffset = 0) => {
 };
 // set time of hours and minutes in epoch format based on 1 jan 2025, 22:00
 const GetTimeZoneEpoch = (userOffset = 0) => {
-   const epoch = Date.UTC(2025, 0, 1, 22, 0, 0, 0) / 1000; // get epoch in seconds
-   const time = Number(epoch + userOffset * 60);
-   return time; // convert user offset in minutes to seconds
+   const epoch = Date.UTC(2025, 0, 1, 22, 0, 0, 0)
+   const time = Number(epoch + userOffset * 60000);
+   const newDate = new Date(time);
+   const finaltime = Date.UTC(2025, 0, 1, newDate.getHours(), 0, 0, 0) / 1000
+   return Math.ceil(finaltime)
 };
 
 // this will return date in epoch format based on 12:00 pm in utc for that date
