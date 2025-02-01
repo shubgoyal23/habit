@@ -24,6 +24,12 @@ const GetTimeEpoch = (hr, min, userOffset = 0) => {
    const time = Number(epoch + userOffset * 60);
    return time; // convert user offset in minutes to seconds
 };
+// set time of hours and minutes in epoch format based on 1 jan 2025, 22:00
+const GetTimeZoneEpoch = (userOffset = 0) => {
+   const epoch = Date.UTC(2025, 0, 1, 22, 0, 0, 0) / 1000; // get epoch in seconds
+   const time = Number(epoch + userOffset * 60);
+   return time; // convert user offset in minutes to seconds
+};
 
 // this will return date in epoch format based on 12:00 pm in utc for that date
 const GetUTCDateEpoch = (date, userOffset = 0) => {
@@ -135,11 +141,9 @@ const addHabit = asyncHandler(async (req, res) => {
       throw new ApiError(401, "Habit Creation Failed, try again later");
    }
    if (habitType != "negative") {
+      let userE = GetTimeZoneEpoch(req?.user?.timeZone);
       await ConnectRedis();
-      await RedisConn.sAdd(
-         "habitLists",
-         `${createUserHabit._id.toString()}:${req.user._id.toString()}`
-      );
+      await RedisConn.sAdd(`habitLists:${userE}`, createUserHabit._id.toString());
    }
    // save to user list
    const add = await User.findByIdAndUpdate(req.user._id, {
@@ -285,11 +289,11 @@ const DeleteHabit = asyncHandler(async (req, res) => {
    await User.findByIdAndUpdate(req.user._id, {
       $set: { habitsList: habits },
    });
+
+   // remove habit from redis
+   let userE = GetTimeZoneEpoch(req?.user?.timeZone);
    await ConnectRedis();
-   await RedisConn.SREM(
-      "habitLists",
-      `${del._id.toString()}:${req.user._id.toString()}`
-   );
+   await RedisConn.SREM(`habitLists-${userE}`, createUserHabit._id.toString());
 
    return res
       .status(200)
@@ -335,7 +339,7 @@ const addStreak = asyncHandler(async (req, res) => {
 
    await ConnectRedis();
    await RedisConn.SADD(
-      `habit_Completed_${servertime.getDate()}-${servertime.getMonth()}`,
+      `habitCompleted:${servertime.getDate()}-${servertime.getMonth()}`,
       id
    );
 
@@ -376,6 +380,12 @@ const removeStreak = asyncHandler(async (req, res) => {
    if (!remove) {
       throw new ApiError(401, "Streak Remove Failed, try again later");
    }
+
+   await ConnectRedis();
+   await RedisConn.SREM(
+      `habit_Completed_${servertime.getDate()}-${servertime.getMonth()}`,
+      id
+   );
 
    return res
       .status(200)
