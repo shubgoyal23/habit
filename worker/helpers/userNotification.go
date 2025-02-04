@@ -236,7 +236,7 @@ func HabitNotDoneReminder() {
 			message.Notification = &messaging.Notification{
 				Title:    fmt.Sprintf("Hey %s, Don't Forget Your Tasks!", userDetails.FirstName),
 				Body:     "You have pending tasks for today. Complete them before the day ends to stay on track! 🚀",
-				ImageURL: ImageUrl,
+				ImageURL: ImageUrlDaily,
 			}
 			messages = append(messages, &message)
 		}
