@@ -17,6 +17,8 @@ func main() {
 
 	godotenv.Load()
 
+	helpers.InitLogger()
+
 	if f := helpers.MongoInit(os.Getenv("MONGODB_URI"), os.Getenv("MONGO_DB")); !f {
 		panic(f)
 	}

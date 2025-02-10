@@ -4,7 +4,7 @@ import { verifyJwt } from "../middleware/auth.middleware.js";
 import {
    addStreak,
    addHabit,
-   DeleteHabit,
+   deleteHabit,
    editHabit,
    listHabit,
    removeStreak,
@@ -19,7 +19,7 @@ router.route("/add").post(verifyJwt, addStreak);
 router.route("/remove").post(verifyJwt, removeStreak);
 router.route("/habit").get(verifyJwt, listHabit);
 router.route("/habit").post(verifyJwt, addHabit);
-router.route("/habit-d").post(verifyJwt, DeleteHabit);
+router.route("/habit-d").post(verifyJwt, deleteHabit);
 router.route("/habit").patch(verifyJwt, editHabit);
 router.route("/streak-list").post(verifyJwt, listStreak);
 router.route("/habits-today").get(verifyJwt, getTodaysHabits);
