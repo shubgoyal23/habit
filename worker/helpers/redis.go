@@ -1,6 +1,8 @@
 package helpers
 
 import (
+	"fmt"
+
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -274,4 +276,18 @@ func CheckRedisSetMemebers(key string, val []string) (fd []int, nf []int, err er
 		}
 	}
 	return fd, nf, nil
+}
+
+func ListLpush(key string, val []interface{}) bool {
+	rc := RedigoConn.Get()
+	defer rc.Close()
+	if _, er := rc.Do("PING"); er != nil {
+		return false
+	}
+	_, err := rc.Do("LPUSH", key, val)
+	if err != nil {
+		fmt.Println("error", err)
+		return false
+	}
+	return true
 }
