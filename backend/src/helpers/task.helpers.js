@@ -1,8 +1,7 @@
-import connectDb from "../db/connectDb.js";
 import { ConnectRedis } from "../db/redis.js";
 import { Habit } from "../models/habit.model.js";
+import { Streak } from "../models/Streak.model.js";
 import { ApiError } from "../utils/ApiError.js";
-import { asyncHandlerGeneral } from "../utils/asyncHandler.js";
 import { Redisclient as RedisConn } from "../db/redis.js";
 import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResposne.js";
@@ -52,124 +51,119 @@ const GetUTCDateEpoch = (date, userOffset = 0) => {
 };
 
 // create a new habit and add it to the list
-const Createhabit = asyncHandlerGeneral(async (data) => {
-   try {
-      let {
-         name,
-         description,
-         duration,
-         startTime,
-         endTime,
-         startDate,
-         endDate,
-         repeat,
-         place,
-         how,
-         ifthen,
-         point,
-         habitType,
-         notify,
-      } = data;
-      if (!name) {
-         return new ApiError(401, "Name Feild is Reqired");
-      }
-      if (startTime) {
-         const [hr, min] = GetTimeFormated(startTime);
-         startTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
-      }
-      if (endTime) {
-         const [hr, min] = GetTimeFormated(endTime);
-         endTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
-         if (endTime < startTime) {
-            endTime += 86400;
-         }
-      }
-      if (startTime && endTime) {
-         duration = Math.floor((endTime - startTime) / 60);
-      }
-
-      startDate = GetUTCDateEpoch(
-         startDate || new Date(),
-         data?.user?.timeZone
-      );
-      endDate = GetUTCDateEpoch(
-         endDate || new Date().setFullYear(new Date().getFullYear() + 1),
-         data?.user?.timeZone
-      );
-
-      if (habitType == "todo") {
-         repeat = {
-            name: "todo",
-            value: [],
-         };
-      }
-      if (!repeat?.name) {
-         repeat = {
-            name: "days",
-            value: [0, 1, 2, 3, 4, 5, 6],
-         };
-      }
-      switch (repeat.name) {
-         case "days":
-            break;
-         case "dates":
-            for (let i = 0; i < repeat.value.length; i++) {
-               repeat.value[i] = GetUTCDateEpoch(
-                  repeat.value[i],
-                  data?.user?.timeZone
-               );
-            }
-            break;
-         case "hours":
-            break;
-         case "todo":
-            repeat.value = [];
-      }
-      if (habitType == "negative") {
-         notify = false;
-      }
-      const createUserHabit = await Habit.create({
-         userId: data.user._id,
-         name: name,
-         startDate: startDate,
-         endDate: endDate,
-         repeat: repeat,
-         habitType: habitType,
-         description: description,
-         duration: duration,
-         startTime: startTime,
-         endTime: endTime,
-         place: place,
-         how: how,
-         ifthen: ifthen,
-         point: point,
-         daysCompleted: [],
-         notify: notify,
-      });
-      if (!createUserHabit) {
-         return new ApiError(401, "Habit Creation Failed, try again later");
-      }
-      if (habitType != "negative") {
-         let userE = GetTimeZoneEpoch(data?.user?.timeZone);
-         await ConnectRedis();
-         await RedisConn.sAdd(
-            `habitLists:${userE}`,
-            `${createUserHabit._id.toString()}:${data.user._id}`
-         );
-      }
-      // save to user list
-      const add = await User.findByIdAndUpdate(data.user._id, {
-         $push: { habitsList: createUserHabit._id },
-      });
-      return new ApiResponse(200, createUserHabit, "Habit Added Successfully");
-   } catch (error) {
-      console.log(error);
-      return new ApiError(401, "Internal server error", error);
+const Createhabit = async (data) => {
+   let {
+      name,
+      description,
+      duration,
+      startTime,
+      endTime,
+      startDate,
+      endDate,
+      repeat,
+      place,
+      how,
+      ifthen,
+      point,
+      habitType,
+      notify,
+   } = data;
+   if (!name) {
+      return new ApiError(401, "Name Feild is Reqired");
    }
-});
+   if (!startTime) {
+      return new ApiError(401, "Start Time Feild is Reqired");
+   }
+   if (startTime) {
+      const [hr, min] = GetTimeFormated(startTime);
+      startTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
+   }
+   if (endTime) {
+      const [hr, min] = GetTimeFormated(endTime);
+      endTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
+      if (endTime < startTime) {
+         endTime += 86400;
+      }
+   }
+   if (startTime && endTime) {
+      duration = Math.floor((endTime - startTime) / 60);
+   }
+
+   startDate = GetUTCDateEpoch(startDate || new Date(), data?.user?.timeZone);
+   endDate = GetUTCDateEpoch(
+      endDate || new Date().setFullYear(new Date().getFullYear() + 1),
+      data?.user?.timeZone
+   );
+
+   if (habitType == "todo") {
+      repeat = {
+         name: "todo",
+         value: [],
+      };
+   }
+   if (!repeat?.name) {
+      repeat = {
+         name: "days",
+         value: [0, 1, 2, 3, 4, 5, 6],
+      };
+   }
+   switch (repeat.name) {
+      case "days":
+         break;
+      case "dates":
+         for (let i = 0; i < repeat.value.length; i++) {
+            repeat.value[i] = GetUTCDateEpoch(
+               repeat.value[i],
+               data?.user?.timeZone
+            );
+         }
+         break;
+      case "hours":
+         break;
+      case "todo":
+         repeat.value = [];
+   }
+   if (habitType == "negative") {
+      notify = false;
+   }
+   const createUserHabit = await Habit.create({
+      userId: data.user._id,
+      name: name,
+      startDate: startDate,
+      endDate: endDate,
+      repeat: repeat,
+      habitType: habitType,
+      description: description,
+      duration: duration,
+      startTime: startTime,
+      endTime: endTime,
+      place: place,
+      how: how,
+      ifthen: ifthen,
+      point: point,
+      daysCompleted: [],
+      notify: notify,
+   });
+   if (!createUserHabit) {
+      return new ApiError(401, "Habit Creation Failed, try again later");
+   }
+   if (habitType != "negative") {
+      let userE = GetTimeZoneEpoch(data?.user?.timeZone);
+      await ConnectRedis();
+      await RedisConn.sAdd(
+         `habitLists:${userE}`,
+         `${createUserHabit._id.toString()}:${data.user._id}`
+      );
+   }
+   // save to user list
+   const add = await User.findByIdAndUpdate(data.user._id, {
+      $push: { habitsList: createUserHabit._id },
+   });
+   return new ApiResponse(200, createUserHabit, "Habit Added Successfully");
+};
 
 // edit a habit
-const EditHabit = asyncHandlerGeneral(async (data) => {
+const EditHabit = async (data) => {
    let {
       id,
       name,
@@ -275,9 +269,9 @@ const EditHabit = asyncHandlerGeneral(async (data) => {
    }
 
    return new ApiResponse(200, updatedHabit, "Habit updated Successfully");
-});
+};
 
-const DeleteHabit = asyncHandlerGeneral(async (data) => {
+const DeleteHabit = async (data) => {
    const { id } = data;
    if (!id) {
       throw new ApiError(401, "id is Reqired");
@@ -307,9 +301,9 @@ const DeleteHabit = asyncHandlerGeneral(async (data) => {
    await RedisConn.SREM(`habitLists:${userE}`, `${id}:${data.user._id}`);
 
    return new ApiResponse(200, {}, "Habit deleted Successfully");
-});
+};
 
-const AddStreak = asyncHandlerGeneral(async (data) => {
+const AddStreak = async (data) => {
    const { id } = data;
    if (!id) {
       throw new ApiError(
@@ -353,9 +347,9 @@ const AddStreak = asyncHandlerGeneral(async (data) => {
    );
 
    return new ApiResponse(200, check, "habit marked Completed");
-});
+};
 
-const RemoveStreak = asyncHandlerGeneral(async (data) => {
+const RemoveStreak = async (data) => {
    const { id } = data;
    if (!id) {
       throw new ApiError(401, "Habit Id is required to add Streak");
@@ -396,15 +390,15 @@ const RemoveStreak = asyncHandlerGeneral(async (data) => {
    );
 
    return new ApiResponse(200, remove, "habit marked Pending");
-});
+};
 
-const ListHabit = asyncHandlerGeneral(async (data) => {
+const ListHabit = async (data) => {
    const list = await Habit.find({ userId: data.user._id });
 
    return new ApiResponse(200, list, "habit list fetched successfully");
-});
+};
 
-const ListStreak = asyncHandlerGeneral(async (data) => {
+const ListStreak = async (data) => {
    let { month, year } = data;
    if (!month) {
       month = new Date().getMonth();
@@ -422,9 +416,9 @@ const ListStreak = asyncHandlerGeneral(async (data) => {
       throw new ApiError(401, "Streak list not found");
    }
    return new ApiResponse(200, list, "streak list fetched successfully");
-});
+};
 
-const GetSteakListAll = asyncHandlerGeneral(async (data) => {
+const GetSteakListAll = async (data) => {
    const { ids } = data;
    if (!id) {
       throw new ApiError(401, "Habit Ids is required to get Streak list");
@@ -442,9 +436,9 @@ const GetSteakListAll = asyncHandlerGeneral(async (data) => {
       throw new ApiError(401, "Streak list not found");
    }
    return new ApiResponse(200, list, "streak list fetched successfully");
-});
+};
 
-const GetTodaysHabits = asyncHandlerGeneral(async (data) => {
+const GetTodaysHabits = async (data) => {
    let dateToday = new Date();
    let dateTodayEpoch = GetUTCDateEpoch(dateToday, data?.user?.timeZone);
    const list = await Habit.find({
@@ -470,7 +464,22 @@ const GetTodaysHabits = asyncHandlerGeneral(async (data) => {
       }
    }
    return new ApiResponse(200, finalList, "Habit list fetched successfully");
-});
+};
+
+const SearchHabitByName = async (data) => {
+   let { name } = data;
+   if (!name) {
+      throw new ApiError(401, "Habit name is required");
+   }
+   const list = await Habit.findOne({
+      userId: data.user._id,
+      name: { $regex: name, $options: "i" },
+   });
+   if (!list) {
+      throw new ApiError(401, "Habit not found");
+   }
+   return new ApiResponse(200, list, "Habit fetched successfully");
+};
 
 export {
    GetTimeFormated,
@@ -486,4 +495,5 @@ export {
    ListStreak,
    GetSteakListAll,
    GetTodaysHabits,
+   SearchHabitByName,
 };
