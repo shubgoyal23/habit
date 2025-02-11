@@ -1,13 +1,19 @@
 import OpenAI from "openai";
 import dotenv from "dotenv";
-import { asyncHandler } from "../utils/asyncHandler";
-import { ApiResponse } from "../utils/ApiResposne";
+import { asyncHandler } from "../utils/asyncHandler.js";
+import { ApiResponse } from "../utils/ApiResposne.js";
 import {
-   AddStreak,
    Createhabit,
+   EditHabit,
    DeleteHabit,
+   AddStreak,
+   RemoveStreak,
    ListHabit,
-} from "../helpers/task.helpers";
+   ListStreak,
+   GetSteakListAll,
+   GetTodaysHabits,
+   SearchHabitByName,
+} from "../helpers/task.helpers.js";
 
 dotenv.config();
 
@@ -138,11 +144,17 @@ Habit MongoDB Schema:
 }
 
 Available Tools: 
-- getAllHabits(): Returns all the Habits from Database 
-- createHabit({}: object): Creates a new Habit in the DB and takes Habit and other items as a object 
-- deleteHabitById(id: string): Deletes the Habit by ID given in the DB 
-- searchHabit(query: string): Searches for all Habits matching the query string using regex
-- markHabit({id: habitid, iscompleted: bool}: object): Mark habit completed or not pending for today, true means completed, false means pending.
+- Createhabit({}): Creates a new Habit in the DB and takes Habit and other items as a object
+- EditHabit({}): Edits a Habit in the DB it also needs habit id and other items as a object
+- DeleteHabit({}): Deletes a Habit in the DB, it needs habit id as a object
+- AddStreak({}): Adds a new streak in the DB and takes habit id
+- RemoveStreak({}): Removes a Streak in the DB and takes habit id
+- ListHabit({}): Returns all the Habits of user from Database
+- ListStreak({}): Returns all the Streaks of user from Database
+- GetSteakListAll({}): Returns all the Streaks of user from Database
+- GetTodaysHabits({}): Returns all the Habits of user due today from Database
+- SearchHabitByName({}): Searches for a Habits matching the query string using regex
+
 
 Example: 
 START  
@@ -158,22 +170,38 @@ START
 {"type": "output", "output": "Your Habit has been created successfully" } 
 `;
 
+const Tools = {
+   Createhabit,
+   EditHabit,
+   DeleteHabit,
+   AddStreak,
+   RemoveStreak,
+   ListHabit,
+   ListStreak,
+   GetSteakListAll,
+   GetTodaysHabits,
+   SearchHabitByName,
+};
+
 const chat = asyncHandler(async (req, res) => {
    const { message } = req.body;
+   console.log(message);
    if (!message || message.length == 0) {
-      return 401, "message is required";
+      return res.status(401).json(new ApiResponse(401, {}, "No message found"));
    }
-
-   const messages = [{ role: "system", content: SYSTEM_PROMPT }, ...message];
+// { role: "system", content: SYSTEM_PROMPT }
+   const messages = [{ role: "system", content: "you are a helpful assistant" }, ...message];
    const chat = await openai.chat.completions.create({
       model: "qwen/qwen2.5-vl-72b-instruct:free",
       messages,
       response_format: { type: "json_object" },
       store: true,
    });
-
+   console.log(chat);
    let response = chat.choices[0].message.content.trim();
+   console.log("response", response);
    let action = JSON.parse(response);
+   console.log("action", action);
    for (msg of action) {
       message.push({ role: "assistant", content: msg });
 
@@ -181,26 +209,16 @@ const chat = asyncHandler(async (req, res) => {
          case "plan":
             continue;
          case "action":
-            switch (message.function) {
-               case "getAllHabits":
-                  ListHabit(message.input);
-                  continue;
-               case "createHabit":
-                  Createhabit(message.input);
-                  continue;
-               case "deleteHabitById":
-                  DeleteHabit(message.input);
-                  continue;
-               case "searchHabit":
-                  ListHabit(message.input);
-                  continue;
-               case "markHabit":
-                  AddStreak(message.input);
-            }
-         case "output":
+            const fn = Tools[message.function];
+            const data = await fn({ ...message.input, user: req.user });
+            message.push({ type: "function", function: data.message });
             continue;
+         case "output":
+            res.status(200).json(new ApiResponse(200, message, "bot reply"));
       }
    }
+   console.log("message", message);
+
    return res
       .status(200)
       .json(new ApiResponse(200, { message: message }, "bot response"));

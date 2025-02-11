@@ -15,6 +15,6 @@ const router = Router();
 router.use(limiter);
 
 //secure route
-router.route("/chat").post(verifyJwt, chat);
+router.route("/").post(verifyJwt, chat);
 
 export default router;

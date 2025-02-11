@@ -16,7 +16,7 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 import userRouter from "./routers/user.router.js";
 import steakRouter from "./routers/steak.router.js";
-import { ConnectRedis } from "./db/redis.js";
+import chatRouter from "./routers/chat.router.js";
 import { ApiResponse } from "./utils/ApiResposne.js";
 
 app.get("/ping", (req, res) => {
@@ -32,6 +32,7 @@ app.use((req, res, next) => {
 });
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/steak", steakRouter);
+app.use("/api/v1/chat", chatRouter);
 
 app.use((err, req, res, next) => {
    if (err instanceof ApiError) {
