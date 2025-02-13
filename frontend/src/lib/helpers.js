@@ -43,27 +43,31 @@ const GetHabitDueToday = (habit) => {
    let list = [...habit];
    let finalList = [];
    let dateToday = new Date();
+   let currentDate = GetUTCDateEpoch(dateToday);
+
    for (let i = 0; i < list.length; i++) {
-      let startDate = GetUTCDateEpoch(list[i].startDate);
-      let endDate = GetUTCDateEpoch(list[i].endDate);
-      let currentDate = GetUTCDateEpoch(dateToday);
-      if (
-         startDate <= currentDate &&
-         endDate >= currentDate &&
-         list[i].habitType == "negative"
-      ) {
-         continue;
-      }
-      if (list[i].repeat.name == "days") {
-         if (list[i].repeat.value.includes(dateToday.getUTCDay())) {
-            finalList.push(list[i]);
-         }
-      } else if (list[i].repeat.name == "dates") {
-         if (list[i].repeat.value.includes(currentDate)) {
-            finalList.push(list[i]);
-         }
-      } else if (list[i].repeat.name == "todo") {
-         finalList.push(list[i]);
+      switch (list[i]?.habitType) {
+         case "negative":
+            continue;
+         case "todo":
+            if (GetUTCDateEpoch(list[i].startDate * 1000) == currentDate)
+               finalList.push(list[i]);
+            continue;
+         case "regular":
+            let startDate = GetUTCDateEpoch(list[i].startDate * 1000);
+            let endDate = GetUTCDateEpoch(list[i].endDate * 1000);
+            if (startDate > currentDate || endDate < currentDate) continue;
+            if (list[i].repeat.name == "days") {
+               if (list[i].repeat.value.includes(dateToday.getUTCDay())) {
+                  finalList.push(list[i]);
+               }
+            } else if (list[i].repeat.name == "dates") {
+               if (list[i].repeat.value.includes(currentDate)) {
+                  finalList.push(list[i]);
+               }
+            } else if (list[i].repeat.name == "todo") {
+               finalList.push(list[i]);
+            }
       }
    }
    return finalList;

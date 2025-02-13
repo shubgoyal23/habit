@@ -60,6 +60,16 @@ const columns = [
       cell: (prop) => <p>{prop.getValue()}</p>,
    },
    {
+      accessorKey: "startDate",
+      header: "Start Date",
+      cell: (prop) => <p>{new Date(prop.getValue() * 1000).toDateString()}</p>,
+   },
+   {
+      accessorKey: "endDate",
+      header: "End Date",
+      cell: (prop) => <p>{new Date(prop.getValue() * 1000).toDateString()}</p>,
+   },
+   {
       accessorKey: "duration",
       header: "Duration",
       cell: (prop) => {
@@ -70,6 +80,16 @@ const columns = [
             return <p>{`${value} mins`}</p>;
          }
       },
+   },
+   {
+      accessorKey: "notify",
+      header: "Notify",
+      cell: (prop) => <p>{prop.getValue() ? "Yes" : "No"}</p>,
+   },
+   {
+      accessorKey: "habitType",
+      header: "habit Type",
+      cell: (prop) => <p>{prop.getValue()}</p>,
    },
    {
       accessorKey: "place",
@@ -141,13 +161,16 @@ function Habit() {
                id == "ifthen" ||
                id == "point" ||
                id == "endTime" ||
-               id == "duration"
+               id == "duration" ||
+               id == "startDate" ||
+               id == "endDate" ||
+               id == "notify" 
             ) {
                column.toggleVisibility(false);
             }
          }
       }
-      if (habitList.length > 0) return
+      if (habitList.length > 0) return;
       let request = axios.get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
          withCredentials: true,
       });
