@@ -27,6 +27,7 @@ const Habit = lazy(() => import("./components/Habit/Habit"));
 const SteakList = lazy(() => import("./components/Steak/SteakList"));
 const AddHabit = lazy(() => import("./components/Habit/AddHabit"));
 const Home = lazy(() => import("./components/Home/Home"));
+const Chat = lazy(() => import("./components/chat/chat"));
 
 const router = createBrowserRouter([
    {
@@ -107,6 +108,14 @@ const router = createBrowserRouter([
             element: (
                <Suspense fallback={<Loader />}>
                   <DeleteAccount />
+               </Suspense>
+            ),
+         },
+         {
+            path: "/chat",
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Chat />
                </Suspense>
             ),
          },
