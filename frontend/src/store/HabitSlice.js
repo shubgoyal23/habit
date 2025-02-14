@@ -1,3 +1,4 @@
+import { setToken } from "@/lib/storeToken";
 import { createSlice } from "@reduxjs/toolkit";
 
 const habitSlice = createSlice({
@@ -5,13 +6,17 @@ const habitSlice = createSlice({
    initialState: [],
    reducers: {
       addListHabits(state, action) {
+         setToken("habitList", JSON.stringify(action.payload));
          return action.payload;
       },
       addHabit(state, action) {
          state.push(action.payload);
+         setToken("habitList", JSON.stringify(state));
       },
       deleteHabit(state, action) {
-         return state.filter((item) => item._id !== action.payload);
+         let s = state.filter((item) => item._id !== action.payload);
+         setToken("habitList", JSON.stringify(s));
+         return s;
       },
       editHabit(state, action) {
          const habit = state.map((item) => {
@@ -20,7 +25,7 @@ const habitSlice = createSlice({
             }
             return item;
          });
-
+         setToken("habitList", JSON.stringify(habit));
          return habit;
       },
    },

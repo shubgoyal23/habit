@@ -23,14 +23,20 @@ function Action({ row }) {
    const habit = row.original;
 
    const deleteHabitHandler = async (id) => {
-      axios
-         .post(
-            `${conf.BACKEND_URL}/api/v1/steak/habit-d`,
-            { id },
-            {
-               withCredentials: true,
-            }
-         )
+      let delhabt = axios.post(
+         `${conf.BACKEND_URL}/api/v1/steak/habit-d`,
+         { id },
+         {
+            withCredentials: true,
+         }
+      );
+      toast.promise(delhabt, {
+         loading: "Deleting habit..",
+         success: "Deleted successfull",
+         error: (err) =>
+            `${err.response?.data?.message || "Something went wrong"}`,
+      });
+      delhabt
          .then((data) => {
             dispatch(deleteHabit(id));
          })

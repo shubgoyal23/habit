@@ -29,6 +29,7 @@ import FilterInput from "./FilterInput";
 import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
 import { EpochToTime } from "@/lib/helpers";
+import { getToken, setToken } from "@/lib/storeToken";
 
 const columns = [
    {
@@ -147,28 +148,28 @@ function Habit() {
       onColumnFiltersChange: setColumnFilters,
    });
 
+   const TableHeads = async () => {
+      let tableItems = await getToken("tableItems");
+      if (!tableItems) {
+         tableItems = ["name", "startTime", "habitType"];
+         await setToken("tableItems", JSON.stringify(tableItems));
+      } else {
+         tableItems = JSON.parse(tableItems);
+      }
+      let columns = table.getAllColumns();
+      for (let column of columns) {
+         let id = column.id;
+         if (!tableItems.includes(id)) {
+            column.toggleVisibility(false);
+         }
+      }
+   };
+
    useEffect(() => {
       if (!user) {
          navigate("/login");
       } else {
-         let columns = table.getAllColumns();
-         for (let column of columns) {
-            let id = column.id;
-            if (
-               id == "description" ||
-               id == "place" ||
-               id == "how" ||
-               id == "ifthen" ||
-               id == "point" ||
-               id == "endTime" ||
-               id == "duration" ||
-               id == "startDate" ||
-               id == "endDate" ||
-               id == "notify" 
-            ) {
-               column.toggleVisibility(false);
-            }
-         }
+         TableHeads();
       }
       if (habitList.length > 0) return;
       let request = axios.get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
