@@ -29,6 +29,7 @@ const SteakList = lazy(() => import("./components/Steak/SteakList"));
 const AddHabit = lazy(() => import("./components/Habit/AddHabit"));
 const Home = lazy(() => import("./components/Home/Home"));
 const Chat = lazy(() => import("./components/chat/chat"));
+const EditDetails = lazy(() => import("./components/profile/EditDetails"));
 
 const router = createBrowserRouter([
    {
@@ -90,11 +91,24 @@ const router = createBrowserRouter([
          },
          {
             path: "/profile",
-            element: (
-               <Suspense fallback={<Loader />}>
-                  <Profile />
-               </Suspense>
-            ),
+            children: [
+               {
+                  path: "",
+                  element: (
+                     <Suspense fallback={<Loader />}>
+                        <Profile />
+                     </Suspense>
+                  ),
+               },
+               {
+                  path: "edit",
+                  element: (
+                     <Suspense fallback={<Loader />}>
+                        <EditDetails />
+                     </Suspense>
+                  ),
+               },
+            ],
          },
          {
             path: "/privacy-policy",
@@ -150,7 +164,6 @@ export default function App() {
       let slist = await getToken("streakList");
       if (slist) {
          slist = JSON.parse(slist);
-         console.log(slist);
          let keys = Object.keys(slist);
          for (let sl of keys) {
             let ids = Object.keys(slist[sl]);

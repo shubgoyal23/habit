@@ -16,6 +16,16 @@ const create = tool(Createhabit, {
    description: "Creates a new habit with the provided details",
    schema: z.object({
       name: z.string("The name of the habit"),
+      startTime: z.string(
+         "Time representing the start time of the habit in 00:00 format"
+      )
+   }),
+});
+const create2 = tool(Createhabit, {
+   name: "CreateHabit",
+   description: "Creates a new habit with the provided details",
+   schema: z.object({
+      name: z.string("The name of the habit"),
       description: z.string("Detailed description of the habit").optional(),
       duration: z
          .string("Duration of the habit, e.g., '30 minutes'")
@@ -27,10 +37,10 @@ const create = tool(Createhabit, {
          .string("Time representing the end time of the habit in 00:00 format")
          .optional(),
       startDate: z
-         .string("Epoch/date object time representing the start date")
+         .string("Epoch or date string representing the start date")
          .optional(),
       endDate: z
-         .string("Epoch/date object time representing the end date")
+         .string("Epoch or date string representing the end date")
          .optional(),
       repeat: z
          .object({
@@ -143,7 +153,7 @@ const srchHabit = tool(SearchHabitByName, {
    }),
 });
 
-export const tools = [
+export {
    create,
    edit,
    deletehbt,
@@ -152,4 +162,4 @@ export const tools = [
    listhbt,
    todayhbt,
    srchHabit,
-];
+};
