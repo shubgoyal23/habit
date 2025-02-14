@@ -1,3 +1,4 @@
+import { setToken } from "@/lib/storeToken";
 import { createSlice } from "@reduxjs/toolkit";
 
 const streakSlice = createSlice({
@@ -8,10 +9,9 @@ const streakSlice = createSlice({
          let data = action.payload;
          if (!state[`${data.month}-${data.year}`]) {
             state[`${data.month}-${data.year}`] = {};
-            state[`${data.month}-${data.year}`][data.habitId] = data;
-         } else {
-            state[`${data.month}-${data.year}`][data.habitId] = data;
          }
+         state[`${data.month}-${data.year}`][data.habitId] = data;
+         setToken("streakList", JSON.stringify(state));
       },
    },
 });

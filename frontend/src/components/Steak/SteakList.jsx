@@ -95,7 +95,6 @@ function Steak() {
    };
 
    const checkDate = (data, index) => {
-      // if (!streakList[`${month}-${year}`]) return null;
       const indexDate = new Date(year, month, index + 1);
       const StartDate = new Date(data.startDate * 1000);
       if (indexDate > DateToday) {
@@ -116,11 +115,20 @@ function Steak() {
          return null;
       }
       if (!streakList[`${month}-${year}`])
-         return (
-            <div className="size-6 m-auto flex justify-center items-center">
-               <SlClose className="size-6 text-red-500" />
-            </div>
-         );
+         switch (data.habitType) {
+            case "regular":
+               return (
+                  <div className="size-6 m-auto flex justify-center items-center">
+                     <SlClose className="size-6 text-red-500" />
+                  </div>
+               );
+            case "negative":
+               return (
+                  <div className="size-6 m-auto flex justify-center items-center">
+                     <FaRegCheckCircle className="size-6 text-green-500" />
+                  </div>
+               );
+         }
       if (!streakList[`${month}-${year}`][data?._id]) {
          switch (data.habitType) {
             case "regular":

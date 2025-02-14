@@ -19,6 +19,7 @@ import {
 import { setTheme } from "./store/ThemeSlice";
 import { addListHabits } from "./store/HabitSlice";
 import { addSteak } from "./store/StreakSlice";
+import { getToken } from "./lib/storeToken";
 
 const Privacy = lazy(() => import("./components/etc/Privacy"));
 const DeleteAccount = lazy(() => import("./components/etc/DeleteAccount"));
@@ -127,32 +128,53 @@ export default function App() {
    const dispatch = useDispatch();
    const [loading, setLoading] = useState(true);
 
-   const LoadDateIntoApp = async () => {
-      const habitreq = await axios.get(
-         `${conf.BACKEND_URL}/api/v1/steak/habit`,
-         {
-            withCredentials: true,
-         }
-      );
-      const steakList = await axios.post(
-         `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
-         { month: new Date().getMonth(), year: new Date().getFullYear() },
-         {
-            withCredentials: true,
-         }
-      );
-      const { data: hData } = habitreq?.data;
-      if (hData?.length > 0) {
-         dispatch(addListHabits(hData));
-      }
-
-      const { data: sData } = steakList?.data;
-      if (sData?.length > 0) {
-         for (let i = 0; i < sData.length; i++) {
-            dispatch(addSteak(sData[i]));
+   const LoadHabitList = async () => {
+      let hlist = await getToken("habitList");
+      if (hlist) {
+         hlist = JSON.parse(hlist);
+         dispatch(addListHabits(hlist));
+      } else {
+         const habitreq = await axios.get(
+            `${conf.BACKEND_URL}/api/v1/steak/habit`,
+            {
+               withCredentials: true,
+            }
+         );
+         const { data: hData } = habitreq?.data;
+         if (hData?.length > 0) {
+            dispatch(addListHabits(hData));
          }
       }
    };
+   const LoadSteakList = async () => {
+      let slist = await getToken("streakList");
+      if (slist) {
+         slist = JSON.parse(slist);
+         console.log(slist);
+         let keys = Object.keys(slist);
+         for (let sl of keys) {
+            let ids = Object.keys(slist[sl]);
+            for (let i = 0; i < ids.length; i++) {
+               dispatch(addSteak(slist[sl][ids[i]]));
+            }
+         }
+      } else {
+         const steakList = await axios.post(
+            `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
+            { month: new Date().getMonth(), year: new Date().getFullYear() },
+            {
+               withCredentials: true,
+            }
+         );
+         const { data: sData } = steakList?.data;
+         if (sData?.length > 0) {
+            for (let i = 0; i < sData.length; i++) {
+               dispatch(addSteak(sData[i]));
+            }
+         }
+      }
+   };
+
    const checkUser = async () => {
       await SetTokenToAxios();
       let storeData = null;
@@ -193,7 +215,8 @@ export default function App() {
       dispatch(setTheme(theme));
       const loggedIn = await checkUser();
       if (loggedIn) {
-         await LoadDateIntoApp();
+         LoadHabitList();
+         LoadSteakList();
       }
    };
 
