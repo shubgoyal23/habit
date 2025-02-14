@@ -276,10 +276,6 @@ const DeleteHabit = async (data) => {
    if (!id) {
       throw new ApiError(401, "id is Reqired");
    }
-   const check = data.user.habitsList.find((i) => i.toString() == id);
-   if (!check) {
-      throw new ApiError(401, "Habit with Id not found for this user");
-   }
 
    const del = await Habit.findOneAndDelete({ _id: id, userId: data.user._id });
    if (!del) {
@@ -290,9 +286,8 @@ const DeleteHabit = async (data) => {
       habitId: id,
    });
 
-   let habits = data.user.habitsList.filter((i) => i.toString() != id);
    await User.findByIdAndUpdate(data.user._id, {
-      $set: { habitsList: habits },
+      $pull: { habitsList: id },
    });
 
    // remove habit from redis
@@ -311,10 +306,7 @@ const AddStreak = async (data) => {
          "Habit Id and date is required to mark completed"
       );
    }
-   const checkHabit = data.user.habitsList.find((i) => i.toString() == id);
-   if (!checkHabit) {
-      throw new ApiError(401, "Habit with Id not found");
-   }
+
    const serverTime = new Date();
    const serTimeOff = serverTime.getTimezoneOffset() * 60 * 1000;
    const userTimeOff = data?.user?.timeZone * 60 * 1000;
@@ -355,10 +347,6 @@ const RemoveStreak = async (data) => {
       throw new ApiError(401, "Habit Id is required to add Streak");
    }
 
-   const checkHabit = data.user.habitsList.find((i) => i.toString() == id);
-   if (!checkHabit) {
-      throw new ApiError(401, "Habit with Id not found");
-   }
    const serverTime = new Date();
    const serTimeOff = serverTime.getTimezoneOffset() * 60 * 1000;
    const userTimeOff = data?.user?.timeZone * 60 * 1000;

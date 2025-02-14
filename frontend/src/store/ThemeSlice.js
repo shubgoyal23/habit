@@ -6,7 +6,6 @@ const themeSlice = createSlice({
    initialState: localStorage.getItem("theme") || "system",
    reducers: {
       setTheme(state, action) {
-         console.log(action.payload)
          if (action.payload === "dark") {
             document.documentElement.classList.add("dark");
          } else if (action.payload === "light") {

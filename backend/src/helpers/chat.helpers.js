@@ -2,17 +2,38 @@ import { ChatOpenAI } from "@langchain/openai";
 import { ToolMessage } from "@langchain/core/messages";
 
 import dotenv from "dotenv";
-import { MessagesAnnotation, StateGraph } from "@langchain/langgraph";
-import { tools } from "./tools.helpers.js";
+import {
+   Annotation,
+   MessagesAnnotation,
+   StateGraph,
+} from "@langchain/langgraph";
+import {
+   create,
+   edit,
+   deletehbt,
+   addstrk,
+   rmvstrk,
+   listhbt,
+   todayhbt,
+   srchHabit,
+} from "./tools.helpers.js";
 
 dotenv.config();
-// const model = new ChatOpenAI({ model: "deepseek/deepseek-r1-distill-llama-70b:free" });
-// const model = new ChatOpenAI({ model: "qwen/qwen2.5-vl-72b-instruct:free" });
 const model = new ChatOpenAI({
-   model: "google/gemini-2.0-flash-lite-preview-02-05:free",
+   model: "google/gemini-2.0-pro-exp-02-05:free",
 });
 
 // const llmWithTools = model.bindTools([create]);
+const tools = [
+   create,
+   edit,
+   deletehbt,
+   addstrk,
+   rmvstrk,
+   listhbt,
+   todayhbt,
+   srchHabit,
+];
 const toolsByName = Object.fromEntries(tools.map((tool) => [tool.name, tool]));
 const llmWithTools = model.bindTools(tools);
 
@@ -22,24 +43,26 @@ async function llmCall(state) {
       {
          role: "system",
          content:
-            "You are a helpful assistant tasked with creating habit for user. you can create habit with just required feilds.",
+            "You are a habit management assistant responsible for managing habits using available tools. Only ask for the details which are required to complete a task, you can skip optionals feilds.",
       },
       ...state.messages,
    ]);
-
    return {
       messages: [result],
+      user: state.user,
    };
 }
 async function toolNode(state) {
    // Performs the tool call
    const results = [];
    const lastMessage = state.messages.at(-1);
-
    if (lastMessage?.tool_calls?.length) {
       for (const toolCall of lastMessage.tool_calls) {
          const tool = toolsByName[toolCall.name];
-         const observation = await tool.invoke(toolCall.args);
+         const observation = await tool.invoke({
+            ...toolCall.args,
+            user: state.user,
+         });
          results.push(
             new ToolMessage({
                content: observation,
@@ -49,7 +72,7 @@ async function toolNode(state) {
       }
    }
 
-   return { messages: results };
+   return { messages: results, user: state.user };
 }
 
 // Conditional edge function to route to the tool node or end
@@ -65,13 +88,16 @@ function shouldContinue(state) {
    return "__end__";
 }
 
-const ChatAgent = new StateGraph(MessagesAnnotation)
+const StateWithUser = Annotation.Root({
+   ...MessagesAnnotation.spec,
+   user: Annotation,
+});
+
+const ChatAgent = new StateGraph(StateWithUser)
    .addNode("llmCall", llmCall)
    .addNode("tools", toolNode)
-   // Add edges to connect nodes
    .addEdge("__start__", "llmCall")
    .addConditionalEdges("llmCall", shouldContinue, {
-      // Name returned by shouldContinue : Name of next node to visit
       Action: "tools",
       __end__: "__end__",
    })
