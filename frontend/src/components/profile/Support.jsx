@@ -25,7 +25,7 @@ import {
 import { Textarea } from "../ui/textarea";
 
 export function Support() {
-   const [topic, setTopic] = useState("");
+   const [topic, setTopic] = useState("help");
    const [desc, setdesc] = useState("");
 
    const saveChanges = async () => {
@@ -92,26 +92,25 @@ export function Support() {
                   </Select>
                </div>
                <div className="">
-                  {topic !== "" && (
-                     <div>
-                        <Label htmlFor="desc">
-                           {topic == "help"
-                              ? "Describe the issue you are facing."
-                              : topic == "feature"
-                              ? "Describe the Feature You want to included in next version."
-                              : topic == "feedback"
-                              ? "We Love to Here Your Feedback"
-                              : "Tell us whats in your mind."}
-                        </Label>
-                        <Textarea
-                           className="mt-1"
-                           id="firstName"
-                           type="text"
-                           value={desc}
-                           onChange={(e) => setdesc(e.target.value)}
-                        />
-                     </div>
-                  )}
+                  <div>
+                     <Label htmlFor="desc">
+                        {topic == "help"
+                           ? "Describe the issue you are facing."
+                           : topic == "feature"
+                           ? "Describe the Feature You want to included in next version."
+                           : topic == "feedback"
+                           ? "We Love to Here Your Feedback"
+                           : "Tell us whats in your mind."}
+                     </Label>
+                     <Textarea
+                        className="mt-1"
+                        id="firstName"
+                        type="text"
+                        height={100}
+                        value={desc}
+                        onChange={(e) => setdesc(e.target.value)}
+                     />
+                  </div>
                </div>
             </div>
             <DialogFooter>

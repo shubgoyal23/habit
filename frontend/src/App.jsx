@@ -32,6 +32,7 @@ const SteakList = lazy(() => import("./components/Steak/SteakList"));
 const AddHabit = lazy(() => import("./components/Habit/AddHabit"));
 const Home = lazy(() => import("./components/Home/Home"));
 const Chat = lazy(() => import("./components/chat/chat"));
+const Navi = lazy(() => import("./components/app/Navigate"));
 
 const router = createBrowserRouter([
    {
@@ -248,6 +249,9 @@ export default function App() {
       <Loader />
    ) : (
       <RouterProvider router={router}>
+         <Suspense fallback={null}>
+            <Navi />
+         </Suspense>
          <Layout />
       </RouterProvider>
    );
