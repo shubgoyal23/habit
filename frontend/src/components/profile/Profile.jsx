@@ -31,6 +31,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { Notification } from "./Notification";
 import { EditDetails } from "./EditDetails";
 import { Support } from "./Support";
+import ShareApp from "./share";
 
 function Profile() {
    const userTheme = useSelector((state) => state.userTheme);
@@ -66,10 +67,7 @@ function Profile() {
                      <h2 className="mt-2">Support & About</h2>
                      <div className="space-y-1 p-2 pl-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
                         <Support />
-                        <div className="flex items-center space-x-2 justify-start gap-2">
-                           <FaCreditCard />
-                           <span>Share with friends</span>
-                        </div>
+                        <ShareApp />
                         <NavLink
                            to={"/terms-and-conditions"}
                            className="flex items-center space-x-2 justify-start gap-2"
