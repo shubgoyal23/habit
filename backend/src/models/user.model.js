@@ -34,6 +34,8 @@ const userSchema = new mongoose.Schema(
       timeZone: Number,
       isActive: Boolean,
       phone: String,
+      notify: Boolean,
+      notifyTime: String,
       habitSkip: {
          type: Number,
          default: 5,

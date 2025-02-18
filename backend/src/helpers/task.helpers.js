@@ -24,11 +24,9 @@ const GetTimeEpoch = (hr, min, userOffset = 0) => {
    return time; // convert user offset in minutes to seconds
 };
 // set time of hours and minutes in epoch format based on 1 jan 2025, 22:00
-const GetTimeZoneEpoch = (userOffset = 0) => {
-   const epoch = Date.UTC(2025, 0, 1, 22, 0, 0, 0);
-   const time = Number(epoch + userOffset * 60000);
-   const finaltime = new Date(time);
-   finaltime.setUTCMinutes(0, 0, 0);
+const GetTimeZoneEpoch = (hr = 22, min = 0, userOffset = 0) => {
+   const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0);
+   const finaltime = Number(epoch + userOffset * 60000);
    return Math.ceil(finaltime / 1000);
 };
 
@@ -71,29 +69,61 @@ const Createhabit = async (data) => {
    if (!name) {
       return new ApiError(401, "Name Feild is Reqired");
    }
-   if (!startTime) {
-      return new ApiError(401, "Start Time Feild is Reqired");
-   }
-   if (startTime) {
-      const [hr, min] = GetTimeFormated(startTime);
-      startTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
-   }
-   if (endTime) {
-      const [hr, min] = GetTimeFormated(endTime);
-      endTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
-      if (endTime < startTime) {
-         endTime += 86400;
-      }
-   }
-   if (startTime && endTime) {
-      duration = Math.floor((endTime - startTime) / 60);
+   if (!habitType) {
+      habitType = "regular";
    }
 
-   startDate = GetUTCDateEpoch(startDate || new Date(), data?.user?.timeZone);
-   endDate = GetUTCDateEpoch(
-      endDate || new Date().setFullYear(new Date().getFullYear() + 1),
-      data?.user?.timeZone
-   );
+   // filter start time and end time
+   switch (habitType) {
+      case "negative":
+         startTime = 0;
+         endTime = 0;
+         duration = 0;
+         break;
+      default:
+         if (!startTime) {
+            return new ApiError(401, "Start Time Feild is Reqired");
+         }
+         const [hr, min] = GetTimeFormated(startTime);
+         startTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
+
+         if (endTime) {
+            const [hr, min] = GetTimeFormated(endTime);
+            endTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
+            if (endTime < startTime) {
+               endTime += 86400;
+            }
+         } else {
+            endTime = startTime + duration * 60;
+         }
+         if (startTime && endTime) {
+            duration = Math.floor((endTime - startTime) / 60);
+         }
+   }
+
+   // filter start date and end date
+   if (!startDate) {
+      return new ApiError(401, "Start Date Feild is Reqired");
+   }
+   switch (habitType) {
+      case "todo":
+         startDate = GetUTCDateEpoch(startDate, data?.user?.timeZone);
+         endDate = startDate + duration * 60;
+         break;
+      default:
+         startDate = GetUTCDateEpoch(startDate, data?.user?.timeZone);
+         if (endDate) {
+            endDate = GetUTCDateEpoch(endDate, data?.user?.timeZone);
+            if (endDate < startDate) {
+               endDate += 86400;
+            }
+         } else {
+            endDate = GetUTCDateEpoch(
+               endDate || new Date().setFullYear(new Date().getFullYear() + 1),
+               data?.user?.timeZone
+            );
+         }
+   }
 
    if (habitType == "todo") {
       repeat = {
@@ -148,15 +178,11 @@ const Createhabit = async (data) => {
       return new ApiError(401, "Habit Creation Failed, try again later");
    }
    if (habitType != "negative") {
-      let userE = GetTimeZoneEpoch(data?.user?.timeZone);
       await ConnectRedis();
-      await RedisConn.sAdd(
-         `habitLists:${userE}`,
-         `${createUserHabit._id.toString()}:${data.user._id}`
-      );
+      await RedisConn.sAdd("AllHabitLists", createUserHabit._id.toString());
    }
    // save to user list
-   const add = await User.findByIdAndUpdate(data.user._id, {
+   await User.findByIdAndUpdate(data.user._id, {
       $push: { habitsList: createUserHabit._id },
    });
    return new ApiResponse(200, createUserHabit, "Habit Added Successfully");
@@ -190,35 +216,74 @@ const EditHabit = async (data) => {
       throw new ApiError(403, "Habit with Id not found for this user");
    }
    if (!name) {
-      throw new ApiError(401, "Name Feild is Reqired");
+      return new ApiError(401, "Name Feild is Reqired");
    }
    if (!habitType) {
-      throw new ApiError(401, "Habit Type is Reqired");
+      habitType = "regular";
    }
-   if (startTime) {
-      const [hr, min] = GetTimeFormated(startTime);
-      startTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
+
+   // filter start time and end time
+   switch (habitType) {
+      case "negative":
+         startTime = 0;
+         endTime = 0;
+         duration = 0;
+         break;
+      default:
+         if (!startTime) {
+            return new ApiError(401, "Start Time Feild is Reqired");
+         }
+         const [hr, min] = GetTimeFormated(startTime);
+         startTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
+
+         if (endTime) {
+            const [hr, min] = GetTimeFormated(endTime);
+            endTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
+            if (endTime < startTime) {
+               endTime += 86400;
+            }
+         } else {
+            endTime = startTime + duration * 60;
+         }
+         if (startTime && endTime) {
+            duration = Math.floor((endTime - startTime) / 60);
+         }
    }
-   if (endTime) {
-      const [hr, min] = GetTimeFormated(endTime);
-      endTime = GetTimeEpoch(hr, min, data?.user?.timeZone);
-      if (endTime < startTime) {
-         endTime += 86400;
-      }
+
+   // filter start date and end date
+   if (!startDate) {
+      return new ApiError(401, "Start Date Feild is Reqired");
    }
-   if (startTime && endTime) {
-      duration = Math.floor((endTime - startTime) / 60);
+   switch (habitType) {
+      case "todo":
+         startDate = GetUTCDateEpoch(startDate, data?.user?.timeZone);
+         endDate = startDate + duration * 60;
+         break;
+      default:
+         startDate = GetUTCDateEpoch(startDate, data?.user?.timeZone);
+         if (endDate) {
+            endDate = GetUTCDateEpoch(endDate, data?.user?.timeZone);
+            if (endDate < startDate) {
+               endDate += 86400;
+            }
+         } else {
+            endDate = GetUTCDateEpoch(
+               endDate || new Date().setFullYear(new Date().getFullYear() + 1),
+               data?.user?.timeZone
+            );
+         }
    }
-   if (startDate) {
-      startDate = GetUTCDateEpoch(startDate, data?.user?.timeZone);
-   }
-   if (endDate) {
-      endDate = GetUTCDateEpoch(endDate, data?.user?.timeZone);
-   }
+
    if (habitType == "todo") {
       repeat = {
          name: "todo",
          value: [],
+      };
+   }
+   if (!repeat?.name) {
+      repeat = {
+         name: "days",
+         value: [0, 1, 2, 3, 4, 5, 6],
       };
    }
    switch (repeat.name) {
@@ -236,7 +301,6 @@ const EditHabit = async (data) => {
          break;
       case "todo":
          repeat.value = [];
-         break;
    }
    if (habitType == "negative") {
       notify = false;
@@ -244,7 +308,6 @@ const EditHabit = async (data) => {
    const updatedHabit = await Habit.findByIdAndUpdate(
       id,
       {
-         userId: data.user._id,
          name: name,
          startDate: startDate,
          endDate: endDate,
@@ -258,7 +321,6 @@ const EditHabit = async (data) => {
          how: how,
          ifthen: ifthen,
          point: point,
-         daysCompleted: [],
          notify: notify,
       },
       { new: true }
@@ -281,8 +343,8 @@ const DeleteHabit = async (data) => {
    if (!del) {
       throw new ApiError(401, "Habit Deletion Failed, try again later");
    }
-
-   const removeStreaks = await Streak.deleteMany({
+   // removeStreaksdata
+   await Streak.deleteMany({
       habitId: id,
    });
 
@@ -291,9 +353,8 @@ const DeleteHabit = async (data) => {
    });
 
    // remove habit from redis
-   let userE = GetTimeZoneEpoch(data?.user?.timeZone);
    await ConnectRedis();
-   await RedisConn.SREM(`habitLists:${userE}`, `${id}:${data.user._id}`);
+   await RedisConn.SREM("AllHabitLists", id);
 
    return new ApiResponse(200, {}, "Habit deleted Successfully");
 };
@@ -333,10 +394,7 @@ const AddStreak = async (data) => {
    }
    let dateCompleted = GetUTCDateEpoch(new Date(), data?.user?.timeZone);
    await ConnectRedis();
-   await RedisConn.SADD(
-      `habitCompleted:${dateCompleted}`,
-      `${id}:${data.user._id}`
-   );
+   await RedisConn.SADD(`habitCompleted:${dateCompleted}`, id);
 
    return new ApiResponse(200, check, "habit marked Completed");
 };
@@ -372,10 +430,7 @@ const RemoveStreak = async (data) => {
 
    let dateCompleted = GetUTCDateEpoch(new Date(), data?.user?.timeZone);
    await ConnectRedis();
-   await RedisConn.SREM(
-      `habitCompleted:${dateCompleted}`,
-      `${id}:${data.user._id}`
-   );
+   await RedisConn.SREM(`habitCompleted:${dateCompleted}`, id);
 
    return new ApiResponse(200, remove, "habit marked Pending");
 };

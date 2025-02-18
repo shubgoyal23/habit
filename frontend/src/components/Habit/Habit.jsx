@@ -63,12 +63,12 @@ const columns = [
    {
       accessorKey: "startDate",
       header: "Start Date",
-      cell: (prop) => <p>{new Date(prop.getValue() * 1000).toDateString()}</p>,
+      cell: (prop) => <p>{new Date(prop.getValue()).toDateString()}</p>,
    },
    {
       accessorKey: "endDate",
       header: "End Date",
-      cell: (prop) => <p>{new Date(prop.getValue() * 1000).toDateString()}</p>,
+      cell: (prop) => <p>{new Date(prop.getValue()).toDateString()}</p>,
    },
    {
       accessorKey: "duration",
@@ -183,6 +183,7 @@ function Habit() {
       });
       request
          .then((data) => {
+            setToken("lastsyncHL", new Date().getTime());
             dispatch(addListHabits(data?.data?.data));
          })
          .catch((err) => console.log(err));
@@ -205,8 +206,13 @@ function Habit() {
             h.duration = 0;
          }
          if (h.startDate) {
+            h.startDate = new Date(h.startDate * 1000);
          }
          if (h.endDate) {
+            h.endDate = new Date(h.endDate * 1000);
+            if (h.endDate < new Date()) {
+               continue;
+            }
          }
          list.push(h);
       }
