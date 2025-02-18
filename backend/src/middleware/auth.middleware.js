@@ -17,7 +17,7 @@ export const verifyJwt = asyncHandler(async (req, res, next) => {
       );
 
       const user = await User.findById(decodedToken._id)?.select(
-         "_id firstName lastName email habitSkip habitsList timeZone"
+         "_id firstName lastName email habitSkip habitsList timeZone notify notifyTime"
       );
 
       req.user = user;

@@ -1,8 +1,8 @@
 const EpochToTime = (epoch) => {
-   epoch = Number(epoch);
    if (!epoch) {
       return;
    }
+   epoch = Number(epoch);
    let time = new Date(epoch);
    let hr = time.getHours();
    let min = time.getMinutes();

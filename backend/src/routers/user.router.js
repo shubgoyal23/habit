@@ -13,6 +13,7 @@ import {
    VerifyOtp,
    ResendOtp,
    RegisterDevice,
+   FeedbackForm,
 } from "../controller/user.controller.js";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 
@@ -33,5 +34,6 @@ router.route("/details").post(verifyJwt, editUserDetails);
 router.route("/password").post(verifyJwt, editUserPassword);
 router.route("/fcm-token").post(verifyJwt, setFcmToken);
 router.route("/close-account").post(verifyJwt, DeleteUser);
+router.route("/feedback").post(verifyJwt, FeedbackForm);
 
 export default router;

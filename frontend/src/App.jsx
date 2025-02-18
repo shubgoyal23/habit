@@ -19,9 +19,12 @@ import {
 import { setTheme } from "./store/ThemeSlice";
 import { addListHabits } from "./store/HabitSlice";
 import { addSteak } from "./store/StreakSlice";
-import { getToken } from "./lib/storeToken";
+import { getToken, setToken } from "./lib/storeToken";
 
 const Privacy = lazy(() => import("./components/etc/Privacy"));
+const TermsAndConditions = lazy(() =>
+   import("./components/etc/Terms&Conditions")
+);
 const DeleteAccount = lazy(() => import("./components/etc/DeleteAccount"));
 const Profile = lazy(() => import("./components/profile/Profile"));
 const Habit = lazy(() => import("./components/Habit/Habit"));
@@ -29,7 +32,6 @@ const SteakList = lazy(() => import("./components/Steak/SteakList"));
 const AddHabit = lazy(() => import("./components/Habit/AddHabit"));
 const Home = lazy(() => import("./components/Home/Home"));
 const Chat = lazy(() => import("./components/chat/chat"));
-const EditDetails = lazy(() => import("./components/profile/EditDetails"));
 
 const router = createBrowserRouter([
    {
@@ -100,23 +102,7 @@ const router = createBrowserRouter([
                      </Suspense>
                   ),
                },
-               {
-                  path: "edit",
-                  element: (
-                     <Suspense fallback={<Loader />}>
-                        <EditDetails />
-                     </Suspense>
-                  ),
-               },
             ],
-         },
-         {
-            path: "/privacy-policy",
-            element: (
-               <Suspense fallback={<Loader />}>
-                  <Privacy />
-               </Suspense>
-            ),
          },
          {
             path: "/close-account",
@@ -134,6 +120,22 @@ const router = createBrowserRouter([
                </Suspense>
             ),
          },
+         {
+            path: "/privacy-policy",
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Privacy />
+               </Suspense>
+            ),
+         },
+         {
+            path: "/terms-and-conditions",
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <TermsAndConditions />
+               </Suspense>
+            ),
+         },
       ],
    },
 ]);
@@ -143,8 +145,10 @@ export default function App() {
    const [loading, setLoading] = useState(true);
 
    const LoadHabitList = async () => {
+      let lastsync = await getToken("lastsyncHL");
+      lastsync = 86400000 + lastsync;
       let hlist = await getToken("habitList");
-      if (hlist) {
+      if (hlist && lastsync > new Date().getTime()) {
          hlist = JSON.parse(hlist);
          dispatch(addListHabits(hlist));
       } else {
@@ -156,13 +160,16 @@ export default function App() {
          );
          const { data: hData } = habitreq?.data;
          if (hData?.length > 0) {
+            setToken("lastsyncHL", new Date().getTime());
             dispatch(addListHabits(hData));
          }
       }
    };
    const LoadSteakList = async () => {
+      let lastsync = await getToken("lastsyncSL");
+      lastsync = 86400000 + lastsync;
       let slist = await getToken("streakList");
-      if (slist) {
+      if (slist && lastsync > new Date().getTime()) {
          slist = JSON.parse(slist);
          let keys = Object.keys(slist);
          for (let sl of keys) {
@@ -181,6 +188,7 @@ export default function App() {
          );
          const { data: sData } = steakList?.data;
          if (sData?.length > 0) {
+            setToken("lastsyncSL", new Date().getTime());
             for (let i = 0; i < sData.length; i++) {
                dispatch(addSteak(sData[i]));
             }
