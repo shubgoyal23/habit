@@ -405,45 +405,6 @@ const DeleteUser = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, {}, "User deleted successfully"));
 });
 
-const RegisterDevice = asyncHandler(async (req, res) => {
-   const {
-      deviceId,
-      model,
-      platform,
-      os,
-      osVersion,
-      manufacturer,
-      isVirtual,
-      webViewVersion,
-      androidSDKVersion,
-      userid,
-   } = req.body;
-
-   if (!deviceId) {
-      throw new ApiError(401, "deviceId is required");
-   }
-   await Device.findOneAndUpdate(
-      { deviceId: deviceId },
-      {
-         $set: {
-            model,
-            platform,
-            os,
-            osVersion,
-            manufacturer,
-            isVirtual,
-            webViewVersion,
-            androidSDKVersion,
-            userid,
-         },
-      },
-      { new: true, upsert: true }
-   );
-   return res
-      .status(200)
-      .json(new ApiResponse(200, {}, "deviceId updated successfully"));
-});
-
 const FeedbackForm = asyncHandler(async (req, res) => {
    let { topic, desc } = req.body;
 
@@ -479,6 +440,5 @@ export {
    DeleteUser,
    VerifyOtp,
    ResendOtp,
-   RegisterDevice,
    FeedbackForm,
 };

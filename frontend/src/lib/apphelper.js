@@ -2,6 +2,7 @@ import { Capacitor } from "@capacitor/core";
 import axios from "axios";
 import { setToken, getToken } from "./storeToken";
 import { Device } from "@capacitor/device";
+import { App } from "@capacitor/app";
 
 const setTokenToStorageAndAxios = async (dataRec) => {
    if (!Capacitor.isNativePlatform()) return;
@@ -46,6 +47,7 @@ const logDeviceInfo = async () => {
    if (!Capacitor.isNativePlatform()) return;
    const deviceId = await Device.getId();
    const info = await Device.getInfo();
+   const { version } = await App.getInfo();
    let device = {};
    device.deviceId = deviceId?.identifier;
    device.model = info.model;
@@ -56,6 +58,7 @@ const logDeviceInfo = async () => {
    device.isVirtual = info.isVirtual;
    device.webViewVersion = info.webViewVersion;
    device.androidSDKVersion = info.androidSDKVersion;
+   device.appVersion = version;
    return device;
 };
 
