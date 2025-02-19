@@ -94,7 +94,7 @@ const Createhabit = async (data) => {
                endTime += 86400;
             }
          } else {
-            endTime = startTime + duration * 60;
+            endTime = startTime + 60 * (duration || 1);
          }
          if (startTime && endTime) {
             duration = Math.floor((endTime - startTime) / 60);
@@ -243,7 +243,7 @@ const EditHabit = async (data) => {
                endTime += 86400;
             }
          } else {
-            endTime = startTime + duration * 60;
+            endTime = startTime + 60 * (duration || 1);
          }
          if (startTime && endTime) {
             duration = Math.floor((endTime - startTime) / 60);
@@ -436,7 +436,13 @@ const RemoveStreak = async (data) => {
 };
 
 const ListHabit = async (data) => {
-   const list = await Habit.find({ userId: data.user._id });
+   const dateTodayEpoch = GetUTCDateEpoch(new Date(), data?.user?.timeZone);
+   const list = await Habit.find({
+      userId: data.user._id,
+      active: true,
+      startDate: { $lte: dateTodayEpoch },
+      endDate: { $gte: dateTodayEpoch },
+   });
 
    return new ApiResponse(200, list, "habit list fetched successfully");
 };

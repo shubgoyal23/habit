@@ -103,10 +103,8 @@ export function Support() {
                            : "Tell us whats in your mind."}
                      </Label>
                      <Textarea
-                        className="mt-1"
-                        id="firstName"
+                        className="mt-1 h-40"
                         type="text"
-                        height={100}
                         value={desc}
                         onChange={(e) => setdesc(e.target.value)}
                      />
