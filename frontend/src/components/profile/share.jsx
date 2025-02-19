@@ -9,7 +9,7 @@ const ShareApp = () => {
          navigator.clipboard.writeText(
             "https://play.google.com/store/apps/details?id=com.proteinslice.habit"
          );
-         toast.success("Copied to clipboard");
+         toast.success("Sharing Link Copied to clipboard");
          return;
       }
       await Share.share({
