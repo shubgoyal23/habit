@@ -29,6 +29,7 @@ import FilterInput from "./FilterInput";
 import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
 import { EpochToTime } from "@/lib/helpers";
+import { getToken, setToken } from "@/lib/storeToken";
 
 const columns = [
    {
@@ -60,6 +61,16 @@ const columns = [
       cell: (prop) => <p>{prop.getValue()}</p>,
    },
    {
+      accessorKey: "startDate",
+      header: "Start Date",
+      cell: (prop) => <p>{new Date(prop.getValue()).toDateString()}</p>,
+   },
+   {
+      accessorKey: "endDate",
+      header: "End Date",
+      cell: (prop) => <p>{new Date(prop.getValue()).toDateString()}</p>,
+   },
+   {
       accessorKey: "duration",
       header: "Duration",
       cell: (prop) => {
@@ -70,6 +81,16 @@ const columns = [
             return <p>{`${value} mins`}</p>;
          }
       },
+   },
+   {
+      accessorKey: "notify",
+      header: "Notify",
+      cell: (prop) => <p>{prop.getValue() ? "Yes" : "No"}</p>,
+   },
+   {
+      accessorKey: "habitType",
+      header: "habit Type",
+      cell: (prop) => <p>{prop.getValue()}</p>,
    },
    {
       accessorKey: "place",
@@ -127,27 +148,30 @@ function Habit() {
       onColumnFiltersChange: setColumnFilters,
    });
 
+   const TableHeads = async () => {
+      let tableItems = await getToken("tableItems");
+      if (!tableItems) {
+         tableItems = ["name", "startTime", "habitType"];
+         await setToken("tableItems", JSON.stringify(tableItems));
+      } else {
+         tableItems = JSON.parse(tableItems);
+      }
+      let columns = table.getAllColumns();
+      for (let column of columns) {
+         let id = column.id;
+         if (!tableItems.includes(id)) {
+            column.toggleVisibility(false);
+         }
+      }
+   };
+
    useEffect(() => {
       if (!user) {
          navigate("/login");
       } else {
-         let columns = table.getAllColumns();
-         for (let column of columns) {
-            let id = column.id;
-            if (
-               id == "description" ||
-               id == "place" ||
-               id == "how" ||
-               id == "ifthen" ||
-               id == "point" ||
-               id == "endTime" ||
-               id == "duration"
-            ) {
-               column.toggleVisibility(false);
-            }
-         }
+         TableHeads();
       }
-      if (habitList.length > 0) return
+      if (habitList.length > 0) return;
       let request = axios.get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
          withCredentials: true,
       });
@@ -159,6 +183,7 @@ function Habit() {
       });
       request
          .then((data) => {
+            setToken("lastsyncHL", new Date().getTime());
             dispatch(addListHabits(data?.data?.data));
          })
          .catch((err) => console.log(err));
@@ -181,8 +206,13 @@ function Habit() {
             h.duration = 0;
          }
          if (h.startDate) {
+            h.startDate = new Date(h.startDate * 1000);
          }
          if (h.endDate) {
+            h.endDate = new Date(h.endDate * 1000);
+            if (h.endDate < new Date()) {
+               continue;
+            }
          }
          list.push(h);
       }

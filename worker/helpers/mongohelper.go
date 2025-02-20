@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"fmt"
 	"habit_notify/models"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -96,4 +97,18 @@ func MongoDeleteManyDoc(collection string, filter interface{}) (f bool) {
 		return
 	}
 	return true
+}
+
+// update many docs
+func MongoUpdateManyDoc(collection string, filter, update bson.M) error {
+	client := MongoConn.Database(MongoDb).Collection(collection)
+
+	res, err := client.UpdateMany(context.TODO(), filter, update)
+	if err != nil {
+		return err
+	}
+	if res.MatchedCount != res.UpsertedCount {
+		return fmt.Errorf("matched count and updated count mismatch")
+	}
+	return nil
 }

@@ -21,6 +21,7 @@ const DeviceSchema = new mongoose.Schema(
       isVirtual: String,
       webViewVersion: String,
       androidSDKVersion: String,
+      appVersion: String,
    },
    { timestamps: true }
 );

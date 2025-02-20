@@ -31,8 +31,14 @@ const HabitSchema = new mongoose.Schema(
       ifthen: String,
       point: Number,
       steak: Number, // regular days user has completed the habit
-      notify: Boolean, // if yes then notificaion will we sent
-      isActive: Boolean,
+      notify: {
+         type: Boolean,
+         default: true,
+      }, // if yes then notificaion will we sent
+      isActive: {
+         type: Boolean,
+         default: true,
+      },
       habitType: {
          type: String, // regular habit is daily , negative is negative which will be marked completed by default and user has to mark it as undone if he wants , oneTime is oneTime like todo
          enum: ["regular", "negative", "todo"],

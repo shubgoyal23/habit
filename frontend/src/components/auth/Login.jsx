@@ -44,7 +44,7 @@ export default function Login() {
       if (data) {
          device.userid = data._id;
          await axios
-            .post(`${conf.BACKEND_URL}/api/v1/users/device`, device, {
+            .post(`${conf.BACKEND_URL}/api/v1/app/device`, device, {
                withCredentials: true,
             })
             .then((data) => {

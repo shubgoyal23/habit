@@ -34,11 +34,12 @@ const userSchema = new mongoose.Schema(
       timeZone: Number,
       isActive: Boolean,
       phone: String,
+      notify: Boolean,
+      notifyTime: Number,
       habitSkip: {
          type: Number,
          default: 5,
       },
-      habitsList: [mongoose.Schema.Types.ObjectId],
    },
    { timestamps: true }
 );

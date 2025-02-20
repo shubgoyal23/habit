@@ -1,6 +1,7 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
 	"habit_notify/models"
 	"time"
@@ -25,6 +26,20 @@ func GetUserDetails(userid primitive.ObjectID) (user models.User, err error) {
 	user.Epoch = time.Now().Unix()
 	AllUsers[userid] = user
 	return
+}
+func SetUserDetails(userDetails bson.M) error {
+
+	byte, err := bson.Marshal(userDetails)
+	if err != nil {
+		return err
+	}
+	var user models.User
+	if err := json.Unmarshal(byte, &user); err != nil {
+		return err
+	}
+	user.Epoch = time.Now().Unix()
+	AllUsers[user.Id] = user
+	return nil
 }
 
 func DoEveryDayTask() {
