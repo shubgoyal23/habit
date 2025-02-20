@@ -8,6 +8,7 @@ import { SendOtp } from "../utils/Email.js";
 import { Habit } from "../models/habit.model.js";
 import { Device } from "../models/device.mdel.js";
 import { Feedback } from "../models/feedback.js";
+import { Streak } from "../models/Streak.model.js";
 
 const generateAccessTokenAndRefresToken = async (id) => {
    try {
@@ -391,15 +392,17 @@ const DeleteUser = asyncHandler(async (req, res) => {
    await User.findByIdAndDelete(user._id);
    let ids = await Habit.find({ userId: user._id }).select("_id");
    await Habit.deleteMany({ userId: user._id });
+   await Streak.deleteMany({ userId: user._id });
+   await Device.deleteMany({ userId: user._id });
 
    // remove from redis too
    let rmids = [];
    await ConnectRedis();
    for (let i = 0; i < ids.length; i++) {
-      rmids.push(`${ids[i]._id.toString()}:${user._id.toString()}`);
+      rmids.push(ids[i]._id.toString());
    }
    await ConnectRedis();
-   await Redisclient.SREM("habitList", rmids);
+   await Redisclient.SREM("AllHabitLists", rmids);
    return res
       .status(200)
       .json(new ApiResponse(200, {}, "User deleted successfully"));
