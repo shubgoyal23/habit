@@ -189,13 +189,18 @@ func ClearOldRecords() {
 		}
 	}()
 
-	utcTime := time.Now().UTC().Add(time.Minute * -60).Unix()
+	utcTime := time.Now().UTC().Add(time.Minute * -60)
 	NotifyMap.Range(func(key, value interface{}) bool {
-		if key.(int64) < utcTime {
+		if key.(int64) < utcTime.Unix() {
 			NotifyMap.Delete(key)
 		}
 		return true
 	})
+	utcTime = utcTime.AddDate(0, 0, -2)
+	t := time.Date(utcTime.Year(), utcTime.Month(), utcTime.Day(), 12, 0, 0, 0, time.UTC).UTC()
+	if err := DelRedisKey(fmt.Sprintf("habitCompleted:%d", t.Unix())); err != nil {
+		return
+	}
 }
 
 // this function sends notification to user if habit is not done till 11 pm localtime

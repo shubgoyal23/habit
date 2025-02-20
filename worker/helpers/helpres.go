@@ -41,21 +41,3 @@ func SetUserDetails(userDetails bson.M) error {
 	AllUsers[user.Id] = user
 	return nil
 }
-
-func DoEveryDayTask() {
-	defer func() {
-		if err := recover(); err != nil {
-			fmt.Println("DoEveryDayTask crashed: ", err)
-		}
-	}()
-	for range time.Tick(24 * time.Hour) {
-		ChangeImageDaily()
-
-		utcTime := time.Now().UTC()
-		dateEpoch := time.Date(utcTime.Year(), utcTime.Month(), utcTime.Day()-2, 12, 0, 0, 0, time.UTC)
-		if err := DelRedisKey(fmt.Sprintf("habitCompleted:%d", dateEpoch.Unix())); err != nil {
-			continue
-		}
-	}
-
-}

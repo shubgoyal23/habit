@@ -32,7 +32,6 @@ func main() {
 	helpers.InitVariables()
 	helpers.InitImageHandler()
 	go helpers.RunNoficationWorker()
-	go helpers.DoEveryDayTask()
 
 	<-stop
 	fmt.Println("shutting down...")
