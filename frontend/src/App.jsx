@@ -19,14 +19,20 @@ import {
 import { setTheme } from "./store/ThemeSlice";
 import { addListHabits } from "./store/HabitSlice";
 import { addSteak } from "./store/StreakSlice";
+import { getToken, setToken } from "./lib/storeToken";
 
 const Privacy = lazy(() => import("./components/etc/Privacy"));
+const TermsAndConditions = lazy(() =>
+   import("./components/etc/Terms&Conditions")
+);
 const DeleteAccount = lazy(() => import("./components/etc/DeleteAccount"));
 const Profile = lazy(() => import("./components/profile/Profile"));
 const Habit = lazy(() => import("./components/Habit/Habit"));
 const SteakList = lazy(() => import("./components/Steak/SteakList"));
 const AddHabit = lazy(() => import("./components/Habit/AddHabit"));
 const Home = lazy(() => import("./components/Home/Home"));
+const Chat = lazy(() => import("./components/chat/chat"));
+const Navi = lazy(() => import("./components/app/Navigate"));
 
 const router = createBrowserRouter([
    {
@@ -88,9 +94,30 @@ const router = createBrowserRouter([
          },
          {
             path: "/profile",
+            children: [
+               {
+                  path: "",
+                  element: (
+                     <Suspense fallback={<Loader />}>
+                        <Profile />
+                     </Suspense>
+                  ),
+               },
+            ],
+         },
+         {
+            path: "/close-account",
             element: (
                <Suspense fallback={<Loader />}>
-                  <Profile />
+                  <DeleteAccount />
+               </Suspense>
+            ),
+         },
+         {
+            path: "/chat",
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Chat />
                </Suspense>
             ),
          },
@@ -103,10 +130,10 @@ const router = createBrowserRouter([
             ),
          },
          {
-            path: "/close-account",
+            path: "/terms-and-conditions",
             element: (
                <Suspense fallback={<Loader />}>
-                  <DeleteAccount />
+                  <TermsAndConditions />
                </Suspense>
             ),
          },
@@ -118,32 +145,58 @@ export default function App() {
    const dispatch = useDispatch();
    const [loading, setLoading] = useState(true);
 
-   const LoadDateIntoApp = async () => {
-      const habitreq = await axios.get(
-         `${conf.BACKEND_URL}/api/v1/steak/habit`,
-         {
-            withCredentials: true,
-         }
-      );
-      const steakList = await axios.post(
-         `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
-         { month: new Date().getMonth(), year: new Date().getFullYear() },
-         {
-            withCredentials: true,
-         }
-      );
-      const { data: hData } = habitreq?.data;
-      if (hData?.length > 0) {
-         dispatch(addListHabits(hData));
-      }
-
-      const { data: sData } = steakList?.data;
-      if (sData?.length > 0) {
-         for (let i = 0; i < sData.length; i++) {
-            dispatch(addSteak(sData[i]));
+   const LoadHabitList = async () => {
+      let lastsync = await getToken("lastsyncHL");
+      lastsync = 86400000 + lastsync;
+      let hlist = await getToken("habitList");
+      if (hlist && lastsync > new Date().getTime()) {
+         hlist = JSON.parse(hlist);
+         dispatch(addListHabits(hlist));
+      } else {
+         const habitreq = await axios.get(
+            `${conf.BACKEND_URL}/api/v1/steak/habit`,
+            {
+               withCredentials: true,
+            }
+         );
+         const { data: hData } = habitreq?.data;
+         if (hData?.length > 0) {
+            setToken("lastsyncHL", new Date().getTime());
+            dispatch(addListHabits(hData));
          }
       }
    };
+   const LoadSteakList = async () => {
+      let lastsync = await getToken("lastsyncSL");
+      lastsync = 86400000 + lastsync;
+      let slist = await getToken("streakList");
+      if (slist && lastsync > new Date().getTime()) {
+         slist = JSON.parse(slist);
+         let keys = Object.keys(slist);
+         for (let sl of keys) {
+            let ids = Object.keys(slist[sl]);
+            for (let i = 0; i < ids.length; i++) {
+               dispatch(addSteak(slist[sl][ids[i]]));
+            }
+         }
+      } else {
+         const steakList = await axios.post(
+            `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
+            { month: new Date().getMonth(), year: new Date().getFullYear() },
+            {
+               withCredentials: true,
+            }
+         );
+         const { data: sData } = steakList?.data;
+         if (sData?.length > 0) {
+            setToken("lastsyncSL", new Date().getTime());
+            for (let i = 0; i < sData.length; i++) {
+               dispatch(addSteak(sData[i]));
+            }
+         }
+      }
+   };
+
    const checkUser = async () => {
       await SetTokenToAxios();
       let storeData = null;
@@ -184,7 +237,8 @@ export default function App() {
       dispatch(setTheme(theme));
       const loggedIn = await checkUser();
       if (loggedIn) {
-         await LoadDateIntoApp();
+         LoadHabitList();
+         LoadSteakList();
       }
    };
 
@@ -195,6 +249,9 @@ export default function App() {
       <Loader />
    ) : (
       <RouterProvider router={router}>
+         <Suspense fallback={null}>
+            <Navi />
+         </Suspense>
          <Layout />
       </RouterProvider>
    );

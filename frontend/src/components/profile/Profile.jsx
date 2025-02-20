@@ -8,17 +8,13 @@ import {
    CardTitle,
 } from "../ui/card";
 import {
-   FaBell,
    FaCircleExclamation,
-   FaCircleQuestion,
    FaCreditCard,
    FaDesktop,
    FaMoon,
    FaRightFromBracket,
    FaSun,
-   FaUser,
 } from "react-icons/fa6";
-import { FaShieldHalved } from "react-icons/fa6";
 import { FaLock } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { setTheme } from "@/store/ThemeSlice";
@@ -31,7 +27,11 @@ import {
    SelectTrigger,
    SelectValue,
 } from "../ui/select";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { Notification } from "./Notification";
+import { EditDetails } from "./EditDetails";
+import { Support } from "./Support";
+import ShareApp from "./share";
 
 function Profile() {
    const userTheme = useSelector((state) => state.userTheme);
@@ -54,37 +54,27 @@ function Profile() {
                   <div className="space-y-2">
                      <h2>Account</h2>
                      <div className="space-y-1 p-2 pl-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
-                        <div className="flex items-center space-x-2 justify-start gap-2">
-                           <FaUser />
-                           <span>Edit Profile</span>
-                        </div>
-                        <div className="flex items-center space-x-2 justify-start gap-2">
-                           <FaShieldHalved />
-                           <span>Security</span>
-                        </div>
-                        <div className="flex items-center space-x-2 justify-start gap-2">
-                           <FaBell />
-                           <span>Notifications</span>
-                        </div>
-                        <div className="flex items-center space-x-2 justify-start gap-2">
+                        <EditDetails />
+                        <Notification />
+                        <NavLink
+                           to={"/privacy-policy"}
+                           className="flex items-center space-x-2 justify-start gap-2"
+                        >
                            <FaLock />
                            <span>Privacy</span>
-                        </div>
+                        </NavLink>
                      </div>
                      <h2 className="mt-2">Support & About</h2>
                      <div className="space-y-1 p-2 pl-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
-                        <div className="flex items-center space-x-2 justify-start gap-2">
-                           <FaCircleQuestion />
-                           <span>Help & Support</span>
-                        </div>
-                        <div className="flex items-center space-x-2 justify-start gap-2">
-                           <FaCreditCard />
-                           <span>my Subscription</span>
-                        </div>
-                        <div className="flex items-center space-x-2 justify-start gap-2">
+                        <Support />
+                        <ShareApp />
+                        <NavLink
+                           to={"/terms-and-conditions"}
+                           className="flex items-center space-x-2 justify-start gap-2"
+                        >
                            <FaCircleExclamation />
                            <span>Terms & Policies</span>
-                        </div>
+                        </NavLink>
                      </div>
 
                      {/* actions */}

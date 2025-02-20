@@ -20,17 +20,18 @@ import (
 
 // User struct
 type User struct {
-	Id           primitive.ObjectID `bson:"_id" json:"_id"`
-	FirstName    string             `json:"firstName" bson:"firstName"`
-	LastName     string             `json:"lastName" bson:"lastName"`
-	Email        string             `json:"email" bson:"email" validate:"required,email,unique"`
-	Username     string             `json:"username" bson:"username" validate:"required,unique"`
-	FCMToken     *string            `json:"fcmToken,omitempty" bson:"fcmToken,omitempty"`
-	TimeZone     *int               `json:"timeZone,omitempty" bson:"timeZone,omitempty"`
-	IsActive     *bool              `json:"isActive,omitempty" bson:"isActive,omitempty"`
-	Phone        *string            `json:"phone,omitempty" bson:"phone,omitempty"`
-	PhoneDetails *PhoneDetail       `json:"phoneDetails,omitempty" bson:"phoneDetails,omitempty"`
-	Epoch        int64              // for local usages
+	Id         primitive.ObjectID `bson:"_id" json:"_id"`
+	FirstName  string             `json:"firstName" bson:"firstName"`
+	FCMToken   *string            `json:"fcmToken,omitempty" bson:"fcmToken,omitempty"`
+	TimeZone   *int               `json:"timeZone,omitempty" bson:"timeZone,omitempty"`
+	NotifyTime *int               `json:"notifyTime,omitempty" bson:"notifyTime,omitempty"`
+	Epoch      int64              // for local usages
+	// LastName     string             `json:"lastName" bson:"lastName"`
+	// Email        string             `json:"email" bson:"email" validate:"required,email,unique"`
+	// Username     string             `json:"username" bson:"username" validate:"required,unique"`
+	// IsActive     *bool              `json:"isActive,omitempty" bson:"isActive,omitempty"`
+	// Phone        *string            `json:"phone,omitempty" bson:"phone,omitempty"`
+	// PhoneDetails *PhoneDetail       `json:"phoneDetails,omitempty" bson:"phoneDetails,omitempty"`
 	// RefreshToken *string            `json:"refreshToken,omitempty" bson:"refreshToken,omitempty"`
 	// Password     string             `json:"password" bson:"password" validate:"required"`
 	// CreatedAt    time.Time          `json:"createdAt" bson:"createdAt"`

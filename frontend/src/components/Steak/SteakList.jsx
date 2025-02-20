@@ -95,7 +95,6 @@ function Steak() {
    };
 
    const checkDate = (data, index) => {
-      if (!streakList[`${month}-${year}`]) return null;
       const indexDate = new Date(year, month, index + 1);
       const StartDate = new Date(data.startDate * 1000);
       if (indexDate > DateToday) {
@@ -112,15 +111,41 @@ function Steak() {
             </div>
          );
       }
-      if (indexDate < StartDate) {
+      if (indexDate < StartDate || indexDate > DateToday) {
          return null;
       }
-      if (!streakList[`${month}-${year}`][data?._id])
-         return (
-            <div className="size-6 m-auto flex justify-center items-center">
-               <SlClose className="size-6 text-red-500" />
-            </div>
-         );
+      if (!streakList[`${month}-${year}`])
+         switch (data.habitType) {
+            case "regular":
+               return (
+                  <div className="size-6 m-auto flex justify-center items-center">
+                     <SlClose className="size-6 text-red-500" />
+                  </div>
+               );
+            case "negative":
+               return (
+                  <div className="size-6 m-auto flex justify-center items-center">
+                     <FaRegCheckCircle className="size-6 text-green-500" />
+                  </div>
+               );
+         }
+      if (!streakList[`${month}-${year}`][data?._id]) {
+         switch (data.habitType) {
+            case "regular":
+               return (
+                  <div className="size-6 m-auto flex justify-center items-center">
+                     <SlClose className="size-6 text-red-500" />
+                  </div>
+               );
+            case "negative":
+               return (
+                  <div className="size-6 m-auto flex justify-center items-center">
+                     <FaRegCheckCircle className="size-6 text-green-500" />
+                  </div>
+               );
+         }
+      }
+
       let check = streakList[`${month}-${year}`][
          data._id
       ]?.daysCompleted.includes(index + 1);
@@ -136,11 +161,20 @@ function Steak() {
          );
       }
       if (check) {
-         return (
-            <div className="size-6 m-auto flex justify-center items-center">
-               <FaRegCheckCircle className="size-6 text-green-500" />
-            </div>
-         );
+         switch (data.habitType) {
+            case "regular":
+               return (
+                  <div className="size-6 m-auto flex justify-center items-center">
+                     <FaRegCheckCircle className="size-6 text-green-500" />
+                  </div>
+               );
+            case "negative":
+               return (
+                  <div className="size-6 m-auto flex justify-center items-center">
+                     <SlClose className="size-6 text-red-500" />
+                  </div>
+               );
+         }
       }
       return (
          <div className="size-6 m-auto flex justify-center items-center">
@@ -185,11 +219,15 @@ function Steak() {
             <TableHeader className="bg-violet-50 dark:bg-gray-950">
                <TableRow>
                   <TableHead className="w-[100px]">Day/ Habit</TableHead>
-                  {habitList.map((item) => (
-                     <TableHead key={item._id} className="w-[100px]">
-                        {item.name}
-                     </TableHead>
-                  ))}
+                  {habitList.map((item) => {
+                     if (item.habitType != "todo") {
+                        return (
+                           <TableHead key={item._id} className="w-[100px]">
+                              {item.name}
+                           </TableHead>
+                        );
+                     }
+                  })}
                </TableRow>
             </TableHeader>
             <TableBody className="text-center">
@@ -198,11 +236,18 @@ function Steak() {
                   .map((_, i) => (
                      <TableRow key={`day-${i + 1}`}>
                         <TableCell>{`${i + 1}`}</TableCell>
-                        {habitList.map((item) => (
-                           <TableCell key={item._id} className="align-center">
-                              {checkDate(item, i)}
-                           </TableCell>
-                        ))}
+                        {habitList.map((item) => {
+                           if (item.habitType != "todo") {
+                              return (
+                                 <TableCell
+                                    key={item._id}
+                                    className="align-center"
+                                 >
+                                    {checkDate(item, i)}
+                                 </TableCell>
+                              );
+                           }
+                        })}
                      </TableRow>
                   ))}
             </TableBody>

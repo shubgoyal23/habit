@@ -7,6 +7,7 @@ import jwt from "jsonwebtoken";
 import { SendOtp } from "../utils/Email.js";
 import { Habit } from "../models/habit.model.js";
 import { Device } from "../models/device.mdel.js";
+import { Feedback } from "../models/feedback.js";
 
 const generateAccessTokenAndRefresToken = async (id) => {
    try {
@@ -49,6 +50,8 @@ const registeruser = asyncHandler(async (req, res) => {
       lastName,
       timeZone,
       isActive: false,
+      notify: true,
+      notifyTime: "22:00",
    });
    await ConnectRedis();
    await Redisclient.set(
@@ -154,6 +157,8 @@ const loginUser = asyncHandler(async (req, res) => {
    user._id = finduser._id;
    user.firstName = finduser.firstName;
    user.lastName = finduser.lastName;
+   user.notify = finduser.notify;
+   user.notifyTime = finduser.notifyTime;
    user.refreshToken = refreshToken;
    user.accessToken = accessToken;
 
@@ -237,6 +242,8 @@ const currentUser = asyncHandler(async (req, res) => {
       _id: req.user._id,
       firstName: req.user.firstName,
       lastName: req.user.lastName,
+      notify: req.user.notify,
+      notifyTime: req.user.notifyTime,
    };
    return res
       .status(200)
@@ -281,31 +288,15 @@ const refreshToken = asyncHandler(async (req, res) => {
 });
 
 const editUserDetails = asyncHandler(async (req, res) => {
-   let { firstName, lastName, email } = req.body;
+   let { firstName, lastName, notify, notifyTime } = req.body;
    const id = req.user._id;
 
-   if (!firstName) {
-      firstName = req.user.firstName;
-   }
-   if (!lastName) {
-      lastName = req.user.lastName;
-   }
-   if (!email) {
-      email = req.user.email;
-   }
-
-   const updateuser = await User.findByIdAndUpdate(
-      id,
-      {
-         $set: {
-            firstName,
-            lastName,
-            email,
-         },
-      },
-      { new: true }
-   ).select("-password -refreshToken");
-
+   const updateuser = await User.findByIdAndUpdate(id, {
+      firstName,
+      lastName,
+      notify,
+      notifyTime,
+   });
    if (!updateuser) {
       throw new ApiError(500, "user details update failed");
    }
@@ -315,7 +306,7 @@ const editUserDetails = asyncHandler(async (req, res) => {
       .json(
          new ApiResponse(
             200,
-            updateuser,
+            { _id: id, firstName, lastName, notify, notifyTime },
             "Account details updated successfully"
          )
       );
@@ -339,6 +330,7 @@ const editUserPassword = asyncHandler(async (req, res) => {
       .status(200)
       .json(new ApiResponse(200, {}, "Account password updated successfully"));
 });
+
 const forgetPassword = asyncHandler(async (req, res) => {
    let { email, password, _id } = req.body;
 
@@ -413,43 +405,26 @@ const DeleteUser = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, {}, "User deleted successfully"));
 });
 
-const RegisterDevice = asyncHandler(async (req, res) => {
-   const {
-      deviceId,
-      model,
-      platform,
-      os,
-      osVersion,
-      manufacturer,
-      isVirtual,
-      webViewVersion,
-      androidSDKVersion,
-      userid,
-   } = req.body;
+const FeedbackForm = asyncHandler(async (req, res) => {
+   let { topic, desc } = req.body;
 
-   if (!deviceId) {
-      throw new ApiError(401, "deviceId is required");
+   if (!topic || !desc) {
+      throw new ApiError(401, "All fields are required");
    }
-   await Device.findOneAndUpdate(
-      {deviceId: deviceId},
-      {
-         $set: {
-            model,
-            platform,
-            os,
-            osVersion,
-            manufacturer,
-            isVirtual,
-            webViewVersion,
-            androidSDKVersion,
-            userid,
-         },
-      },
-      { new: true, upsert: true }
-   );
+
+   const f = await Feedback.create({
+      userid: req.user?._id,
+      topic,
+      desc,
+   });
+
+   if (!f) {
+      throw new ApiError(500, "Internal server error");
+   }
+
    return res
       .status(200)
-      .json(new ApiResponse(200, {}, "deviceId updated successfully"));
+      .json(new ApiResponse(200, {}, "User deleted successfully"));
 });
 
 export {
@@ -465,5 +440,5 @@ export {
    DeleteUser,
    VerifyOtp,
    ResendOtp,
-   RegisterDevice,
+   FeedbackForm,
 };

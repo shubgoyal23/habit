@@ -1,3 +1,4 @@
+import { clearTokens } from "@/lib/storeToken";
 import { createSlice } from "@reduxjs/toolkit";
 
 const authSlice = createSlice({
@@ -12,6 +13,7 @@ const authSlice = createSlice({
       logout(state, action) {
          state.loggedin = false;
          state.userDate = null;
+         clearTokens();
       },
    },
 });

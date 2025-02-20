@@ -12,7 +12,7 @@ import {
    DeleteUser,
    VerifyOtp,
    ResendOtp,
-   RegisterDevice,
+   FeedbackForm,
 } from "../controller/user.controller.js";
 import { verifyJwt } from "../middleware/auth.middleware.js";
 
@@ -24,7 +24,6 @@ router.route("/verify").post(VerifyOtp);
 router.route("/resend-otp").post(ResendOtp);
 router.route("/forgot-password").post(forgetPassword);
 router.route("/renew-token").get(refreshToken);
-router.route("/device").post(RegisterDevice);
 
 //secure route
 router.route("/logout").get(verifyJwt, logoutUser);
@@ -33,5 +32,6 @@ router.route("/details").post(verifyJwt, editUserDetails);
 router.route("/password").post(verifyJwt, editUserPassword);
 router.route("/fcm-token").post(verifyJwt, setFcmToken);
 router.route("/close-account").post(verifyJwt, DeleteUser);
+router.route("/feedback").post(verifyJwt, FeedbackForm);
 
 export default router;

@@ -6,7 +6,6 @@ import { conf } from "@/conf/conf";
 import { MdOutlineRadioButtonUnchecked, MdCheckCircle } from "react-icons/md";
 import { addSteak } from "@/store/StreakSlice";
 
-
 function MarkSteak({ row }) {
    const streakList = useSelector((state) => state.streak) || [];
    const data = row.original;
@@ -57,7 +56,8 @@ function MarkSteak({ row }) {
             className="size-4 cursor-pointer border-gray-200 rounded text-blue-600 focus:ring-blue-500"
             onClick={handleMarked}
          >
-            {marked ? (
+            {(data.habitType === "negative" && !marked) ||
+            (data.habitType !== "negative" && marked) ? (
                <MdCheckCircle className="text-green-600 size-6" />
             ) : (
                <MdOutlineRadioButtonUnchecked className="text-gray-400 size-6" />

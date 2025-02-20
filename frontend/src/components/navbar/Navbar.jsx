@@ -67,8 +67,8 @@ function Navbar() {
                         <NavLink
                            className={({ isActive }) =>
                               `${
-                                 isActive ? "font-bold text-violet-800" : ""
-                              } flex flex-col-reverse md:flex-row items-center justify-center md:gap-1`
+                                 isActive ? "text-violet-800" : ""
+                              } flex flex-col-reverse md:flex-row items-center justify-center md:gap-1 transition-all duration-500`
                            }
                            to={item.to}
                         >

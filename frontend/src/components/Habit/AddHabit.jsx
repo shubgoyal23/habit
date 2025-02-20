@@ -171,7 +171,7 @@ export default function AddHabit() {
                               type === "regular"
                                  ? "bg-green-600"
                                  : "bg-gray-500"
-                           } p-1 rounded-md cursor-pointer flex flex-col justify-center items-center text-xs`}
+                           } p-1 rounded-md cursor-pointer flex flex-col justify-center items-center text-xs transition-all duration-500`}
                            onClick={() => setType("regular")}
                         >
                            <HiArrowPathRoundedSquare className="h-6 w-6" />
@@ -179,10 +179,8 @@ export default function AddHabit() {
                         </span>
                         <span
                            className={`${
-                              type === "negative"
-                                 ? "bg-red-600"
-                                 : "bg-gray-500"
-                           } p-1 rounded-md h-16 cursor-pointer flex flex-col justify-center items-center text-xs`}
+                              type === "negative" ? "bg-red-600" : "bg-gray-500"
+                           } p-1 rounded-md h-16 cursor-pointer flex flex-col justify-center items-center text-xs transition-all duration-500`}
                            onClick={() => setType("negative")}
                         >
                            <AiOutlineStop className="h-6 w-6" />
@@ -191,12 +189,45 @@ export default function AddHabit() {
                         <span
                            className={`${
                               type === "todo" ? "bg-blue-800" : "bg-gray-500"
-                           } p-1 rounded-md  cursor-pointer flex flex-col justify-center items-center text-xs`}
+                           } p-1 rounded-md  cursor-pointer flex flex-col justify-center items-center text-xs transition-all duration-500`}
                            onClick={() => setType("todo")}
                         >
                            <TiTick className="h-6 w-6" />
                            one time Todo
                         </span>
+                     </div>
+                  </div>
+                  {/* habit type description */}
+                  <div>
+                     <div className="relative bg-gray-300 dark:bg-gray-800 rounded-md p-2 pl-4">
+                        <span
+                           className={`absolute -top-[6px] box-border p-2 bg-gray-300 dark:bg-gray-800 rotate-45 transition-all duration-500 rounded-sm  ${
+                              type == "regular"
+                                 ? "left-[13%]"
+                                 : type == "todo"
+                                 ? "left-[83%]"
+                                 : "left-[50%] -translate-x-2"
+                           }`}
+                        ></span>
+                        <h2 className="font-bold capitalize">{type}</h2>
+                        {type === "regular" && (
+                           <p className="text-xs text-gray-700 dark:text-gray-100/70">
+                              A habit you follow daily. Mark it regularly as you
+                              complete it. Example: Reading a book every day.
+                           </p>
+                        )}
+                        {type === "negative" && (
+                           <p className="text-xs text-gray-700 dark:text-gray-100/70">
+                              Starts as completed each day. Uncheck it only if
+                              you fail. Example: Avoiding smoking or alcohol.
+                           </p>
+                        )}
+                        {type === "todo" && (
+                           <p className="text-xs text-gray-700 dark:text-gray-100/70">
+                              A reminder for one-time tasks on a specific date.
+                              Example: Taking a medical test on Friday.
+                           </p>
+                        )}
                      </div>
                   </div>
                   {/* habit name */}
