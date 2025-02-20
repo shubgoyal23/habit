@@ -432,7 +432,7 @@ const ListHabit = async (data) => {
    const dateTodayEpoch = GetUTCDateEpoch(new Date(), data?.user?.timeZone);
    const list = await Habit.find({
       userId: data.user._id,
-      active: true,
+      isActive: true,
       startDate: { $lte: dateTodayEpoch },
       endDate: { $gte: dateTodayEpoch },
    });
