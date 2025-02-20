@@ -282,8 +282,9 @@ func HabitNotDoneReminder() {
 		habitlist[habitData.Id.Hex()] = habitData.UserID
 		habitids = append(habitids, habitData.Id.Hex())
 	}
-
-	_, nf, err := CheckRedisSetMemebers("habitCompleted", habitids)
+	t := time.Date(utcTime.Year(), utcTime.Month(), utcTime.Day(), 12, 00, 0, 0, time.UTC).Unix()
+	key := fmt.Sprintf("habitCompleted:%d", t)
+	_, nf, err := CheckRedisSetMemebers(key, habitids)
 	if err != nil {
 		return
 	}
