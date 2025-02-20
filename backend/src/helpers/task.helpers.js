@@ -181,10 +181,7 @@ const Createhabit = async (data) => {
       await ConnectRedis();
       await RedisConn.sAdd("AllHabitLists", createUserHabit._id.toString());
    }
-   // save to user list
-   await User.findByIdAndUpdate(data.user._id, {
-      $push: { habitsList: createUserHabit._id },
-   });
+
    return new ApiResponse(200, createUserHabit, "Habit Added Successfully");
 };
 
@@ -346,10 +343,6 @@ const DeleteHabit = async (data) => {
    // removeStreaksdata
    await Streak.deleteMany({
       habitId: id,
-   });
-
-   await User.findByIdAndUpdate(data.user._id, {
-      $pull: { habitsList: id },
    });
 
    // remove habit from redis

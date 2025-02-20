@@ -11,21 +11,11 @@ function Navigate() {
    const navigate = useNavigate();
 
    const AppVersionCheck = async () => {
-      const { version } = await App.getInfo();
+      const { build } = await App.getInfo();
 
       axios.get(`${conf.BACKEND_URL}/api/v1/app/version`).then((data) => {
-         let leastAppVersion = data?.data?.data?.version;
-         leastAppVersion = leastAppVersion.split(".");
-         leastAppVersion = Number(
-            leastAppVersion[0] * 100 +
-               leastAppVersion[1] * 10 +
-               leastAppVersion[2]
-         );
-         let versionNumber = version.split(".");
-         versionNumber = Number(
-            versionNumber[0] * 100 + versionNumber[1] * 10 + versionNumber[2]
-         );
-
+         let leastAppVersion = Number(data?.data?.data?.version);
+         let versionNumber = Number(build);
          if (versionNumber < leastAppVersion) {
             setUpdate(true);
          }

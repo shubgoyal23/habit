@@ -25,15 +25,31 @@ export function Notification() {
 
    useEffect(() => {
       if (user) {
-         setRTimes(user.notifyTime);
          setNotify(!!user.notify);
+         if (user.notifyTime) {
+            let t = new Date(user.notifyTime * 1000);
+            let hr = t.getHours();
+            let min = t.getMinutes();
+            if (hr < 10) hr = "0" + hr;
+            if (min < 10) min = "0" + min;
+            setRTimes(`${hr}:${min}`);
+         }
       }
    }, [user]);
 
    const saveChanges = async () => {
+      let TimeEpoch = Math.ceil(
+         new Date(2025, 0, 1, 22, 0, 0, 0, 0).getTime() / 1000
+      );
+      if (rTimes) {
+         let t = rTimes.split(":");
+         TimeEpoch = Math.ceil(
+            new Date(2025, 0, 1, t[0], t[1], 0, 0, 0).getTime() / 1000
+         );
+      }
       const save = axios.post(
          `${conf.BACKEND_URL}/api/v1/users/details`,
-         { notifyTime: rTimes, notify: notify },
+         { notifyTime: TimeEpoch, notify: notify },
          {
             withCredentials: true,
          }
