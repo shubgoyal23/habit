@@ -1,9 +1,9 @@
 package helpers
 
 import (
+	"encoding/json"
 	"fmt"
 	"habit_notify/models"
-	"strings"
 	"sync"
 	"time"
 
@@ -26,17 +26,30 @@ func InitVariables() {
 }
 
 func RunNoficationWorker() {
-	go FilerAndSendNotifications()
-	go GetHabitRecords()
-	go ClearOldRecords()
-	go HabitNotDoneReminder()
+	go DoEvery(time.Minute, FilerAndSendNotifications)                                                         // run every minute
+	go DoEvery(time.Duration(Duration_Notify)*time.Second, GetHabitRecords, ChangeImage, HabitNotDoneReminder) // run every Duration_Notify
+	go DoEvery(24*time.Hour, ClearOldRecords, InactiveHabits)                                                  // run every 12 hours
 
-	for range time.Tick(time.Duration(Duration_Notify) * time.Second) {
-		GetHabitRecords()
-		ChangeImage()
+	go GetHabitRecords() // this will runs for first time
+}
+
+func DoEvery(after time.Duration, f ...func()) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("DoEvery crashed: ", err)
+		}
+	}()
+	if len(f) == 0 {
+		return
+	}
+	for range time.Tick(after) {
+		for _, fn := range f {
+			go fn()
+		}
 	}
 }
 
+// sends notificaion to users if they exist in NotifyMap at that epoch
 func FilerAndSendNotifications() {
 	defer func() {
 		if err := recover(); err != nil {
@@ -45,35 +58,26 @@ func FilerAndSendNotifications() {
 	}()
 	utcTime := time.Now().UTC()
 	timeEpoch := time.Date(2025, time.January, 1, utcTime.Hour(), utcTime.Minute(), 0, 0, time.UTC).Add(time.Minute * 5).Unix() // 5 min ahead of current time
-	endEpoch := time.Date(2025, time.January, 1, 23, 59, 59, 59, time.UTC).Unix()
-	for range time.Tick(1 * time.Minute) {
-		timeEpoch = timeEpoch + 60
-		if timeEpoch > endEpoch {
-			timeEpoch = time.Date(2025, time.January, 1, 0, 0, 0, 0, time.UTC).Unix()
-			n := fmt.Sprintf("%s: %d", time.Now().Format("2006-01-02 15:04:05"), timeEpoch)
-			InsertRedisListLPush("Time_change", []string{n})
-		}
 
-		// check if timeEpoch is in map
-		res, ok := NotifyMap.Load(timeEpoch)
-		if !ok {
-			continue
-		}
-
-		docs, ok := res.([]*UserNotification)
-		if !ok {
-			continue
-		}
-
-		for _, doc := range docs {
-			n := fmt.Sprintf("%s: %s", time.Now().Format("2006-01-02 15:04:05"), doc.Notification.Title)
-			InsertRedisListLPush("habit_notification_To_Send", []string{n})
-			if err := SendHabitNotification(doc); err != nil {
-				continue
-			}
-		}
-		NotifyMap.Delete(timeEpoch)
+	// check if timeEpoch is in map
+	res, ok := NotifyMap.Load(timeEpoch)
+	if !ok {
+		return
 	}
+
+	docs, ok := res.([]*UserNotification)
+	if !ok {
+		return
+	}
+
+	for _, doc := range docs {
+		n := fmt.Sprintf("%s: %s", time.Now().Format("2006-01-02 15:04:05"), doc.Notification.Title)
+		InsertRedisListLPush("habit_notification_To_Send", []string{n})
+		if err := SendHabitNotification(doc); err != nil {
+			continue
+		}
+	}
+	NotifyMap.Delete(timeEpoch)
 }
 
 func GetHabitRecords() {
@@ -102,11 +106,8 @@ func GetHabitRecords() {
 			continue
 		}
 		nofity := make([]int64, 0)
-		switch habitData.HabitType {
-		case "regular":
-		case "negative":
+		if habitData.HabitType == "negative" {
 			continue
-		case "todo":
 		}
 		switch habitData.Repeat.Name {
 		case "days":
@@ -188,15 +189,13 @@ func ClearOldRecords() {
 		}
 	}()
 
-	for t := range time.Tick(12 * time.Hour) {
-		utcTime := t.UTC().Add(time.Minute * -60).Unix()
-		NotifyMap.Range(func(key, value interface{}) bool {
-			if key.(int64) < utcTime {
-				NotifyMap.Delete(key)
-			}
-			return true
-		})
-	}
+	utcTime := time.Now().UTC().Add(time.Minute * -60).Unix()
+	NotifyMap.Range(func(key, value interface{}) bool {
+		if key.(int64) < utcTime {
+			NotifyMap.Delete(key)
+		}
+		return true
+	})
 }
 
 // this function sends notification to user if habit is not done till 11 pm localtime
@@ -206,44 +205,129 @@ func HabitNotDoneReminder() {
 			fmt.Println("HabitNotDoneReminder crashed: ", err)
 		}
 	}()
-	for t := range time.Tick(1 * time.Hour) {
-		utcTime := t.UTC()
-		timeEpoch := time.Date(2025, time.January, 1, utcTime.Hour(), 0, 0, 0, time.UTC)
-		key := fmt.Sprintf("habitLists:%d", timeEpoch.Unix())
-		habits, err := GetAllRedisSetMemeber(key)
+	utcTime := time.Now().UTC()
+	timeEpoch := time.Date(2025, time.January, 1, utcTime.Hour(), utcTime.Minute(), 0, 0, time.UTC).Add(time.Minute * 5).Unix() // 5 min ahead of current time
+	dateEpoch := timeEpoch + Duration_Notify
+
+	users, f := MongoGetManyDoc("users", bson.M{"notifyTime": bson.M{"$gte": timeEpoch, "$lt": dateEpoch}})
+	if !f || len(users) == 0 {
+		return
+	}
+	usersId := make([]primitive.ObjectID, 0)
+	for _, v := range users {
+		uid, ok := v["_id"].(primitive.ObjectID)
+		if !ok {
+			continue
+		}
+		usersId = append(usersId, uid)
+		SetUserDetails(v)
+	}
+
+	habits, f := MongoGetManyDoc("habits", bson.M{"userID": bson.M{"$in": usersId}, "isActive": true})
+	if !f || len(habits) == 0 {
+		return
+	}
+	habitlist := make(map[string]primitive.ObjectID)
+	habitids := make([]string, 0)
+	for _, v := range habits {
+		var habitData models.Habit
+		hbyte, err := bson.Marshal(v)
 		if err != nil {
 			continue
 		}
-		dateEpoch := time.Date(utcTime.Year(), utcTime.Month(), utcTime.Day(), 12, 0, 0, 0, time.UTC)
-		_, nf, err := CheckRedisSetMemebers(fmt.Sprintf("habitCompleted:%d", dateEpoch.Unix()), habits)
+		if err := json.Unmarshal(hbyte, &habitData); err != nil {
+			continue
+		}
+
+		// check if habit is due today or not
+		if habitData.HabitType == "negative" {
+			continue
+		}
+		switch habitData.Repeat.Name {
+		case "days":
+			day := int(utcTime.Weekday())
+			var include bool
+			for _, v := range habitData.Repeat.Value {
+				if v == day {
+					include = true
+					break
+				}
+			}
+			if !include {
+				continue
+			}
+		case "dates":
+			currentDate := utcTime.Day()
+			currentMonth := utcTime.Month()
+
+			var include bool
+			for _, v := range habitData.Repeat.Value {
+				d := time.Unix(int64(v), 0)
+				if d.Day() == currentDate && d.Month() == currentMonth {
+					include = true
+					break
+				}
+			}
+			if !include {
+				continue
+			}
+		case "todo":
+			currentDate := utcTime.Day()
+			currentMonth := utcTime.Month()
+			userDate := time.Unix(habitData.StartTime, 0)
+			if userDate.Day() != currentDate || userDate.Month() != currentMonth {
+				continue
+			}
+		}
+		habitlist[habitData.Id.Hex()] = habitData.UserID
+		habitids = append(habitids, habitData.Id.Hex())
+	}
+
+	_, nf, err := CheckRedisSetMemebers("habitCompleted", habitids)
+	if err != nil {
+		return
+	}
+	if len(nf) == 0 {
+		return
+	}
+	userlist := make(map[primitive.ObjectID]bool, 0)
+	for _, v := range nf {
+		if _, ok := userlist[habitlist[habitids[v]]]; !ok {
+			userlist[habitlist[habitids[v]]] = true
+		}
+	}
+	for k := range userlist {
+		userDetails, err := GetUserDetails(k)
 		if err != nil {
 			continue
 		}
-		messages := make([]*messaging.Message, 0)
-		for _, v := range nf {
-			habitid := habits[v]
-			habitArr := strings.Split(habitid, ":")
-			userid, err := primitive.ObjectIDFromHex(habitArr[1])
-			if err != nil {
-				continue
-			}
-			userDetails, err := GetUserDetails(userid)
-			if err != nil {
-				continue
-			}
-			var message messaging.Message
-			message.Token = *userDetails.FCMToken
-			message.Notification = &messaging.Notification{
-				Title:    fmt.Sprintf("Hey %s, Don't Forget Your Tasks!", userDetails.FirstName),
-				Body:     "You have pending tasks for today. Complete them before the day ends to stay on track! 🚀",
-				ImageURL: ImageUrl,
-			}
-			messages = append(messages, &message)
+		var message UserNotification
+		message.Token = *userDetails.FCMToken
+		message.Notification = &messaging.Notification{
+			Title:    fmt.Sprintf("Hey %s, Don't Forget Your Tasks!", userDetails.FirstName),
+			Body:     "You have pending tasks for today. Complete them before the day ends to stay on track! 🚀",
+			ImageURL: ImageUrl,
 		}
-		if len(messages) > 0 {
-			if err := SendNotificationBulk(messages); err != nil {
-				println(err)
-			}
+		if val, ok := NotifyMap.Load(userDetails.NotifyTime); !ok {
+			NotifyMap.Store(userDetails.NotifyTime, []*UserNotification{&message})
+		} else {
+			val := val.([]*UserNotification)
+			val = append(val, &message)
+			NotifyMap.Store(userDetails.NotifyTime, val)
 		}
+	}
+}
+
+func InactiveHabits() {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println("InactiveHabits crashed: ", err)
+		}
+	}()
+	utcTime := time.Now().Add(time.Hour * -24).UTC().Unix()
+	filter := bson.M{"endDate": bson.M{"$lt": utcTime}, "isActive": true}
+	update := bson.M{"$set": bson.M{"isActive": false}}
+	if err := MongoUpdateManyDoc("habits", filter, update); err != nil {
+		return
 	}
 }
