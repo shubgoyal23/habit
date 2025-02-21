@@ -35,7 +35,10 @@ const userSchema = new mongoose.Schema(
       isActive: Boolean,
       phone: String,
       notify: Boolean,
-      notifyTime: Number,
+      notifyTime: {
+         type: Number,
+         default: 0,
+      },
       habitSkip: {
          type: Number,
          default: 5,
