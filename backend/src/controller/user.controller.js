@@ -9,6 +9,7 @@ import { Habit } from "../models/habit.model.js";
 import { Device } from "../models/device.mdel.js";
 import { Feedback } from "../models/feedback.js";
 import { Streak } from "../models/Streak.model.js";
+import { GetTimeZoneEpoch } from "../helpers/task.helpers.js";
 
 const generateAccessTokenAndRefresToken = async (id) => {
    try {
@@ -52,7 +53,7 @@ const registeruser = asyncHandler(async (req, res) => {
       timeZone,
       isActive: false,
       notify: true,
-      notifyTime: "22:00",
+      notifyTime: GetTimeZoneEpoch(22, 0, timeZone),
    });
    await ConnectRedis();
    await Redisclient.set(
