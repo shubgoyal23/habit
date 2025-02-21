@@ -254,7 +254,7 @@ const currentUser = asyncHandler(async (req, res) => {
 
 const refreshToken = asyncHandler(async (req, res) => {
    let token = req.cookies.refreshToken || req.headers.refreshtoken;
-   token = token.replace("Bearer ", "");
+   token = token?.replace("Bearer ", "");
    if (!token) {
       throw new ApiError(401, "RefreshToken not found");
    }

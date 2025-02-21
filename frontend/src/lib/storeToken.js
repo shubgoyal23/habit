@@ -1,4 +1,5 @@
 import { Preferences } from "@capacitor/preferences";
+import axios from "axios";
 
 const setToken = async (token, value) => {
    await Preferences.set({
@@ -18,15 +19,9 @@ const removeToken = async (token) => {
 };
 
 const clearTokens = async () => {
-   removeToken("lastsyncHL");
-   removeToken("lastsyncSL");
-   removeToken("deviceRegistered");
-   removeToken("tableItems");
-   removeToken("accesstoken");
-   removeToken("refreshtoken");
-   removeToken("habitList");
-   removeToken("streakList");
-   removeToken("theme");
+   await Preferences.clear();
+   axios.defaults.headers.common["Accesstoken"] = "";
+   axios.defaults.headers.common["Refreshtoken"] = "";
 };
 
 export { setToken, getToken, removeToken, clearTokens };
