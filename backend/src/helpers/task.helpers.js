@@ -436,8 +436,6 @@ const ListHabit = async (data) => {
       startDate: { $lte: dateTodayEpoch },
       endDate: { $gte: dateTodayEpoch },
    });
-   console.log("list", list);
-
    return new ApiResponse(200, list, "habit list fetched successfully");
 };
 
