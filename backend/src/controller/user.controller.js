@@ -234,8 +234,8 @@ const logoutUser = asyncHandler(async (req, res) => {
    };
 
    res.status(200)
-      .clearCookie("accessToken", options)
-      .clearCookie("refreshToken", options)
+      .cookie("accessToken", "", options)
+      .cookie("refreshToken", "", options)
       .json(new ApiResponse(200, {}, "User logged out Successfully"));
 });
 
@@ -404,8 +404,14 @@ const DeleteUser = asyncHandler(async (req, res) => {
    }
    await ConnectRedis();
    await Redisclient.SREM("AllHabitLists", rmids);
+   const options = {
+      httpOnly: true,
+      secure: true,
+   };
    return res
       .status(200)
+      .cookie("accessToken", "", options)
+      .cookie("refreshToken", "", options)
       .json(new ApiResponse(200, {}, "User deleted successfully"));
 });
 
