@@ -22,9 +22,9 @@ import (
 type User struct {
 	Id         primitive.ObjectID `bson:"_id" json:"_id"`
 	FirstName  string             `json:"firstName" bson:"firstName"`
-	FCMToken   *string            `json:"fcmToken,omitempty" bson:"fcmToken,omitempty"`
-	TimeZone   *int               `json:"timeZone,omitempty" bson:"timeZone,omitempty"`
-	NotifyTime *int               `json:"notifyTime,omitempty" bson:"notifyTime,omitempty"`
+	FCMToken   string             `json:"fcmToken,omitempty" bson:"fcmToken,omitempty"`
+	TimeZone   int32              `json:"timeZone,omitempty" bson:"timeZone,omitempty"`
+	NotifyTime int64              `json:"notifyTime,omitempty" bson:"notifyTime,omitempty"`
 	Epoch      int64              // for local usages
 	// LastName     string             `json:"lastName" bson:"lastName"`
 	// Email        string             `json:"email" bson:"email" validate:"required,email,unique"`

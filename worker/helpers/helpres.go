@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"encoding/json"
 	"fmt"
 	"habit_notify/models"
 	"time"
@@ -34,7 +33,7 @@ func SetUserDetails(userDetails bson.M) error {
 		return err
 	}
 	var user models.User
-	if err := json.Unmarshal(byte, &user); err != nil {
+	if err := bson.Unmarshal(byte, &user); err != nil {
 		return err
 	}
 	user.Epoch = time.Now().Unix()

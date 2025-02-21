@@ -1,7 +1,6 @@
 package helpers
 
 import (
-	"encoding/json"
 	"fmt"
 	"habit_notify/models"
 	"sync"
@@ -167,7 +166,7 @@ func GetHabitRecords() {
 			ImageURL: ImageUrl,
 		}
 		userPayload.Notification = paylod
-		userPayload.Token = *userDetails.FCMToken
+		userPayload.Token = userDetails.FCMToken
 		nofity = append(nofity, habitData.StartTime)
 
 		for _, t := range nofity {
@@ -240,7 +239,7 @@ func HabitNotDoneReminder() {
 		if err != nil {
 			continue
 		}
-		if err := json.Unmarshal(hbyte, &habitData); err != nil {
+		if err := bson.Unmarshal(hbyte, &habitData); err != nil {
 			continue
 		}
 
@@ -308,7 +307,7 @@ func HabitNotDoneReminder() {
 			continue
 		}
 		var message UserNotification
-		message.Token = *userDetails.FCMToken
+		message.Token = userDetails.FCMToken
 		message.Notification = &messaging.Notification{
 			Title:    fmt.Sprintf("Hey %s, Don't Forget Your Tasks!", userDetails.FirstName),
 			Body:     "You have pending tasks for today. Complete them before the day ends to stay on track! 🚀",
