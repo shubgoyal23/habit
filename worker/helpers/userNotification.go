@@ -14,6 +14,7 @@ import (
 var AllUsers map[primitive.ObjectID]models.User
 var Duration_Notify int64 = 1800 // 30 min in sec
 var NotifyMap sync.Map
+var MaxTime int64 = time.Date(2025, time.January, 1, 23, 59, 59, 59, time.UTC).Unix() //end epoch of 1 jan 2025
 
 type UserNotification struct {
 	Notification *messaging.Notification
@@ -57,7 +58,9 @@ func FilerAndSendNotifications() {
 	}()
 	utcTime := time.Now().UTC()
 	timeEpoch := time.Date(2025, time.January, 1, utcTime.Hour(), utcTime.Minute(), 0, 0, time.UTC).Add(time.Minute * 5).Unix() // 5 min ahead of current time
-
+	if timeEpoch > MaxTime {
+		timeEpoch -= 86400
+	}
 	// check if timeEpoch is in map
 	res, ok := NotifyMap.Load(timeEpoch)
 	if !ok {
@@ -87,6 +90,9 @@ func GetHabitRecords() {
 	}()
 	utcTime := time.Now().UTC().Add(time.Minute * 5) // 5 min ahead of current time
 	timeEpoch := time.Date(2025, time.January, 1, utcTime.Hour(), utcTime.Minute(), 0, 0, time.UTC).Unix()
+	if timeEpoch > MaxTime {
+		timeEpoch -= 86400
+	}
 	query := bson.M{"startTime": bson.M{"$gte": timeEpoch, "$lt": timeEpoch + Duration_Notify}, "notify": true}
 
 	docs, f := MongoGetManyDoc("habits", query)
@@ -211,6 +217,9 @@ func HabitNotDoneReminder() {
 	}()
 	utcTime := time.Now().UTC()
 	timeEpoch := time.Date(2025, time.January, 1, utcTime.Hour(), utcTime.Minute(), 0, 0, time.UTC).Add(time.Minute * 5).Unix() // 5 min ahead of current time
+	if timeEpoch > MaxTime {
+		timeEpoch -= 86400
+	}
 	dateEpoch := timeEpoch + Duration_Notify
 
 	users, f := MongoGetManyDoc("users", bson.M{"notifyTime": bson.M{"$gte": timeEpoch, "$lt": dateEpoch}})
@@ -227,7 +236,7 @@ func HabitNotDoneReminder() {
 		SetUserDetails(v)
 	}
 
-	habits, f := MongoGetManyDoc("habits", bson.M{"userID": bson.M{"$in": usersId}, "isActive": true})
+	habits, f := MongoGetManyDoc("habits", bson.M{"userId": bson.M{"$in": usersId}, "isActive": true})
 	if !f || len(habits) == 0 {
 		return
 	}
