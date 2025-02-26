@@ -19,14 +19,22 @@ const GetTimeFormated = (data) => {
 // set time of hours and minutes in epoch format based on 1 jan 2025
 // input time is in user local time zone, alone with user time zone offset in minutes
 const GetTimeEpoch = (hr, min, userOffset = 0) => {
-   const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0) / 1000; // get epoch in seconds
-   const time = Number(epoch + userOffset * 60);
-   return time; // convert user offset in minutes to seconds
+   const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0); // get epoch in seconds
+   const time = Number(epoch + userOffset * 60000);
+   const Max = Date.UTC(2025, 0, 1, 23, 59, 59, 59); // it time is grater then 1 jan make it start of 1st jan
+   if (time > Max){
+      time = time - 8640000
+   }
+   return Math.ceil(time / 1000); // convert user offset in minutes to seconds
 };
 // set time of hours and minutes in epoch format based on 1 jan 2025, 22:00
 const GetTimeZoneEpoch = (hr = 22, min = 0, userOffset = 0) => {
    const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0);
    const finaltime = Number(epoch + userOffset * 60000);
+   const Max = Date.UTC(2025, 0, 1, 23, 59, 59, 59); // it time is grater then 1 jan make it start of 1st jan
+   if (finaltime > Max){
+      finaltime = finaltime - 8640000
+   }
    return Math.ceil(finaltime / 1000);
 };
 
