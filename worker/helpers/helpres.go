@@ -12,6 +12,11 @@ import (
 var Max_userDetails_Local_storage int64 = 86400 // one day
 
 func GetUserDetails(userid primitive.ObjectID) (user models.User, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("GetUserDetails Crashed: ", r)
+		}
+	}()
 	if user, ok := AllUsers[userid]; ok {
 		if (user.Epoch + Max_userDetails_Local_storage) > time.Now().Unix() {
 			return user, nil
@@ -27,7 +32,11 @@ func GetUserDetails(userid primitive.ObjectID) (user models.User, err error) {
 	return
 }
 func SetUserDetails(userDetails bson.M) error {
-
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("SetUserDetails Crashed: ", r)
+		}
+	}()
 	byte, err := bson.Marshal(userDetails)
 	if err != nil {
 		return err

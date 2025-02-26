@@ -61,7 +61,7 @@ func MongoAddManyDoc(collection string, doc []interface{}) (f bool) {
 }
 
 // get many doc from mongo db
-func MongoGetManyDoc(collection string, filter interface{}) (doc []bson.M, f bool) {
+func MongoGetManyDoc(collection string, filter any) (doc []bson.M, f bool) {
 	doc = []bson.M{}
 	f = false
 	client := MongoConn.Database(MongoDb).Collection(collection)
@@ -104,6 +104,20 @@ func MongoUpdateManyDoc(collection string, filter, update bson.M) error {
 	client := MongoConn.Database(MongoDb).Collection(collection)
 
 	res, err := client.UpdateMany(context.TODO(), filter, update)
+	if err != nil {
+		return err
+	}
+	if res.MatchedCount != res.UpsertedCount {
+		return fmt.Errorf("matched count and updated count mismatch")
+	}
+	return nil
+}
+
+// update one docs
+func MongoUpdateOneDoc(collection string, filter, update bson.M) error {
+	client := MongoConn.Database(MongoDb).Collection(collection)
+
+	res, err := client.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
 		return err
 	}
