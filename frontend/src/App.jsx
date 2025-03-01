@@ -155,13 +155,14 @@ export default function App() {
    const [loading, setLoading] = useState(true);
 
    const LoadHabitList = async () => {
-      let lastsync = await getToken("lastsyncHL");
-      lastsync = 86400000 + lastsync;
       let hlist = await getToken("habitList");
-      if (hlist && lastsync > new Date().getTime()) {
+      if (hlist) {
          hlist = JSON.parse(hlist);
          dispatch(addListHabits(hlist));
-      } else {
+      }
+      let lastsync = await getToken("lastsyncHL");
+      lastsync = 86400000 + lastsync;
+      if (new Date().getTime() > lastsync) {
          const habitreq = await axios.get(
             `${conf.BACKEND_URL}/api/v1/steak/habit`,
             {
@@ -176,10 +177,8 @@ export default function App() {
       }
    };
    const LoadSteakList = async () => {
-      let lastsync = await getToken("lastsyncSL");
-      lastsync = 86400000 + lastsync;
       let slist = await getToken("streakList");
-      if (slist && lastsync > new Date().getTime()) {
+      if (slist) {
          slist = JSON.parse(slist);
          let keys = Object.keys(slist);
          for (let sl of keys) {
@@ -188,7 +187,10 @@ export default function App() {
                dispatch(addSteak(slist[sl][ids[i]]));
             }
          }
-      } else {
+      }
+      let lastsync = await getToken("lastsyncSL");
+      lastsync = 86400000 + lastsync;
+      if (new Date().getTime() > lastsync) {
          const steakList = await axios.post(
             `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
             { month: new Date().getMonth(), year: new Date().getFullYear() },
