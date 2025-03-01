@@ -16,12 +16,10 @@ import {
    useReactTable,
 } from "@tanstack/react-table";
 
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { addListHabits } from "@/store/HabitSlice";
-import MarkSteak from "./MarkSteak";
 import Action from "./Action";
 import { LuChevronsUpDown } from "react-icons/lu";
 import RowSelector from "./RowSelector";
@@ -32,13 +30,6 @@ import { EpochToTime } from "@/lib/helpers";
 import { getToken, setToken } from "@/lib/storeToken";
 
 const columns = [
-   {
-      id: "Status",
-      header: "Status",
-      enableSorting: false,
-      enableHiding: false,
-      cell: ({ row }) => <MarkSteak row={row} />,
-   },
    {
       accessorKey: "name",
       header: "Habit",
@@ -121,12 +112,9 @@ const columns = [
       cell: ({ row }) => <Action row={row} />,
    },
 ];
-
-function Habit() {
-   const habitList = useSelector((state) => state.habit) || [];
+function Archive() {
    const user = useSelector((state) => state.auth.loggedin);
    const [data, setData] = useState([]);
-   const dispatch = useDispatch();
    const navigate = useNavigate();
 
    const [sorting, setSorting] = useState([]);
@@ -165,37 +153,9 @@ function Habit() {
       }
    };
 
-   useEffect(() => {
-      if (!user) {
-         navigate("/login");
-      } else {
-         TableHeads();
-      }
-      if (habitList.length > 0) return;
-      let request = axios.get(`${conf.BACKEND_URL}/api/v1/steak/habit`, {
-         withCredentials: true,
-      });
-      toast.promise(request, {
-         loading: "Loading Habit List",
-         success: "successfull",
-         error: (err) =>
-            `${err.response?.data?.message || "Something went wrong"}`,
-      });
-      request
-         .then((data) => {
-            setToken("lastsyncHL", new Date().getTime());
-            dispatch(addListHabits(data?.data?.data));
-         })
-         .catch((err) => console.log(err));
-   }, []);
-
-   useEffect(() => {
-      if (!habitList) {
-         return;
-      }
-      let list = [];
-      for (let i = 0; i < habitList.length; i++) {
-         let h = { ...habitList[i] };
+   const setDisplaydata = (list) => {
+      for (let i = 0; i < list.length; i++) {
+         let h = { ...list[i] };
          if (h.startTime) {
             h.startTime = EpochToTime(h.startTime * 1000);
          }
@@ -210,19 +170,58 @@ function Habit() {
          }
          if (h.endDate) {
             h.endDate = new Date(h.endDate * 1000);
-            if (h.endDate < new Date()) {
-               continue;
-            }
          }
-         list.push(h);
+         list[i] = h;
       }
       setData(list);
-   }, [habitList]);
+   };
+
+   const getData = async () => {
+      let archdata = await getToken("HabitArchive");
+      let lastsync = await getToken("lastsyncHAL");
+      lastsync += 86400000;
+      let timeNow = new Date().getTime();
+      let list = [];
+      if (!archdata || timeNow > lastsync) {
+         let request = axios.get(
+            `${conf.BACKEND_URL}/api/v1/steak/habit-archive`,
+            {
+               withCredentials: true,
+            }
+         );
+         toast.promise(request, {
+            loading: "Loading Habit List",
+            success: "successfull",
+            error: (err) =>
+               `${err.response?.data?.message || "Something went wrong"}`,
+         });
+         request
+            .then((data) => {
+               list = data?.data?.data || [];
+               setDisplaydata(list);
+               setToken("lastsyncHAL", new Date().getTime());
+               setToken("HabitArchive", JSON.stringify(list));
+            })
+            .catch((err) => console.log(err));
+      } else {
+         list = JSON.parse(archdata) || [];
+         setDisplaydata(list);
+      }
+   };
+
+   useEffect(() => {
+      if (!user) {
+         navigate("/login");
+      } else {
+         TableHeads();
+      }
+      getData();
+   }, []);
 
    return (
       <div className="w-full p-2 md:p-6 mt-3">
          <h1 className="text-center text-xl font-semibold my-3 text-blue-500 underline underline-offset-2">
-            Habit List
+            Archived Habit List
          </h1>
          <div className="flex justify-between items-center">
             <FilterInput table={table} />
@@ -230,7 +229,7 @@ function Habit() {
          </div>
          <Table className="md:p-6 text-center border border-gray-200 rounded-md">
             <TableCaption>
-               {habitList.length === 0
+               {data.length === 0
                   ? "Add habit to see here"
                   : "A list of your Daily Habits."}
             </TableCaption>
@@ -296,12 +295,12 @@ function Habit() {
          </Table>
 
          <div className="flex justify-center mt-6">
-            <Link to={"/habit-archive"} className="text-blue-500 underline">
-               Archived Habit List
+            <Link to={"/habit-list"} className="text-blue-500 underline">
+               Habit List
             </Link>
          </div>
       </div>
    );
 }
 
-export default Habit;
+export default Archive;

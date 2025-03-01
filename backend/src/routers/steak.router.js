@@ -11,6 +11,7 @@ import {
    getTodaysHabits,
    listStreak,
    searchHabitByName,
+   listHabitArchive,
 } from "../controller/taks.controller.js";
 
 const router = Router();
@@ -25,5 +26,6 @@ router.route("/habit-d").post(verifyJwt, deleteHabit);
 router.route("/habit").patch(verifyJwt, editHabit);
 router.route("/streak-list").post(verifyJwt, listStreak);
 router.route("/habits-today").get(verifyJwt, getTodaysHabits);
+router.route("/habit-archive").get(verifyJwt, listHabitArchive);
 
 export default router;
