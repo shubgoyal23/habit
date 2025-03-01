@@ -33,6 +33,7 @@ const AddHabit = lazy(() => import("./components/Habit/AddHabit"));
 const Home = lazy(() => import("./components/Home/Home"));
 const Chat = lazy(() => import("./components/chat/chat"));
 const Navi = lazy(() => import("./components/app/Navigate"));
+const Archive = lazy(() => import("./components/Habit/Archive"));
 
 const router = createBrowserRouter([
    {
@@ -134,6 +135,14 @@ const router = createBrowserRouter([
             element: (
                <Suspense fallback={<Loader />}>
                   <TermsAndConditions />
+               </Suspense>
+            ),
+         },
+         {
+            path: "/habit-archive",
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Archive />
                </Suspense>
             ),
          },

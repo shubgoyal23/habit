@@ -15,7 +15,7 @@ import {
    FaRightFromBracket,
    FaSun,
 } from "react-icons/fa6";
-import { FaLock } from "react-icons/fa";
+import { FaLock, FaSyncAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { setTheme } from "@/store/ThemeSlice";
 import {
@@ -32,6 +32,7 @@ import { Notification } from "./Notification";
 import { EditDetails } from "./EditDetails";
 import { Support } from "./Support";
 import ShareApp from "./share";
+import { clearTokens } from "@/lib/storeToken";
 
 function Profile() {
    const userTheme = useSelector((state) => state.userTheme);
@@ -106,6 +107,13 @@ function Profile() {
                                  </SelectGroup>
                               </SelectContent>
                            </Select>
+                        </div>
+                        <div
+                           className="flex items-center space-x-2 justify-start gap-2 cursor-pointer"
+                           onClick={() => {clearTokens()}}
+                        >
+                          <FaSyncAlt />
+                           <span>Sync Data</span>
                         </div>
                         <div
                            className="flex items-center space-x-2 justify-start gap-2 cursor-pointer"

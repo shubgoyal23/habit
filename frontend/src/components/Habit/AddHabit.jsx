@@ -33,6 +33,7 @@ import Repeat from "./Repeat";
 import DateSelector from "./DateSelector";
 import TimeSelector from "./TimeSelector";
 import { EpochToDate, EpochToTime } from "@/lib/helpers";
+import { getToken } from "@/lib/storeToken";
 
 export default function AddHabit() {
    const user = useSelector((state) => state.auth.loggedin);
@@ -56,9 +57,13 @@ export default function AddHabit() {
    const [times, setTimes] = useState({});
    const [repeat, setRepeat] = useState({});
 
-   useEffect(() => {
+   const getHabitDate = async() => {
       if (id && id !== "new") {
-         const data = userData.find((item) => item._id === id);
+         let data = userData?.find((item) => item._id === id)
+         if (!data){
+            let archdata = await getToken("HabitArchive");
+            data = JSON.parse(archdata)?.find((item) => item._id === id)
+         }
          if (data) {
             setDates({
                startDate: EpochToDate(data.startDate * 1000),
@@ -72,17 +77,20 @@ export default function AddHabit() {
             setRepeat(data.frequency);
             setValue("name", data.name);
             setValue("description", data.description);
-            setValue("startDate", data.startDate); // can be set from current time or start date
-            setValue("endDate", data.endDate); // cant we less then start date
             setValue("notify", data.notify);
             setValue("duration", data.duration);
             setValue("place", data.place);
             setValue("how", data.how);
             setValue("ifthen", data.ifthen);
             setValue("point", data.point); // 1 to 10 , also called priority
-            setValue("type", data.type); // TODO, NavigateHabit, PositiveHabit
+            setType(data.habitType)
          }
+
       }
+   }
+
+   useEffect(() => {
+      getHabitDate()
    }, [userData]);
 
    useEffect(() => {
@@ -143,7 +151,7 @@ export default function AddHabit() {
          });
          addHAbit
             .then((data) => {
-               dispatch(editHabit(data.data.data));
+               dispatch(addHabit(data.data.data));
                navigate("/habit-list");
             })
             .catch((err) => console.log(err));

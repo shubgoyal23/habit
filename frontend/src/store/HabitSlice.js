@@ -10,7 +10,17 @@ const habitSlice = createSlice({
          return action.payload;
       },
       addHabit(state, action) {
-         state.push(action.payload);
+         const habitIdx = state.indexOf((item) => {
+            if (item._id === action.payload._id) {
+               return true;
+            }
+            return false;
+         });
+         if (habitIdx == -1) {
+            state.push(action.payload);
+         } else {
+            state[habitIdx] = action.payload;
+         }
          setToken("habitList", JSON.stringify(state));
       },
       deleteHabit(state, action) {

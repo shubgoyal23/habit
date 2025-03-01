@@ -22,8 +22,8 @@ const GetTimeEpoch = (hr, min, userOffset = 0) => {
    const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0); // get epoch in seconds
    const time = Number(epoch + userOffset * 60000);
    const Max = Date.UTC(2025, 0, 1, 23, 59, 59, 59); // it time is grater then 1 jan make it start of 1st jan
-   if (time > Max){
-      time = time - 8640000
+   if (time > Max) {
+      time = time - 8640000;
    }
    return Math.ceil(time / 1000); // convert user offset in minutes to seconds
 };
@@ -32,8 +32,8 @@ const GetTimeZoneEpoch = (hr = 22, min = 0, userOffset = 0) => {
    const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0);
    const finaltime = Number(epoch + userOffset * 60000);
    const Max = Date.UTC(2025, 0, 1, 23, 59, 59, 59); // it time is grater then 1 jan make it start of 1st jan
-   if (finaltime > Max){
-      finaltime = finaltime - 8640000
+   if (finaltime > Max) {
+      finaltime = finaltime - 8640000;
    }
    return Math.ceil(finaltime / 1000);
 };
@@ -530,6 +530,15 @@ const SearchHabitByName = async (data) => {
    return new ApiResponse(200, list, "Habit fetched successfully");
 };
 
+const ListHabitArchive = async (data) => {
+   const dateTodayEpoch = GetUTCDateEpoch(new Date(), data?.user?.timeZone);
+   const list = await Habit.find({
+      userId: data.user._id,
+      endDate: { $lte: dateTodayEpoch },
+   });
+   return new ApiResponse(200, list, "habit archive fetched successfully");
+};
+
 export {
    GetTimeFormated,
    GetTimeEpoch,
@@ -545,4 +554,5 @@ export {
    GetSteakListAll,
    GetTodaysHabits,
    SearchHabitByName,
+   ListHabitArchive,
 };
