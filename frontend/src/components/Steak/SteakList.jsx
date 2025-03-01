@@ -33,7 +33,18 @@ const monthsName = [
    "November",
    "December",
 ];
-const DateToday = new Date();
+const datenow = new Date()
+const DateToday = new Date(
+   Date.UTC(
+      datenow.getFullYear(),
+      datenow.getMonth(),
+      datenow.getDate(),
+      12,
+      0,
+      0,
+      0
+   )
+)
 
 function Steak() {
    const dispatch = useDispatch();
@@ -83,11 +94,11 @@ function Steak() {
    const daysInMonth = (m) => {
       const days = [31, 28, 31, 30, 31, 31, 30, 31, 30, 31, 30, 31];
       if (m == 1) {
-         year / 400
+         year % 400 == 0
             ? (days[1] = 29)
-            : year / 100
+            : year % 100 == 0
             ? (days[1] = 28)
-            : year / 4
+            : year % 4 == 0
             ? (days[1] = 29)
             : (days[1] = 28);
       }
@@ -95,90 +106,60 @@ function Steak() {
    };
 
    const checkDate = (data, index) => {
-      const indexDate = new Date(year, month, index + 1);
+      const utcdate = Date.UTC(year, month, index + 1, 12, 0, 0, 0);
+      const indexDate = new Date(utcdate);
       const StartDate = new Date(data.startDate * 1000);
-      if (indexDate > DateToday) {
+      if (indexDate > DateToday || indexDate < StartDate) {
          return null;
       }
+
+      let list = streakList[`${month}-${year}`];
+      let done = false;
+      if (list) {
+         if (list[data._id]) {
+            let check = list[data._id]?.daysCompleted.includes(index + 1);
+            if (check) {
+               done = true;
+            }
+            let checkFreez = list[data._id]?.daysCompleted.includes(
+               index + 101
+            );
+            if (checkFreez) {
+               return (
+                  <div className="size-6 m-auto flex justify-center items-center">
+                     <PiFireFill className="size-6 text-blue-500" />
+                  </div>
+               );
+            }
+         }
+      }
+
+      if (data.habitType == "negative") {
+         done = !done;
+      }
+
       if (
          StartDate.getDate() === indexDate.getDate() &&
          StartDate.getMonth() === indexDate.getMonth() &&
          StartDate.getFullYear() === indexDate.getFullYear()
       ) {
          return (
-            <div className="bg-yellow-400 m-auto size-6 rounded-md flex justify-center items-center font-bold">
-               S
+            <div
+               className={`${
+                  done ? "text-green-500" : "text-red-500"
+               } m-auto size-6 rounded-md flex justify-center items-center font-bold`}
+            >
+               Start
             </div>
          );
-      }
-      if (indexDate < StartDate || indexDate > DateToday) {
-         return null;
-      }
-      if (!streakList[`${month}-${year}`])
-         switch (data.habitType) {
-            case "regular":
-               return (
-                  <div className="size-6 m-auto flex justify-center items-center">
-                     <SlClose className="size-6 text-red-500" />
-                  </div>
-               );
-            case "negative":
-               return (
-                  <div className="size-6 m-auto flex justify-center items-center">
-                     <FaRegCheckCircle className="size-6 text-green-500" />
-                  </div>
-               );
-         }
-      if (!streakList[`${month}-${year}`][data?._id]) {
-         switch (data.habitType) {
-            case "regular":
-               return (
-                  <div className="size-6 m-auto flex justify-center items-center">
-                     <SlClose className="size-6 text-red-500" />
-                  </div>
-               );
-            case "negative":
-               return (
-                  <div className="size-6 m-auto flex justify-center items-center">
-                     <FaRegCheckCircle className="size-6 text-green-500" />
-                  </div>
-               );
-         }
-      }
-
-      let check = streakList[`${month}-${year}`][
-         data._id
-      ]?.daysCompleted.includes(index + 1);
-      let checkFreez = streakList[`${month}-${year}`][
-         data._id
-      ]?.daysCompleted.includes(index + 101);
-
-      if (checkFreez) {
-         return (
-            <div className="size-6 m-auto flex justify-center items-center">
-               <PiFireFill className="size-6 text-blue-500" />
-            </div>
-         );
-      }
-      if (check) {
-         switch (data.habitType) {
-            case "regular":
-               return (
-                  <div className="size-6 m-auto flex justify-center items-center">
-                     <FaRegCheckCircle className="size-6 text-green-500" />
-                  </div>
-               );
-            case "negative":
-               return (
-                  <div className="size-6 m-auto flex justify-center items-center">
-                     <SlClose className="size-6 text-red-500" />
-                  </div>
-               );
-         }
       }
       return (
          <div className="size-6 m-auto flex justify-center items-center">
-            <SlClose className="size-6 text-red-500" />
+            {done ? (
+               <FaRegCheckCircle className="size-6 text-green-500" />
+            ) : (
+               <SlClose className="size-6 text-red-500" />
+            )}
          </div>
       );
    };
