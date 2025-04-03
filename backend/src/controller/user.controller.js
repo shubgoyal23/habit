@@ -143,7 +143,7 @@ const loginUser = asyncHandler(async (req, res) => {
    if (finduser.thirdPartyLogin) {
       throw new ApiError(
          403,
-         `Login with ${finduser.thirdPartyInfo.provider} to continue`
+         `You are registered with ${finduser.thirdPartyLogin} account. Please login with ${finduser.thirdPartyLogin} account`
       );
    }
 
@@ -352,7 +352,7 @@ const refreshToken = asyncHandler(async (req, res) => {
       "_id firstName lastName refreshToken accessToken"
    );
 
-   if (!user && !(user.refreshToken === token)) {
+   if (!user && !(user?.refreshToken === token)) {
       throw new ApiError(401, "User not found");
    }
 
