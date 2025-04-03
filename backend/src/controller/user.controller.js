@@ -210,7 +210,7 @@ const loginUserGoogle = asyncHandler(async (req, res) => {
    if (!finduser) {
       finduser = await User.create({
          email,
-         firstName: payload?.family_name,
+         firstName: payload?.given_name,
          lastName: payload?.family_name,
          picture: payload?.picture,
          timeZone,
