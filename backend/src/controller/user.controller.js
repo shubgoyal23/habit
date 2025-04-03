@@ -10,6 +10,7 @@ import { Device } from "../models/device.mdel.js";
 import { Feedback } from "../models/feedback.js";
 import { Streak } from "../models/Streak.model.js";
 import { GetTimeZoneEpoch } from "../helpers/task.helpers.js";
+import { OAuth2Client } from "google-auth-library";
 
 const generateAccessTokenAndRefresToken = async (id) => {
    try {
@@ -139,6 +140,12 @@ const loginUser = asyncHandler(async (req, res) => {
          "Email Not Verified, Please verify your email to login"
       );
    }
+   if (finduser.thirdPartyLogin) {
+      throw new ApiError(
+         403,
+         `Login with ${finduser.thirdPartyInfo.provider} to continue`
+      );
+   }
 
    const checkpass = await finduser.checkPassword(password);
 
@@ -155,6 +162,84 @@ const loginUser = asyncHandler(async (req, res) => {
       maxAge: 864000000,
    };
 
+   let user = {};
+   user._id = finduser._id;
+   user.firstName = finduser.firstName;
+   user.lastName = finduser.lastName;
+   user.notify = finduser.notify;
+   user.notifyTime = finduser.notifyTime;
+   user.refreshToken = refreshToken;
+   user.accessToken = accessToken;
+
+   return res
+      .status(200)
+      .cookie("accessToken", accessToken, options)
+      .cookie("refreshToken", refreshToken, options)
+      .json(new ApiResponse(200, user, "User Logged in successfully"));
+});
+const loginUserGoogle = asyncHandler(async (req, res) => {
+   const { token, timeZone } = req.body;
+
+   if (!token) {
+      throw new ApiError(401, "Tokein is required to Login");
+   }
+   const client = new OAuth2Client(
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+      process.env.GOOGLE_REDIRECT_URI
+   );
+
+   const { tokens } = await client.getToken({
+      code: token,
+      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+   });
+
+   if (!tokens) {
+      throw new ApiError(403, "User not found, check Email id or register one");
+   }
+   client.setCredentials(tokens);
+
+   const userInfo = await client.request({
+      url: "https://www.googleapis.com/oauth2/v2/userinfo",
+   });
+
+   let payload = userInfo.data;
+   const email = payload?.email;
+
+   let finduser = await User.findOne({ email });
+   if (!finduser) {
+      finduser = await User.create({
+         email,
+         firstName: payload?.family_name,
+         lastName: payload?.family_name,
+         picture: payload?.picture,
+         timeZone,
+         isActive: true,
+         notify: true,
+         notifyTime: GetTimeZoneEpoch(22, 0, timeZone),
+         thirdPartyLogin: true,
+         thirdPartyInfo: {
+            provider: "Google",
+            uid: payload?.id,
+         },
+      });
+   }
+
+   if (!finduser.isActive) {
+      throw new ApiError(
+         403,
+         "Email Not Verified, Please verify your email to login"
+      );
+   }
+
+   const { refreshToken, accessToken } =
+      await generateAccessTokenAndRefresToken(finduser._id);
+
+   const options = {
+      httpOnly: true,
+      secure: true,
+      maxAge: 864000000,
+   };
    let user = {};
    user._id = finduser._id;
    user.firstName = finduser.firstName;
@@ -451,4 +536,5 @@ export {
    VerifyOtp,
    ResendOtp,
    FeedbackForm,
+   loginUserGoogle,
 };

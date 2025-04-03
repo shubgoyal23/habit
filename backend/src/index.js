@@ -11,6 +11,5 @@ app.listen(port, () => {
 });
 connectDb()
    .then((res) => {
-     
    })
    .catch((error) => console.log(error));
