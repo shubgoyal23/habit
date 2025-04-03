@@ -24,6 +24,7 @@ import {
    RegisterForNotifications,
    sendFcmTokenToServer,
 } from "@/lib/notification";
+import GoogleLoginApp from "./GoogleLogin";
 
 export default function Login() {
    const [showPass, setShowPass] = useState(false);
@@ -66,6 +67,30 @@ export default function Login() {
       const login = axios.post(`${conf.BACKEND_URL}/api/v1/users/login`, data, {
          withCredentials: true,
       });
+
+      toast.promise(login, {
+         loading: "Loading",
+         success: "Login successfull",
+         error: (err) =>
+            `${err.response?.data?.message || "Something went wrong"}`,
+      });
+      login
+         .then((data) => {
+            dispatch(authlogin(data.data.data));
+            AppSpecific(data.data.data);
+            navigate("/");
+         })
+         .catch((err) => console.log(err));
+   };
+   const LoginWithGoogle = (data) => {
+      const token = data?.token;
+      const login = axios.post(
+         `${conf.BACKEND_URL}/api/v1/users/login-google`,
+         { token, timeZone: new Date().getTimezoneOffset()},
+         {
+            withCredentials: true,
+         }
+      );
 
       toast.promise(login, {
          loading: "Loading",
@@ -128,6 +153,7 @@ export default function Login() {
                      <Button className="w-full" type="submit">
                         Login
                      </Button>
+                     <GoogleLoginApp LoginWithGoogle={LoginWithGoogle} />
                   </div>
                </form>
                <CardFooter className="p-0 pt-1 justify-between">

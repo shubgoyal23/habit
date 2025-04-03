@@ -23,7 +23,6 @@ const userSchema = new mongoose.Schema(
       },
       password: {
          type: String,
-         required: true,
       },
       username: {
          type: String,
@@ -43,6 +42,16 @@ const userSchema = new mongoose.Schema(
          type: Number,
          default: 5,
       },
+      thirdPartyLogin: {
+         type: Boolean,
+         default: false,
+      },
+      thirdPartyInfo: {
+         type: { provider: String, uid: String },
+         default: {},
+         _id: false,
+      },
+      picture: String,
    },
    { timestamps: true }
 );
