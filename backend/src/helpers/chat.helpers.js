@@ -20,7 +20,7 @@ import {
 
 dotenv.config();
 const model = new ChatOpenAI({
-   model: "google/gemini-2.0-pro-exp-02-05:free",
+   model: "google/gemini-2.5-pro-exp-03-25:free",
 });
 
 // const llmWithTools = model.bindTools([create]);
@@ -38,14 +38,15 @@ const toolsByName = Object.fromEntries(tools.map((tool) => [tool.name, tool]));
 const llmWithTools = model.bindTools(tools);
 
 async function llmCall(state) {
+   const {messages} = state
    // LLM decides whether to call a tool or not
    const result = await llmWithTools.invoke([
       {
          role: "system",
          content:
-            "You are a habit management assistant responsible for managing habits using available tools. Only ask for the details which are required to complete a task, you can skip optionals feilds.",
+            "You are a habit management assistant responsible for managing habits using available tools. Only ask for the details which are required to complete a task, Do Not ask for details in optionals feilds. Note that Never ask user for user object containing _id and timeZone.",
       },
-      ...state.messages,
+      ...messages,
    ]);
    return {
       messages: [result],
@@ -61,7 +62,7 @@ async function toolNode(state) {
          const tool = toolsByName[toolCall.name];
          const observation = await tool.invoke({
             ...toolCall.args,
-            user: state.user,
+            user: { _id: state.user._id.toString(), timeZone: state.user.timeZone },
          });
          results.push(
             new ToolMessage({
@@ -97,11 +98,10 @@ const ChatAgent = new StateGraph(StateWithUser)
    .addNode("llmCall", llmCall)
    .addNode("tools", toolNode)
    .addEdge("__start__", "llmCall")
+   .addEdge("tools", "llmCall")
    .addConditionalEdges("llmCall", shouldContinue, {
       Action: "tools",
       __end__: "__end__",
    })
-   .addEdge("tools", "llmCall")
    .compile();
-
-export { ChatAgent };
+   export { ChatAgent };

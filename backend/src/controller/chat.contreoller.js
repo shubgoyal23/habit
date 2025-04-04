@@ -18,7 +18,7 @@ const chat = asyncHandler(async (req, res) => {
    }
    const result = await ChatAgent.invoke({
       messages: messages,
-      user: { _id: req.user._id, timeZone: req.user.timeZone },
+      user: { _id: req.user._id.toString(), timeZone: req.user.timeZone },
    });
    const lastMessage = result.messages.at(-1);
    if (lastMessage instanceof AIMessage) {
