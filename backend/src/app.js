@@ -4,9 +4,22 @@ import cookieParser from "cookie-parser";
 import { ApiError } from "./utils/ApiError.js";
 import dotenv from "dotenv";
 import connectDb from "./db/connectDb.js";
+import rateLimit from "express-rate-limit";
+import { ApiResponse } from "./utils/ApiResposne.js";
+
+
 dotenv.config();
 
 const app = express();
+
+const limiter = rateLimit({
+   windowMs: 60 * 60 * 1000,
+   limit: 30,
+   standardHeaders: "draft-8",
+   legacyHeaders: false,
+});
+app.use(limiter);
+
 app.use(
    cors({ origin: process.env.CORS_ORIGIN.split(";"), credentials: true })
 );
@@ -18,7 +31,7 @@ import userRouter from "./routers/user.router.js";
 import steakRouter from "./routers/steak.router.js";
 import chatRouter from "./routers/chat.router.js";
 import appRouter from "./routers/app.router.js";
-import { ApiResponse } from "./utils/ApiResposne.js";
+import NotesRouter from "./routers/note.router.js";
 
 app.get("/ping", (req, res) => {
    res.send("pong");
@@ -35,6 +48,7 @@ app.use("/api/v1/users", userRouter);
 app.use("/api/v1/steak", steakRouter);
 app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/app", appRouter);
+app.use("/api/v1/notes", NotesRouter);
 
 app.use((err, req, res, next) => {
    if (err instanceof ApiError) {

@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { RxAvatar } from "react-icons/rx";
 import MarkSteak from "../Habit/MarkSteak";
 import { GetHabitDueToday } from "@/lib/helpers";
+import NotesBox from "../Notes/NotesBox";
 
 function Home() {
    const loggedin = useSelector((state) => state.auth.loggedin);
@@ -47,8 +48,9 @@ function Home() {
                      className="space-y-1 p-2 pl-3 flex justify-start items-center gap-5"
                   >
                      <MarkSteak row={{ original: item }} />
-                     <div className="flex flex-1 items-center justify-start bg-black/10 dark:bg-white/10 rounded-lg py-4 px-2">
+                     <div className="flex flex-1 items-center justify-between bg-black/10 dark:bg-white/10 rounded-lg py-4 px-2">
                         <span>{item.name}</span>
+                        <NotesBox habitId={item?._id} date={dateToday} />
                      </div>
                   </div>
                ))}
