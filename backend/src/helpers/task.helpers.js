@@ -3,13 +3,14 @@ import { Habit } from "../models/habit.model.js";
 import { Streak } from "../models/Streak.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Redisclient as RedisConn } from "../db/redis.js";
-import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResposne.js";
+
 // format time of type 13:00, return hours and minutes
 const GetTimeFormated = (data) => {
+   data = data?.trim().toLowerCase().replace("am", "").replace("pm", "").trim();
    let startTime = data?.split(":");
    if (startTime.length < 2) {
-      return;
+      return [0, 0];
    }
    let hours = Number(startTime[0]);
    let minutes = Number(startTime[1]);
@@ -20,7 +21,7 @@ const GetTimeFormated = (data) => {
 // input time is in user local time zone, alone with user time zone offset in minutes
 const GetTimeEpoch = (hr, min, userOffset = 0) => {
    const epoch = Date.UTC(2025, 0, 1, hr, min, 0, 0); // get epoch in seconds
-   const time = Number(epoch + userOffset * 60000);
+   let time = Number(epoch + userOffset * 60000);
    const Max = Date.UTC(2025, 0, 1, 23, 59, 59, 59); // it time is grater then 1 jan make it start of 1st jan
    if (time > Max) {
       time = time - 8640000;
@@ -74,6 +75,7 @@ const Createhabit = async (data) => {
       habitType,
       notify,
    } = data;
+
    if (!name) {
       return new ApiError(401, "Name Feild is Reqired");
    }
@@ -119,6 +121,7 @@ const Createhabit = async (data) => {
          endDate = startDate + duration * 60;
          break;
       default:
+         habitType = "regular";
          startDate = GetUTCDateEpoch(startDate, data?.user?.timeZone);
          if (endDate) {
             endDate = GetUTCDateEpoch(endDate, data?.user?.timeZone);
