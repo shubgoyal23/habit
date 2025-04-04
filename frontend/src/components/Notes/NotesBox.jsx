@@ -22,6 +22,7 @@ import toast from "react-hot-toast";
 import { getToken } from "@/lib/storeToken";
 
 function NotesBox({ habitId, date }) {
+   if (!habitId || !date) return null;
    const d = new Date(date);
    const sDate = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
    const note = useSelector((state) => state.note);
@@ -68,15 +69,14 @@ function NotesBox({ habitId, date }) {
                `${err.response?.data?.message || "Something went wrong"}`,
          });
          req.then((data) => {
-            if (data.statusCode == 200) {
-               dispatch(
-                  AddNote({
-                     id: habitId,
-                     date: sDate,
-                     notesData: { _id: data._id, note: data.note },
-                  })
-               );
-            }
+            let itemdata = data.data.data;
+            dispatch(
+               AddNote({
+                  id: habitId,
+                  date: sDate,
+                  notesData: { _id: itemdata._id, note: itemdata.note },
+               })
+            );
          }).catch((err) => console.log(err));
       }
    };
@@ -98,9 +98,9 @@ function NotesBox({ habitId, date }) {
             `${err.response?.data?.message || "Something went wrong"}`,
       });
       req.then((data) => {
-         if (data.statusCode == 200) {
-            dispatch(DeleteNote({ id: habitId, date: sDate }));
-         }
+         dispatch(DeleteNote({ id: habitId, date: sDate }));
+         setWriteNotes("");
+         setNotes(null);
       }).catch((err) => console.log(err));
    };
 

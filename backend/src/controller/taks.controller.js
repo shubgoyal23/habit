@@ -66,7 +66,9 @@ const listHabit = asyncHandler(async (req, res) => {
    if (data instanceof ApiError) {
       throw data;
    }
-   return res.status(200).json(data);
+   return res
+      .status(200)
+      .json(new ApiResponse(200, data, "habit list fetched successfully"));
 });
 
 const listStreak = asyncHandler(async (req, res) => {
