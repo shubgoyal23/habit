@@ -7,6 +7,7 @@ import connectDb from "./db/connectDb.js";
 import rateLimit from "express-rate-limit";
 import { ApiResponse } from "./utils/ApiResposne.js";
 
+
 dotenv.config();
 
 const app = express();
@@ -18,18 +19,10 @@ const limiter = rateLimit({
    legacyHeaders: false,
 });
 app.use(limiter);
-var whitelist = process.env.CORS_ORIGIN.split(",");
-var corsOptions = {
-   origin: function (origin, callback) {
-      if (whitelist.indexOf(origin) !== -1) {
-         callback(null, true);
-      } else {
-         callback(new Error("Not allowed by CORS"));
-      }
-   },
-   credentials: true,
-};
-app.use(cors(corsOptions));
+
+app.use(
+   cors({ origin: process.env.CORS_ORIGIN.split(","), credentials: true })
+);
 app.use(cookieParser());
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
