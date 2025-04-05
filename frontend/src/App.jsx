@@ -35,6 +35,7 @@ const Home = lazy(() => import("./components/Home/Home"));
 const Chat = lazy(() => import("./components/chat/chat"));
 const Navi = lazy(() => import("./components/app/Navigate"));
 const Archive = lazy(() => import("./components/Habit/Archive"));
+const Timmer = lazy(() => import("./components/Timer/Timer"));
 
 const router = createBrowserRouter([
    {
@@ -147,6 +148,14 @@ const router = createBrowserRouter([
                </Suspense>
             ),
          },
+         {
+            path: "/timer",
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Timmer />
+               </Suspense>
+            ),
+         },
       ],
    },
 ]);
@@ -162,7 +171,7 @@ export default function App() {
          dispatch(addListHabits(hlist));
       }
       let lastsync = await getToken("lastsyncHL");
-      lastsync = 86400000 + lastsync;
+      lastsync = 1 * 24 * 60 * 60 * 1000 + lastsync;
       if (new Date().getTime() > lastsync) {
          const habitreq = await axios.get(
             `${conf.BACKEND_URL}/api/v1/steak/habit`,
@@ -190,7 +199,7 @@ export default function App() {
          }
       }
       let lastsync = await getToken("lastsyncSL");
-      lastsync = 86400000 + lastsync;
+      lastsync = 1 * 24 * 60 * 60 * 1000 + lastsync;
       if (new Date().getTime() > lastsync) {
          const steakList = await axios.post(
             `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
@@ -215,39 +224,43 @@ export default function App() {
          const noteslist = JSON.parse(notes);
          if (noteslist) {
             dispatch(LoadNotes(noteslist));
-            return;
          }
       }
+      let lastsync = await getToken("lastsyncNotes");
+      lastsync = 1 * 24 * 60 * 60 * 1000 + lastsync;
       let date = new Date();
-      let sDate = date.getMonth() + "-" + date.getFullYear();
-      const req = axios.post(
-         `${conf.BACKEND_URL}/api/v1/notes/list-month`,
-         {
-            fulldate: sDate,
-         },
-         {
-            withCredentials: true,
-         }
-      );
-      req.then((data) => {
-         const noteslist = data.data.data;
-         if (noteslist.length > 0) {
-            for (let i = 0; i < noteslist.length; i++) {
-               let dataitem = noteslist[i];
-               dispatch(
-                  AddNote({
-                     id: dataitem.habitId,
-                     date: dataitem.date,
-                     month: sDate,
-                     notesData: {
-                        _id: dataitem._id,
-                        note: dataitem.note,
-                     },
-                  })
-               );
+      if (date.getTime() > lastsync) {
+         let sDate = date.getMonth() + "-" + date.getFullYear();
+         const req = axios.post(
+            `${conf.BACKEND_URL}/api/v1/notes/list-month`,
+            {
+               fulldate: sDate,
+            },
+            {
+               withCredentials: true,
             }
-         }
-      }).catch((err) => console.log(err));
+         );
+         req.then((data) => {
+            setToken("lastsyncNotes", new Date().getTime());
+            const noteslist = data.data.data;
+            if (noteslist.length > 0) {
+               for (let i = 0; i < noteslist.length; i++) {
+                  let dataitem = noteslist[i];
+                  dispatch(
+                     AddNote({
+                        id: dataitem.habitId,
+                        date: dataitem.date,
+                        month: sDate,
+                        notesData: {
+                           _id: dataitem._id,
+                           note: dataitem.note,
+                        },
+                     })
+                  );
+               }
+            }
+         }).catch((err) => console.log(err));
+      }
    };
 
    const checkUser = async () => {

@@ -107,7 +107,7 @@ function NotesBox({ habitId, date }) {
       <div>
          <AlertDialog>
             <AlertDialogTrigger>
-               <Pencil1Icon />
+               <Pencil1Icon className="w-5 h-5" />
             </AlertDialogTrigger>
             <AlertDialogContent>
                <AlertDialogHeader>

@@ -5,6 +5,7 @@ import { RxAvatar } from "react-icons/rx";
 import MarkSteak from "../Habit/MarkSteak";
 import { GetHabitDueToday } from "@/lib/helpers";
 import NotesBox from "../Notes/NotesBox";
+import { RiTimerLine } from "react-icons/ri";
 
 function Home() {
    const loggedin = useSelector((state) => state.auth.loggedin);
@@ -50,7 +51,16 @@ function Home() {
                      <MarkSteak row={{ original: item }} />
                      <div className="flex flex-1 items-center justify-between bg-black/10 dark:bg-white/10 rounded-lg py-4 px-2">
                         <span>{item.name}</span>
-                        <NotesBox habitId={item?._id} date={dateToday} />
+                        <div className="flex gap-2">
+                           <NotesBox habitId={item?._id} date={dateToday} />
+                           <RiTimerLine
+                              onClick={() =>
+                                 navigate(
+                                    `/timer?id=${item?._id}&min=${item?.duration}`
+                                 )
+                              }
+                           />
+                        </div>
                      </div>
                   </div>
                ))}
