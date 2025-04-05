@@ -9,7 +9,6 @@ import {
 } from "../ui/card";
 import {
    FaCircleExclamation,
-   FaCreditCard,
    FaDesktop,
    FaMoon,
    FaRightFromBracket,
@@ -40,6 +39,12 @@ function Profile() {
    const navigate = useNavigate();
    const handeltheme = (e) => {
       dispatch(setTheme(e));
+   };
+
+   const syncHandler = () => {
+      clearTokens();
+      navigate("/");
+      window.location.reload();
    };
    return (
       <div className="w-full flex justify-center items-center">
@@ -110,9 +115,9 @@ function Profile() {
                         </div>
                         <div
                            className="flex items-center space-x-2 justify-start gap-2 cursor-pointer"
-                           onClick={() => {clearTokens()}}
+                           onClick={syncHandler}
                         >
-                          <FaSyncAlt />
+                           <FaSyncAlt />
                            <span>Sync Data</span>
                         </div>
                         <div

@@ -30,7 +30,16 @@ function Home() {
          <div className="w-full flex justify-between items-center m-0 px-2 mt-4">
             <h2 className="m-0 text-lg font-bold">Hello, {user?.firstName}!</h2>
             <Link to="/profile" className="md:hidden">
-               <RxAvatar className="w-6 h-6" />
+               <div className="w-6 h-6">
+                  {user?.picture ? (
+                     <img
+                        src={user?.picture}
+                        className="w-full h-full rounded-full"
+                     />
+                  ) : (
+                     <RxAvatar className="w-6 h-6" />
+                  )}
+               </div>
             </Link>
          </div>
          <div className="w-full flex justify-between items-center m-0 px-2">
