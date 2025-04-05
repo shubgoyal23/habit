@@ -11,6 +11,7 @@ import { Feedback } from "../models/feedback.js";
 import { Streak } from "../models/Streak.model.js";
 import { GetTimeZoneEpoch } from "../helpers/task.helpers.js";
 import { OAuth2Client } from "google-auth-library";
+import { userDataRemoveSensitiveData } from "../helpers/user.helpers.js";
 
 const generateAccessTokenAndRefresToken = async (id) => {
    try {
@@ -159,15 +160,11 @@ const loginUser = asyncHandler(async (req, res) => {
    const options = {
       httpOnly: true,
       secure: true,
-      maxAge: 864000000,
+      maxAge: 365 * 24 * 60 * 60 * 1000,
    };
 
-   let user = {};
-   user._id = finduser._id;
-   user.firstName = finduser.firstName;
-   user.lastName = finduser.lastName;
-   user.notify = finduser.notify;
-   user.notifyTime = finduser.notifyTime;
+   let user = userDataRemoveSensitiveData(finduser);
+
    user.refreshToken = refreshToken;
    user.accessToken = accessToken;
 
@@ -238,7 +235,7 @@ const loginUserGoogle = asyncHandler(async (req, res) => {
    const options = {
       httpOnly: true,
       secure: true,
-      maxAge: 864000000,
+      maxAge: 365 * 24 * 60 * 60 * 1000,
    };
    let user = {};
    user._id = finduser._id;
@@ -325,16 +322,9 @@ const logoutUser = asyncHandler(async (req, res) => {
 });
 
 const currentUser = asyncHandler(async (req, res) => {
-   let user = {
-      _id: req.user._id,
-      firstName: req.user.firstName,
-      lastName: req.user.lastName,
-      notify: req.user.notify,
-      notifyTime: req.user.notifyTime,
-   };
    return res
       .status(200)
-      .json(new ApiResponse(200, user, "User fetched successfully"));
+      .json(new ApiResponse(200, req.user, "User fetched successfully"));
 });
 
 const refreshToken = asyncHandler(async (req, res) => {
@@ -348,9 +338,7 @@ const refreshToken = asyncHandler(async (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
    );
 
-   const user = await User.findById(decodedToken._id)?.select(
-      "_id firstName lastName refreshToken accessToken"
-   );
+   const user = await User.findById(decodedToken._id)
 
    if (!user && !(user?.refreshToken === token)) {
       throw new ApiError(401, "User not found");
@@ -359,19 +347,21 @@ const refreshToken = asyncHandler(async (req, res) => {
    const { refreshToken, accessToken } =
       await generateAccessTokenAndRefresToken(user._id);
 
-   user.accessToken = accessToken;
-   user.refreshToken = refreshToken;
+   let userData = userDataRemoveSensitiveData(user);
+
+   userData.accessToken = accessToken;
+   userData.refreshToken = refreshToken;
    const options = {
       httpOnly: true,
       secure: true,
-      maxAge: 864000000,
+      maxAge: 365 * 24 * 60 * 60 * 1000,
    };
 
    return res
       .status(200)
       .cookie("accessToken", accessToken, options)
       .cookie("refreshToken", refreshToken, options)
-      .json(new ApiResponse(200, user, "Tokens Renewed successfully"));
+      .json(new ApiResponse(200, userData, "Tokens Renewed successfully"));
 });
 
 const editUserDetails = asyncHandler(async (req, res) => {
@@ -388,12 +378,14 @@ const editUserDetails = asyncHandler(async (req, res) => {
       throw new ApiError(500, "user details update failed");
    }
 
+   const user = userDataRemoveSensitiveData(updateuser);
+
    return res
       .status(200)
       .json(
          new ApiResponse(
             200,
-            { _id: id, firstName, lastName, notify, notifyTime },
+            user,
             "Account details updated successfully"
          )
       );

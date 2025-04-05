@@ -159,7 +159,13 @@ function NotesBox({ habitId, date }) {
                         placeholder="Add Notes"
                         rows={4}
                         value={writeNotes}
-                        onChange={(e) => setWriteNotes(e.target.value)}
+                        onChange={(e) => {
+                           let data = e.target.value;
+                           if (data.length > 150) {
+                              return;
+                           }
+                           setWriteNotes(data)
+                        }}
                      />
                   </AlertDialogDescription>
                </AlertDialogHeader>
