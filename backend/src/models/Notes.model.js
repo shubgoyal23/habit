@@ -16,7 +16,7 @@ const NoteSchema = new mongoose.Schema({
    year: Number,
    note: {
       type: String,
-      maxlength: 1000,
+      maxlength: 150,
    },
 });
 

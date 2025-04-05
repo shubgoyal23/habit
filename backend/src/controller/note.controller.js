@@ -10,6 +10,10 @@ const AddNote = asyncHandler(async (req, res) => {
       throw new ApiError(401, "all fields are required");
    }
 
+   if (note.length > 150) {
+      throw new ApiError(401, "note is too long");
+   }
+
    let datesplit = fulldate.split("-");
    let date = Number(datesplit[0]);
    let month = Number(datesplit[1]);

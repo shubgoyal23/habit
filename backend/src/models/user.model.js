@@ -48,10 +48,17 @@ const userSchema = new mongoose.Schema(
       },
       thirdPartyInfo: {
          type: { provider: String, uid: String },
-         default: {},
          _id: false,
       },
       picture: String,
+      habitsAllowed: {
+         type: Number,
+         default: 10,
+      },
+      totalActiveHabits: {
+         type: Number,
+         default: 0,
+      },
    },
    { timestamps: true }
 );

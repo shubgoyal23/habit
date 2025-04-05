@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/ApiError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
+import { userDataRemoveSensitiveData } from "../helpers/user.helpers.js";
 
 export const verifyJwt = asyncHandler(async (req, res, next) => {
    try {
@@ -16,11 +17,9 @@ export const verifyJwt = asyncHandler(async (req, res, next) => {
          process.env.ACCESS_TOKEN_SECRET
       );
 
-      const user = await User.findById(decodedToken._id)?.select(
-         "_id firstName lastName email habitSkip timeZone notify notifyTime"
-      );
+      const user = await User.findById(decodedToken._id);
 
-      req.user = user;
+      req.user = userDataRemoveSensitiveData(user);
       next();
    } catch (error) {
       throw new ApiError(401, "user not loggedin");
