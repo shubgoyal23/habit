@@ -198,12 +198,12 @@ function Steak() {
                   : "A list of your Daily Habits."}
             </TableCaption>
             <TableHeader className="bg-violet-50 dark:bg-gray-950">
-               <TableRow>
-                  <TableHead className="w-[100px]">Day/ Habit</TableHead>
+               <TableRow className="text-sm">
+                  <TableHead className="max-w-5 overflow-x-scroll text-center">Day/ Habit</TableHead>
                   {habitList.map((item) => {
                      if (item.habitType != "todo") {
                         return (
-                           <TableHead key={item._id} className="w-[100px]">
+                           <TableHead key={item._id} className="max-w-10 text-center overflow-x-scroll">
                               {item.name}
                            </TableHead>
                         );
