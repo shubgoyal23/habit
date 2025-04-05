@@ -172,7 +172,7 @@ export default function AddHabit() {
                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                   {/* habit type */}
                   <div>
-                     <Label htmlFor="type">Habit Type</Label>
+                     <Label className="mb-2" htmlFor="type">Habit Type</Label>
                      <div className="grid grid-cols-3 gap-2">
                         <span
                            className={`${
@@ -240,7 +240,7 @@ export default function AddHabit() {
                   </div>
                   {/* habit name */}
                   <div>
-                     <Label htmlFor="name">Habit Name</Label>
+                     <Label className="mb-2" htmlFor="name">Habit Name</Label>
                      <Input
                         id="name"
                         placeholder="Read Book"
@@ -297,7 +297,7 @@ export default function AddHabit() {
                      </div>
                      <CollapsibleContent className="space-y-2 mt-2">
                         <div className="">
-                           <Label htmlFor="description">Description</Label>
+                           <Label className="mb-2" htmlFor="description">Description</Label>
                            <Textarea
                               id="description"
                               placeholder="Read Book Daily for 15 min in Morning"
@@ -308,7 +308,7 @@ export default function AddHabit() {
 
                         <div className="flex gap-2 items-center justify-between">
                            <div>
-                              <Label htmlFor="place">Place</Label>
+                              <Label className="mb-2" htmlFor="place">Place</Label>
                               <Input
                                  id="place"
                                  placeholder="Bed Room"
@@ -317,7 +317,7 @@ export default function AddHabit() {
                               />
                            </div>
                            <div>
-                              <Label htmlFor="point">Importance</Label>
+                              <Label className="mb-2" htmlFor="point">Importance</Label>
                               <Input
                                  id="point"
                                  placeholder="2"
@@ -328,7 +328,7 @@ export default function AddHabit() {
                         </div>
 
                         <div className="space-y-2">
-                           <Label htmlFor="how">How you will do it</Label>
+                           <Label className="mb-2" htmlFor="how">How you will do it</Label>
                            <Input
                               id="how"
                               placeholder="Morning just befor Tea/Coffee"
@@ -337,7 +337,7 @@ export default function AddHabit() {
                            />
                         </div>
                         <div className="space-y-2">
-                           <Label htmlFor="ifthen">If not done then?</Label>
+                           <Label className="mb-2" htmlFor="ifthen">If not done then?</Label>
                            <Input
                               id="ifthen"
                               type="text"
@@ -357,7 +357,7 @@ export default function AddHabit() {
                               setNotify((prev) => !prev);
                            }}
                         />
-                        <Label htmlFor="notify" className="ml-2">
+                        <Label className="mb-2 ml-2" htmlFor="notify">
                            Send reminder to do the task
                         </Label>
                      </div>

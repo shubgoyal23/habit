@@ -9,7 +9,7 @@ function DateSelector({ dates, setDates, type }) {
    return (
       <div className="flex gap-2 items-center justify-between">
          <div className="flex-1">
-            <Label htmlFor="startTime">Start Date</Label>
+            <Label className="mb-2" htmlFor="startTime">Start Date</Label>
             <Popover>
                <PopoverTrigger asChild>
                   <Button
@@ -39,7 +39,7 @@ function DateSelector({ dates, setDates, type }) {
          </div>
          {type !== "todo" && (
             <div className="flex-1">
-               <Label htmlFor="startTime">End Date</Label>
+               <Label className="mb-2" htmlFor="startTime">End Date</Label>
                <Popover>
                   <PopoverTrigger asChild>
                      <Button

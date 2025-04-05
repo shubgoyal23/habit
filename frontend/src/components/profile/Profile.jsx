@@ -43,7 +43,7 @@ function Profile() {
    };
    return (
       <div className="w-full flex justify-center items-center">
-         <Card className="mx-auto max-w-sm">
+         <Card className="mx-auto w-sm">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Profile</CardTitle>
                <CardDescription>
