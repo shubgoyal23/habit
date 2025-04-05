@@ -20,6 +20,7 @@ import { setTheme } from "./store/ThemeSlice";
 import { addListHabits } from "./store/HabitSlice";
 import { addSteak } from "./store/StreakSlice";
 import { getToken, setToken } from "./lib/storeToken";
+import { AddNote, LoadNotes } from "./store/NoteSlice";
 
 const Privacy = lazy(() => import("./components/etc/Privacy"));
 const TermsAndConditions = lazy(() =>
@@ -208,6 +209,47 @@ export default function App() {
       }
    };
 
+   const LoadNotesForMonth = async () => {
+      const notes = await getToken("notes");
+      if (notes) {
+         const noteslist = JSON.parse(notes);
+         if (noteslist) {
+            dispatch(LoadNotes(noteslist));
+            return;
+         }
+      }
+      let date = new Date();
+      let sDate = date.getMonth() + "-" + date.getFullYear();
+      const req = axios.post(
+         `${conf.BACKEND_URL}/api/v1/notes/list-month`,
+         {
+            fulldate: sDate,
+         },
+         {
+            withCredentials: true,
+         }
+      );
+      req.then((data) => {
+         const noteslist = data.data.data;
+         if (noteslist.length > 0) {
+            for (let i = 0; i < noteslist.length; i++) {
+               let dataitem = noteslist[i];
+               dispatch(
+                  AddNote({
+                     id: dataitem.habitId,
+                     date: dataitem.date,
+                     month: sDate,
+                     notesData: {
+                        _id: dataitem._id,
+                        note: dataitem.note,
+                     },
+                  })
+               );
+            }
+         }
+      }).catch((err) => console.log(err));
+   };
+
    const checkUser = async () => {
       await SetTokenToAxios();
       let storeData = null;
@@ -250,6 +292,7 @@ export default function App() {
       if (loggedIn) {
          LoadHabitList();
          LoadSteakList();
+         LoadNotesForMonth();
       }
    };
 
