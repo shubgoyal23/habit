@@ -91,7 +91,7 @@ function Profile() {
                            )}
                            <Select className="p-1" onValueChange={handeltheme}>
                               <SelectTrigger
-                                 className="p-1 border-none outline-none"
+                                 className="p-1 border-none outline-none flex-1"
                                  variant="none"
                               >
                                  <SelectValue placeholder="Select a Theme" />

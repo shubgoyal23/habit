@@ -4,6 +4,7 @@ import { Streak } from "../models/Streak.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Redisclient as RedisConn } from "../db/redis.js";
 import { ApiResponse } from "../utils/ApiResposne.js";
+import { User } from "../models/user.model.js";
 
 // format time of type 13:00, return hours and minutes
 const GetTimeFormated = (data) => {
@@ -75,6 +76,13 @@ const Createhabit = async (data) => {
       habitType,
       notify,
    } = data;
+
+   if (data?.user?.habitsAllowed < data?.user?.totalActiveHabits) {
+      throw new ApiError(
+         401,
+         "Habit limit reached, Delete some habits to add more"
+      );
+   }
 
    if (!name) {
       return new ApiError(401, "Name Feild is Reqired");
@@ -192,6 +200,9 @@ const Createhabit = async (data) => {
       await ConnectRedis();
       await RedisConn.sAdd("AllHabitLists", createUserHabit._id.toString());
    }
+   await User.findByIdAndUpdate(data.user._id, {
+      $inc: { habitCount: 1 },
+   });
 
    return new ApiResponse(200, createUserHabit, "Habit Added Successfully");
 };
@@ -355,6 +366,12 @@ const DeleteHabit = async (data) => {
    await Streak.deleteMany({
       habitId: id,
    });
+
+   if (del.isActive) {
+      await User.findByIdAndUpdate(data.user._id, {
+         $inc: { habitCount: -1 },
+      });
+   }
 
    // remove habit from redis
    await ConnectRedis();

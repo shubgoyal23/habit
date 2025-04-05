@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema(
          type: Number,
          default: 10,
       },
-      totalActiveHabits: {
+      habitCount: {
          type: Number,
          default: 0,
       },

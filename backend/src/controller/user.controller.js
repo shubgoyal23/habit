@@ -11,7 +11,7 @@ import { Feedback } from "../models/feedback.js";
 import { Streak } from "../models/Streak.model.js";
 import { GetTimeZoneEpoch } from "../helpers/task.helpers.js";
 import { OAuth2Client } from "google-auth-library";
-import { userDataRemoveSensitiveData } from "../helpers/user.helpers.js";
+import { userDataRemoveSensitiveData } from "../helpers/helpers.js";
 
 const generateAccessTokenAndRefresToken = async (id) => {
    try {

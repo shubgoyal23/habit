@@ -22,9 +22,6 @@ const addHabit = asyncHandler(async (req, res) => {
    if (data instanceof ApiError) {
       throw data;
    }
-   if (data instanceof ApiError) {
-      throw data;
-   }
    return res.status(200).json(data);
 });
 
