@@ -7,20 +7,26 @@ const noteSlice = createSlice({
    reducers: {
       AddNote(state, action) {
          if (!action.payload) return;
-         if (!state[action.payload.id]) state[action.payload.id] = {};
          const date = action.payload.date;
-         state[action.payload.id][date] = action.payload.notesData;
+         const month = action.payload.month;
+         if (!state[month]) state[month] = {};
+         if (!state[month][action.payload.id])
+            state[month][action.payload.id] = {};
+         state[month][action.payload.id][date] = action.payload.notesData;
          setToken("notes", JSON.stringify(state));
       },
       DeleteNote(state, action) {
          if (!action.payload) return;
-         delete state[action.payload.id][action.payload.date];
+         delete state[action.payload.month][action.payload.id][
+            action.payload.date
+         ];
          setToken("notes", JSON.stringify(state));
       },
       LoadNotes(state, action) {
          if (!action.payload) return;
-         state[action.payload.id] = action.payload;
-      }
+         state = action.payload;
+         return state;
+      },
    },
 });
 

@@ -19,12 +19,12 @@ import { AddNote, DeleteNote, LoadNotes } from "@/store/NoteSlice";
 import { conf } from "@/conf/conf";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { getToken } from "@/lib/storeToken";
 
 function NotesBox({ habitId, date }) {
    if (!habitId || !date) return null;
    const d = new Date(date);
-   const sDate = `${d.getDate()}-${d.getMonth()}-${d.getFullYear()}`;
+   const sDate = `${d.getDate()}`;
+   const mDate = `${d.getMonth()}-${d.getFullYear()}`;
    const note = useSelector((state) => state.note);
    const [Notes, setNotes] = React.useState("");
    const [writeNotes, setWriteNotes] = React.useState("");
@@ -32,14 +32,12 @@ function NotesBox({ habitId, date }) {
 
    useEffect(() => {
       if (date) {
-         if (note?.[habitId]?.[sDate]) {
-            setNotes(note[habitId][sDate]);
-            setWriteNotes(note[habitId][sDate].note);
-         } else {
-            GetNotesForDate();
+         if (note?.[mDate]?.[habitId]?.[sDate]) {
+            setNotes(note?.[mDate]?.[habitId]?.[sDate]);
+            setWriteNotes(note?.[mDate]?.[habitId]?.[sDate]?.note);
          }
       }
-   }, [note?.[habitId]?.[sDate]]);
+   }, [note?.[mDate]?.[habitId]?.[sDate]]);
 
    const HandleRequest = async () => {
       if (!writeNotes || writeNotes != Notes?.note) {
@@ -55,7 +53,7 @@ function NotesBox({ habitId, date }) {
             `${conf.BACKEND_URL}/api/v1/notes`,
             {
                habitId,
-               fulldate: sDate,
+               fulldate: sDate + "-" + mDate,
                note: writeNotes,
             },
             {
@@ -74,6 +72,7 @@ function NotesBox({ habitId, date }) {
                AddNote({
                   id: habitId,
                   date: sDate,
+                  month: mDate,
                   notesData: { _id: itemdata._id, note: itemdata.note },
                })
             );
@@ -98,49 +97,9 @@ function NotesBox({ habitId, date }) {
             `${err.response?.data?.message || "Something went wrong"}`,
       });
       req.then((data) => {
-         dispatch(DeleteNote({ id: habitId, date: sDate }));
+         dispatch(DeleteNote({ id: habitId, date: sDate, month: mDate }));
          setWriteNotes("");
          setNotes(null);
-      }).catch((err) => console.log(err));
-   };
-
-   const GetNotesForDate = async () => {
-      const notes = await getToken("notes");
-      if (notes) {
-         const noteslist = JSON.parse(notes);
-         if (noteslist?.[habitId]) {
-            setNotes(noteslist[habitId][sDate]);
-            setWriteNotes(noteslist[habitId][sDate].note);
-            dispatch(LoadNotes(noteslist[habitId]));
-            return;
-         }
-      }
-      const req = axios.post(
-         `${conf.BACKEND_URL}/api/v1/notes/list`,
-         {
-            fulldate: sDate,
-         },
-         {
-            withCredentials: true,
-         }
-      );
-      req.then((data) => {
-         const noteslist = data.data.data;
-         if (noteslist.length > 0) {
-            for (let i = 0; i < noteslist.length; i++) {
-               let dataitem = noteslist[i];
-               dispatch(
-                  AddNote({
-                     id: dataitem.habitId,
-                     date: sDate,
-                     notesData: {
-                        _id: dataitem._id,
-                        note: dataitem.note,
-                     },
-                  })
-               );
-            }
-         }
       }).catch((err) => console.log(err));
    };
 
@@ -164,7 +123,7 @@ function NotesBox({ habitId, date }) {
                            if (data.length > 150) {
                               return;
                            }
-                           setWriteNotes(data)
+                           setWriteNotes(data);
                         }}
                      />
                   </AlertDialogDescription>

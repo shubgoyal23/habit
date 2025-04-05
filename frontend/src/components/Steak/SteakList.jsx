@@ -18,6 +18,13 @@ import { addSteak } from "@/store/StreakSlice";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { SlClose } from "react-icons/sl";
 import { PiFireFill } from "react-icons/pi";
+import {
+   HoverCard,
+   HoverCardContent,
+   HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { MdOutlineNoteAlt } from "react-icons/md";
+import { AddNote } from "@/store/NoteSlice";
 
 const monthsName = [
    "January",
@@ -33,7 +40,7 @@ const monthsName = [
    "November",
    "December",
 ];
-const datenow = new Date()
+const datenow = new Date();
 const DateToday = new Date(
    Date.UTC(
       datenow.getFullYear(),
@@ -44,12 +51,13 @@ const DateToday = new Date(
       0,
       0
    )
-)
+);
 
 function Steak() {
    const dispatch = useDispatch();
    const navigate = useNavigate();
    const user = useSelector((state) => state.auth.loggedin);
+   const notesData = useSelector((state) => state.note);
    const habitList = useSelector((state) => state.habit) || [];
    const streakList = useSelector((state) => state.streak) || [];
    const [month, setMonth] = useState(new Date().getMonth());
@@ -74,6 +82,11 @@ function Steak() {
    }, []);
 
    useEffect(() => {
+      handleNextMonth();
+      LoadNotesForMonth();
+   }, [month, year]);
+
+   const handleNextMonth = () => {
       if (streakList[`${month}-${year}`]) return;
       axios
          .post(
@@ -89,7 +102,41 @@ function Steak() {
             }
          })
          .catch((err) => console.log(err));
-   }, [month, year]);
+   };
+
+   const LoadNotesForMonth = async () => {
+      let sDate = `${month}-${year}`;
+      if (notesData[sDate]) return;
+
+      const req = axios.post(
+         `${conf.BACKEND_URL}/api/v1/notes/list-month`,
+         {
+            fulldate: sDate,
+         },
+         {
+            withCredentials: true,
+         }
+      );
+      req.then((data) => {
+         const noteslist = data.data.data;
+         if (noteslist.length > 0) {
+            for (let i = 0; i < noteslist.length; i++) {
+               let dataitem = noteslist[i];
+               dispatch(
+                  AddNote({
+                     id: dataitem.habitId,
+                     date: dataitem.date,
+                     month: sDate,
+                     notesData: {
+                        _id: dataitem._id,
+                        note: dataitem.note,
+                     },
+                  })
+               );
+            }
+         }
+      }).catch((err) => console.log(err));
+   };
 
    const daysInMonth = (m) => {
       const days = [31, 28, 31, 30, 31, 31, 30, 31, 30, 31, 30, 31];
@@ -153,6 +200,23 @@ function Steak() {
             </div>
          );
       }
+      let note = notesData?.[`${month}-${year}`]?.[data._id]?.[index + 1];
+      if (note) {
+         return (
+            <HoverCard>
+               <HoverCardTrigger>
+                  <div className="size-6 m-auto flex justify-center items-center">
+                     {done ? (
+                        <MdOutlineNoteAlt className="size-6 text-green-500" />
+                     ) : (
+                        <MdOutlineNoteAlt className="size-6 text-red-500" />
+                     )}
+                  </div>
+               </HoverCardTrigger>
+               <HoverCardContent>{note.note}</HoverCardContent>
+            </HoverCard>
+         );
+      }
       return (
          <div className="size-6 m-auto flex justify-center items-center">
             {done ? (
@@ -199,11 +263,16 @@ function Steak() {
             </TableCaption>
             <TableHeader className="bg-violet-50 dark:bg-gray-950">
                <TableRow className="text-sm">
-                  <TableHead className="max-w-5 overflow-x-scroll text-center">Day/ Habit</TableHead>
+                  <TableHead className="max-w-5 overflow-x-scroll text-center">
+                     Day/ Habit
+                  </TableHead>
                   {habitList.map((item) => {
                      if (item.habitType != "todo") {
                         return (
-                           <TableHead key={item._id} className="max-w-10 text-center overflow-x-scroll">
+                           <TableHead
+                              key={item._id}
+                              className="max-w-10 text-center overflow-x-scroll"
+                           >
                               {item.name}
                            </TableHead>
                         );
