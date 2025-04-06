@@ -26,16 +26,22 @@ type User struct {
 	TimeZone   int32              `json:"timeZone,omitempty" bson:"timeZone,omitempty"`
 	NotifyTime int64              `json:"notifyTime,omitempty" bson:"notifyTime,omitempty"`
 	Epoch      int64              // for local usages
-	// LastName     string             `json:"lastName" bson:"lastName"`
-	// Email        string             `json:"email" bson:"email" validate:"required,email,unique"`
-	// Username     string             `json:"username" bson:"username" validate:"required,unique"`
-	// IsActive     *bool              `json:"isActive,omitempty" bson:"isActive,omitempty"`
-	// Phone        *string            `json:"phone,omitempty" bson:"phone,omitempty"`
-	// PhoneDetails *PhoneDetail       `json:"phoneDetails,omitempty" bson:"phoneDetails,omitempty"`
-	// RefreshToken *string            `json:"refreshToken,omitempty" bson:"refreshToken,omitempty"`
-	// Password     string             `json:"password" bson:"password" validate:"required"`
-	// CreatedAt    time.Time          `json:"createdAt" bson:"createdAt"`
-	// UpdatedAt    time.Time          `json:"updatedAt" bson:"updatedAt"`
+
+	// HabitSkip     int          `json:"habitSkip,omitempty" bson:"habitSkip,omitempty"`
+	// HabitsAllowed int          `json:"habitsAllowed,omitempty" bson:"habitsAllowed,omitempty"`
+	// HabitCount    int          `json:"habitCount" bson:"habitCount"`
+	// LastStreak    int          `json:"lastStreak" bson:"lastStreak"`
+	// StreakCount   int          `json:"streakCount" bson:"streakCount"`
+	// LastName      string       `json:"lastName" bson:"lastName"`
+	// Email         string       `json:"email" bson:"email" validate:"required,email,unique"`
+	// Username      string       `json:"username" bson:"username" validate:"required,unique"`
+	// IsActive      *bool        `json:"isActive,omitempty" bson:"isActive,omitempty"`
+	// Phone         *string      `json:"phone,omitempty" bson:"phone,omitempty"`
+	// PhoneDetails  *PhoneDetail `json:"phoneDetails,omitempty" bson:"phoneDetails,omitempty"`
+	// RefreshToken  *string      `json:"refreshToken,omitempty" bson:"refreshToken,omitempty"`
+	// Password      string       `json:"password" bson:"password" validate:"required"`
+	// CreatedAt     time.Time    `json:"createdAt" bson:"createdAt"`
+	// UpdatedAt     time.Time    `json:"updatedAt" bson:"updatedAt"`
 }
 
 // Nested struct for phone details

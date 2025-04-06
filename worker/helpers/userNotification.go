@@ -340,6 +340,21 @@ func InactiveHabits() {
 	}()
 	utcTime := time.Now().Add(time.Hour * -24).UTC().Unix()
 	filter := bson.M{"endDate": bson.M{"$lt": utcTime}, "isActive": true}
+	ids, f := MongoGetManyDoc("habits", filter)
+	if !f {
+		return
+	}
+	for _, v := range ids {
+		var habit models.Habit
+		byte, err := bson.Marshal(v)
+		if err != nil {
+			continue
+		}
+		if err := bson.Unmarshal(byte, &habit); err != nil {
+			continue
+		}
+		MongoUpdateOneDoc("users", bson.M{"_id": habit.UserID}, bson.M{"$inc": bson.M{"habitCount": -1}})
+	}
 	update := bson.M{"$set": bson.M{"isActive": false}}
 	if err := MongoUpdateManyDoc("habits", filter, update); err != nil {
 		return

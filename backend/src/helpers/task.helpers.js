@@ -32,7 +32,7 @@ const Createhabit = async (data) => {
       notify,
    } = data;
 
-   if (data?.user?.habitsAllowed < data?.user?.totalActiveHabits) {
+   if (data?.user?.habitsAllowed < data?.user?.habitCount) {
       throw new ApiError(
          401,
          "Habit limit reached, Delete some habits to add more"
@@ -185,6 +185,17 @@ const EditHabit = async (data) => {
       throw new ApiError(401, "Habit Id is Reqired");
    }
    const habit = await Habit.findById(id);
+   if (!habit.isActive) {
+      if (data?.user?.habitsAllowed < data?.user?.habitCount) {
+         throw new ApiError(
+            401,
+            "Habit limit reached, Archive or Delete some habits to add more"
+         );
+      }
+      await User.findByIdAndUpdate(data.user._id, {
+         $inc: { habitCount: 1 },
+      });
+   }
 
    if (!habit || habit.userId == data.user._id) {
       throw new ApiError(403, "Habit with Id not found for this user");
@@ -296,6 +307,7 @@ const EditHabit = async (data) => {
          ifthen: ifthen,
          point: point,
          notify: notify,
+         isActive: true,
       },
       { new: true }
    );

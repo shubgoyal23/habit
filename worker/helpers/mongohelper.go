@@ -107,7 +107,8 @@ func MongoUpdateManyDoc(collection string, filter, update bson.M) error {
 	if err != nil {
 		return err
 	}
-	if res.MatchedCount != res.UpsertedCount {
+	total := res.ModifiedCount + res.UpsertedCount
+	if res.MatchedCount != total {
 		return fmt.Errorf("matched count and updated count mismatch")
 	}
 	return nil
