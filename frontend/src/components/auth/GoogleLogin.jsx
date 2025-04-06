@@ -16,7 +16,6 @@ function GoogleLoginApp({ LoginWithGoogle }) {
 function GoogleLoginAppaa({ LoginWithGoogle }) {
    const login = useGoogleLogin({
       onSuccess: (codeResponse) => {
-         // console.log(codeResponse);
          LoginWithGoogle({ token: codeResponse.code });
       },
       flow: "auth-code",

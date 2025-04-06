@@ -109,7 +109,7 @@ export default function Login() {
 
    return (
       <div className="w-full flex justify-center items-center my-10">
-         <Card className="mx-auto max-w-sm">
+         <Card className="mx-auto max-w-sm w-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Login</CardTitle>
                <CardDescription>
