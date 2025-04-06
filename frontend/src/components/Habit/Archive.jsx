@@ -16,7 +16,7 @@ import {
    useReactTable,
 } from "@tanstack/react-table";
 
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
@@ -28,6 +28,7 @@ import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
 import { EpochToTime } from "@/lib/helpers";
 import { getToken, setToken } from "@/lib/storeToken";
+import { addListArchives } from "@/store/ArchiveSlice";
 
 const columns = [
    {
@@ -114,8 +115,10 @@ const columns = [
 ];
 function Archive() {
    const user = useSelector((state) => state.auth.loggedin);
+   const archivelist = useSelector((state) => state.archive);
    const [data, setData] = useState([]);
    const navigate = useNavigate();
+   const dispatch = useDispatch();
 
    const [sorting, setSorting] = useState([]);
    const [columnVisibility, setColumnVisibility] = useState({});
@@ -136,6 +139,10 @@ function Archive() {
       onColumnFiltersChange: setColumnFilters,
    });
 
+   useEffect(() => {
+      setDisplaydata(archivelist);
+   }, [archivelist]);
+
    const TableHeads = async () => {
       let tableItems = await getToken("tableItems");
       if (!tableItems) {
@@ -154,6 +161,7 @@ function Archive() {
    };
 
    const setDisplaydata = (list) => {
+      let data = [];
       for (let i = 0; i < list.length; i++) {
          let h = { ...list[i] };
          if (h.startTime) {
@@ -171,12 +179,15 @@ function Archive() {
          if (h.endDate) {
             h.endDate = new Date(h.endDate * 1000);
          }
-         list[i] = h;
+         data[i] = h;
       }
-      setData(list);
+      setData(data);
    };
 
    const getData = async () => {
+      if (archivelist.length > 0) {
+         return;
+      }
       let archdata = await getToken("HabitArchive");
       let lastsync = await getToken("lastsyncHAL");
       lastsync += 86400000;
@@ -198,14 +209,13 @@ function Archive() {
          request
             .then((data) => {
                list = data?.data?.data || [];
-               setDisplaydata(list);
                setToken("lastsyncHAL", new Date().getTime());
-               setToken("HabitArchive", JSON.stringify(list));
+               dispatch(addListArchives(list));
             })
             .catch((err) => console.log(err));
       } else {
          list = JSON.parse(archdata) || [];
-         setDisplaydata(list);
+         dispatch(addListArchives(list));
       }
    };
 

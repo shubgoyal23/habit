@@ -33,7 +33,7 @@ import Repeat from "./Repeat";
 import DateSelector from "./DateSelector";
 import TimeSelector from "./TimeSelector";
 import { EpochToDate, EpochToTime } from "@/lib/helpers";
-import { getToken } from "@/lib/storeToken";
+import { deleteArchive } from "@/store/ArchiveSlice";
 
 export default function AddHabit() {
    const user = useSelector((state) => state.auth.loggedin);
@@ -42,6 +42,7 @@ export default function AddHabit() {
    const navigate = useNavigate();
 
    const userData = useSelector((state) => state.habit) || [];
+   const userDataArchive = useSelector((state) => state.archive) || [];
    const {
       register,
       handleSubmit,
@@ -56,13 +57,14 @@ export default function AddHabit() {
    const [dates, setDates] = useState({});
    const [times, setTimes] = useState({});
    const [repeat, setRepeat] = useState({});
+   const [isArchived, setIsArchived] = useState(false);
 
-   const getHabitDate = async() => {
+   const getHabitDate = async () => {
       if (id && id !== "new") {
-         let data = userData?.find((item) => item._id === id)
-         if (!data){
-            let archdata = await getToken("HabitArchive");
-            data = JSON.parse(archdata)?.find((item) => item._id === id)
+         let data = userData?.find((item) => item._id === id);
+         if (!data) {
+            data = userDataArchive?.find((item) => item._id === id);
+            setIsArchived(true);
          }
          if (data) {
             setDates({
@@ -83,14 +85,13 @@ export default function AddHabit() {
             setValue("how", data.how);
             setValue("ifthen", data.ifthen);
             setValue("point", data.point); // 1 to 10 , also called priority
-            setType(data.habitType)
+            setType(data.habitType);
          }
-
       }
-   }
+   };
 
    useEffect(() => {
-      getHabitDate()
+      getHabitDate();
    }, [userData]);
 
    useEffect(() => {
@@ -151,7 +152,12 @@ export default function AddHabit() {
          });
          addHAbit
             .then((data) => {
-               dispatch(addHabit(data.data.data));
+               if (isArchived) {
+                  dispatch(deleteArchive(id));
+                  dispatch(addHabit(data.data.data));
+               } else {
+                  dispatch(editHabit(data.data.data));
+               }
                navigate("/habit-list");
             })
             .catch((err) => console.log(err));
@@ -172,7 +178,9 @@ export default function AddHabit() {
                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                   {/* habit type */}
                   <div>
-                     <Label className="mb-2" htmlFor="type">Habit Type</Label>
+                     <Label className="mb-2" htmlFor="type">
+                        Habit Type
+                     </Label>
                      <div className="grid grid-cols-3 gap-2">
                         <span
                            className={`${
@@ -240,7 +248,9 @@ export default function AddHabit() {
                   </div>
                   {/* habit name */}
                   <div>
-                     <Label className="mb-2" htmlFor="name">Habit Name</Label>
+                     <Label className="mb-2" htmlFor="name">
+                        Habit Name
+                     </Label>
                      <Input
                         id="name"
                         placeholder="Read Book"
@@ -297,7 +307,9 @@ export default function AddHabit() {
                      </div>
                      <CollapsibleContent className="space-y-2 mt-2">
                         <div className="">
-                           <Label className="mb-2" htmlFor="description">Description</Label>
+                           <Label className="mb-2" htmlFor="description">
+                              Description
+                           </Label>
                            <Textarea
                               id="description"
                               placeholder="Read Book Daily for 15 min in Morning"
@@ -308,7 +320,9 @@ export default function AddHabit() {
 
                         <div className="flex gap-2 items-center justify-between">
                            <div>
-                              <Label className="mb-2" htmlFor="place">Place</Label>
+                              <Label className="mb-2" htmlFor="place">
+                                 Place
+                              </Label>
                               <Input
                                  id="place"
                                  placeholder="Bed Room"
@@ -317,7 +331,9 @@ export default function AddHabit() {
                               />
                            </div>
                            <div>
-                              <Label className="mb-2" htmlFor="point">Importance</Label>
+                              <Label className="mb-2" htmlFor="point">
+                                 Importance
+                              </Label>
                               <Input
                                  id="point"
                                  placeholder="2"
@@ -328,7 +344,9 @@ export default function AddHabit() {
                         </div>
 
                         <div className="space-y-2">
-                           <Label className="mb-2" htmlFor="how">How you will do it</Label>
+                           <Label className="mb-2" htmlFor="how">
+                              How you will do it
+                           </Label>
                            <Input
                               id="how"
                               placeholder="Morning just befor Tea/Coffee"
@@ -337,7 +355,9 @@ export default function AddHabit() {
                            />
                         </div>
                         <div className="space-y-2">
-                           <Label className="mb-2" htmlFor="ifthen">If not done then?</Label>
+                           <Label className="mb-2" htmlFor="ifthen">
+                              If not done then?
+                           </Label>
                            <Input
                               id="ifthen"
                               type="text"

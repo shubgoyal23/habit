@@ -4,6 +4,7 @@ import HabitSlice from "./HabitSlice";
 import streakSlice from "./StreakSlice";
 import themeSlice from "./ThemeSlice";
 import noteSlice from "./NoteSlice";
+import archiveSlice from "./ArchiveSlice";
 
 export const store = configureStore({
    reducer: {
@@ -12,5 +13,6 @@ export const store = configureStore({
       streak: streakSlice,
       userTheme: themeSlice,
       note: noteSlice,
+      archive: archiveSlice,
    },
 });

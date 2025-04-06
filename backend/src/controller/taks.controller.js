@@ -13,6 +13,7 @@ import {
    GetTodaysHabits,
    SearchHabitByName,
    ListHabitArchive,
+   ArchiveHabit,
 } from "../helpers/task.helpers.js";
 import { ApiError } from "../utils/ApiError.js";
 
@@ -36,6 +37,13 @@ const editHabit = asyncHandler(async (req, res) => {
 
 const deleteHabit = asyncHandler(async (req, res) => {
    const data = await DeleteHabit({ ...req.body, user: req.user });
+   if (data instanceof ApiError) {
+      throw data;
+   }
+   return res.status(200).json(data);
+});
+const archiveHabit = asyncHandler(async (req, res) => {
+   const data = await ArchiveHabit({ ...req.body, user: req.user });
    if (data instanceof ApiError) {
       throw data;
    }
@@ -117,4 +125,5 @@ export {
    getSteakListAll,
    searchHabitByName,
    listHabitArchive,
+   archiveHabit
 };

@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import toast from "react-hot-toast";
 import { conf } from "@/conf/conf";
+import { addArchive } from "@/store/ArchiveSlice";
 
 function Action({ row }) {
    const dispatch = useDispatch();
@@ -44,6 +45,27 @@ function Action({ row }) {
    };
    const editHabitHandler = async (id) => {
       navigate(`/habit/${id}`);
+   };
+   const ArchiveHabit = async (id) => {
+      let delhabt = axios.post(
+         `${conf.BACKEND_URL}/api/v1/steak/habit-a`,
+         { id },
+         {
+            withCredentials: true,
+         }
+      );
+      toast.promise(delhabt, {
+         loading: "Archiving habit..",
+         success: "Archived successfull",
+         error: (err) =>
+            `${err.response?.data?.message || "Something went wrong"}`,
+      });
+      delhabt
+         .then((data) => {
+            dispatch(deleteHabit(id));
+            dispatch(addArchive(habit));
+         })
+         .catch((err) => console.log(err));
    };
 
    const duplicateHabit = () => {
@@ -88,11 +110,16 @@ function Action({ row }) {
             <DropdownMenuItem onClick={() => editHabitHandler(habit._id)}>
                Edit Habit
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => deleteHabitHandler(habit._id)}>
-               Delete Habit
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => duplicateHabit()}>
                Duplicate Habit
+            </DropdownMenuItem>
+            {habit.isActive && (
+               <DropdownMenuItem onClick={() => ArchiveHabit(habit._id)}>
+                  Archive Habit
+               </DropdownMenuItem>
+            )}
+            <DropdownMenuItem onClick={() => deleteHabitHandler(habit._id)}>
+               Delete Habit
             </DropdownMenuItem>
          </DropdownMenuContent>
       </DropdownMenu>

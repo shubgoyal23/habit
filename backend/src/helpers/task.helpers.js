@@ -319,6 +319,27 @@ const EditHabit = async (data) => {
    return new ApiResponse(200, updatedHabit, "Habit updated Successfully");
 };
 
+const ArchiveHabit = async (data) => {
+   const { id } = data;
+   if (!id) {
+      throw new ApiError(401, "id is Reqired");
+   }
+
+   const arc = await Habit.findOneAndUpdate(
+      { _id: id, userId: data.user._id },
+      {
+         isActive: false,
+      }
+   );
+   if (!arc) {
+      throw new ApiError(401, "Habit Archive Failed, try again later");
+   }
+   await User.findByIdAndUpdate(data.user._id, {
+      $inc: { habitCount: -1 },
+   });
+
+   return new ApiResponse(200, {}, "Habit Archived Successfully");
+};
 const DeleteHabit = async (data) => {
    const { id } = data;
    if (!id) {
@@ -518,10 +539,9 @@ const SearchHabitByName = async (data) => {
 };
 
 const ListHabitArchive = async (data) => {
-   const dateTodayEpoch = GetUTCDateEpoch(getUserTime(data?.user?.timeZone));
    const list = await Habit.find({
       userId: data.user._id,
-      endDate: { $lte: dateTodayEpoch },
+      isActive: false,
    });
    return new ApiResponse(200, list, "habit archive fetched successfully");
 };
@@ -542,4 +562,5 @@ export {
    GetTodaysHabits,
    SearchHabitByName,
    ListHabitArchive,
+   ArchiveHabit
 };
