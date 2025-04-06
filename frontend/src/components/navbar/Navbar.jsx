@@ -68,7 +68,7 @@ function Navbar() {
                            className={({ isActive }) =>
                               `${
                                  isActive ? "text-violet-800" : ""
-                              } flex flex-col-reverse md:flex-row items-center justify-center md:gap-1 transition-all duration-500`
+                              } flex flex-col-reverse md:flex-row items-center justify-center text-center md:gap-1 transition-all duration-500`
                            }
                            to={item.to}
                         >
@@ -82,7 +82,7 @@ function Navbar() {
                         className={({ isActive }) =>
                            `${
                               isActive ? "font-bold text-violet-800" : ""
-                           } hidden md:flex flex-col-reverse md:flex-row items-center justify-center md:gap-1`
+                           } hidden md:flex flex-col-reverse md:flex-row items-center justify-center text-center md:gap-1`
                         }
                         to={"/profile"}
                      >
