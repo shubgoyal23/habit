@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { addSteak } from "@/store/StreakSlice";
 import { RxSpeakerLoud, RxSpeakerOff } from "react-icons/rx";
+import notificationSound from "../../resources/timer_notify.mp3";
 
 function useQuery() {
    return new URLSearchParams(useLocation().search);
@@ -33,7 +34,7 @@ function Timer() {
       min: min || 25,
       sec: sec || 0,
    });
-   const audio = new Audio("/alarm.mp3");
+   const audio = new Audio(notificationSound);
    const [tune, setTune] = useState(true);
    const intervalRef = React.useRef(null);
 
@@ -43,7 +44,6 @@ function Timer() {
       if (done && id) {
          markHabitDone();
          if (tune) {
-            console.log("object")
             audio.play();
          }
       }
