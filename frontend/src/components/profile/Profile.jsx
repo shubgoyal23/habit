@@ -31,7 +31,7 @@ import { Notification } from "./Notification";
 import { EditDetails } from "./EditDetails";
 import { Support } from "./Support";
 import ShareApp from "./share";
-import { clearTokens } from "@/lib/storeToken";
+import { SyncClearTokens } from "@/lib/storeToken";
 
 function Profile() {
    const userTheme = useSelector((state) => state.userTheme);
@@ -42,7 +42,7 @@ function Profile() {
    };
 
    const syncHandler = () => {
-      clearTokens();
+      SyncClearTokens();
       navigate("/");
       window.location.reload();
    };

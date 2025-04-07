@@ -49,5 +49,8 @@ const clearTokens = async () => {
    axios.defaults.headers.common["Accesstoken"] = "";
    axios.defaults.headers.common["Refreshtoken"] = "";
 };
+const SyncClearTokens = async () => {
+   await Preferences.clear();
+};
 
-export { setToken, getToken, removeToken, clearTokens };
+export { setToken, getToken, removeToken, clearTokens, SyncClearTokens };
