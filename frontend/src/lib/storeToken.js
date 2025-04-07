@@ -1,14 +1,17 @@
 import { Preferences } from "@capacitor/preferences";
 import axios from "axios";
+import { conf } from "@/conf/conf";
 
-const setToken = async (token, value, key = "secret") => {
+const SECRET_KEY = conf.SECRET_KEY;
+
+const setToken = async (token, value) => {
    if (!value || !token) return;
    value = String(value);
    let Val = btoa(
       [...value]
          .map((char, i) =>
             String.fromCharCode(
-               char.charCodeAt(0) ^ key.charCodeAt(i % key.length)
+               char.charCodeAt(0) ^ SECRET_KEY.charCodeAt(i % SECRET_KEY.length)
             )
          )
          .join("")
@@ -18,7 +21,7 @@ const setToken = async (token, value, key = "secret") => {
       value: Val,
    });
 };
-const getToken = async (token, key = "secret") => {
+const getToken = async (token) => {
    if (!token) return;
    const { value } = await Preferences.get({
       key: token,
@@ -30,7 +33,7 @@ const getToken = async (token, key = "secret") => {
    let Val = [...text]
       .map((char, i) =>
          String.fromCharCode(
-            char.charCodeAt(0) ^ key.charCodeAt(i % key.length)
+            char.charCodeAt(0) ^ SECRET_KEY.charCodeAt(i % SECRET_KEY.length)
          )
       )
       .join("");
