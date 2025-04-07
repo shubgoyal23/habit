@@ -18,13 +18,9 @@ import { addSteak } from "@/store/StreakSlice";
 import { FaRegCheckCircle } from "react-icons/fa";
 import { SlClose } from "react-icons/sl";
 import { PiFireFill } from "react-icons/pi";
-import {
-   HoverCard,
-   HoverCardContent,
-   HoverCardTrigger,
-} from "@/components/ui/hover-card";
 import { MdOutlineNoteAlt } from "react-icons/md";
 import { AddNote } from "@/store/NoteSlice";
+import NoteCard from "../Notes/NoteCard";
 
 const monthsName = [
    "January",
@@ -203,18 +199,15 @@ function Steak() {
       let note = notesData?.[`${month}-${year}`]?.[data._id]?.[index + 1];
       if (note) {
          return (
-            <HoverCard>
-               <HoverCardTrigger>
-                  <div className="size-6 m-auto flex justify-center items-center">
-                     {done ? (
-                        <MdOutlineNoteAlt className="size-6 text-green-500" />
-                     ) : (
-                        <MdOutlineNoteAlt className="size-6 text-red-500" />
-                     )}
-                  </div>
-               </HoverCardTrigger>
-               <HoverCardContent>{note.note}</HoverCardContent>
-            </HoverCard>
+            <NoteCard note={note}>
+               <div className="size-6 m-auto flex justify-center items-center">
+                  {done ? (
+                     <MdOutlineNoteAlt className="size-6 text-green-500" />
+                  ) : (
+                     <MdOutlineNoteAlt className="size-6 text-red-500" />
+                  )}
+               </div>
+            </NoteCard>
          );
       }
       return (
