@@ -28,7 +28,8 @@ func InitVariables() {
 func RunNoficationWorker() {
 	go DoEvery(time.Minute, FilerAndSendNotifications)                                                         // run every minute
 	go DoEvery(time.Duration(Duration_Notify)*time.Second, GetHabitRecords, ChangeImage, HabitNotDoneReminder) // run every Duration_Notify
-	go DoEvery(24*time.Hour, ClearOldRecords, InactiveHabits)                                                  // run every 12 hours
+	go DoEvery(24*time.Hour, ClearOldRecords)                                                                  // run every 12 hours
+	go DoEvery(6*time.Hour, InactiveHabits)                                                                    // run every 12 hours
 
 	go GetHabitRecords() // this will runs for first time
 }
