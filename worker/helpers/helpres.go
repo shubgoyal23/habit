@@ -7,6 +7,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.uber.org/zap"
 )
 
 var Max_userDetails_Local_storage int64 = 86400 // one day
@@ -48,4 +49,23 @@ func SetUserDetails(userDetails bson.M) error {
 	user.Epoch = time.Now().Unix()
 	AllUsers[user.Id] = user
 	return nil
+}
+
+func RemoveFcmToken(Token string) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Println("RemoveFcmToken Crashed: ", r)
+		}
+	}()
+	var user models.User
+	if f := MongoGetOneDoc("users", bson.M{"fcmToken": Token}, &user); !f {
+		Logger.Error("Failed to get user", zap.String("fcmToken", Token))
+		return
+	}
+	if time.Since(user.UpdatedAt) < time.Hour*48 {
+		return
+	}
+	if err := MongoUpdateOneDoc("users", bson.M{"_id": user.Id}, bson.M{"$set": bson.M{"fcmToken": ""}}); err != nil {
+		Logger.Error("Failed to update user", zap.Error(err))
+	}
 }

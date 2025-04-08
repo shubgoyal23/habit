@@ -25,6 +25,7 @@ type User struct {
 	FCMToken   string             `json:"fcmToken,omitempty" bson:"fcmToken,omitempty"`
 	TimeZone   int32              `json:"timeZone,omitempty" bson:"timeZone,omitempty"`
 	NotifyTime int64              `json:"notifyTime,omitempty" bson:"notifyTime,omitempty"`
+	UpdatedAt  time.Time          `json:"updatedAt" bson:"updatedAt"`
 	Epoch      int64              // for local usages
 
 	// HabitSkip     int          `json:"habitSkip,omitempty" bson:"habitSkip,omitempty"`
@@ -41,7 +42,6 @@ type User struct {
 	// RefreshToken  *string      `json:"refreshToken,omitempty" bson:"refreshToken,omitempty"`
 	// Password      string       `json:"password" bson:"password" validate:"required"`
 	// CreatedAt     time.Time    `json:"createdAt" bson:"createdAt"`
-	// UpdatedAt     time.Time    `json:"updatedAt" bson:"updatedAt"`
 }
 
 // Nested struct for phone details

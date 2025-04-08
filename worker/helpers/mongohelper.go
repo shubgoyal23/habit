@@ -8,6 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.uber.org/zap"
 )
 
 var MongoConn *mongo.Client
@@ -19,10 +20,12 @@ func MongoInit(uri string, dbName string) (f bool) {
 	opts := options.Client().ApplyURI(uri).SetServerAPIOptions(serverAPI)
 	client, err := mongo.Connect(context.TODO(), opts)
 	if err != nil {
+		Logger.Error("Failed to connect to MongoDB", zap.Error(err))
 		return
 	}
 	err = client.Ping(context.TODO(), nil)
 	if err != nil {
+		Logger.Error("Failed to ping MongoDB", zap.Error(err))
 		return
 	}
 	MongoConn = client
@@ -37,6 +40,7 @@ func MongoAddOncDoc(collection string, doc interface{}) (f bool) {
 
 	ints, err := client.InsertOne(context.TODO(), doc)
 	if err != nil {
+		Logger.Error("Failed to insert one document", zap.Error(err))
 		return
 	}
 	if ints.InsertedID == nil {
@@ -52,6 +56,7 @@ func MongoAddManyDoc(collection string, doc []interface{}) (f bool) {
 
 	ints, err := client.InsertMany(context.TODO(), doc)
 	if err != nil {
+		Logger.Error("Failed to insert many documents", zap.Error(err))
 		return
 	}
 	if ints.InsertedIDs == nil {
@@ -67,10 +72,12 @@ func MongoGetManyDoc(collection string, filter any) (doc []bson.M, f bool) {
 	client := MongoConn.Database(MongoDb).Collection(collection)
 	cursor, err := client.Find(context.TODO(), filter)
 	if err != nil {
+		Logger.Error("Failed to find documents", zap.Error(err))
 		return
 	}
 	err = cursor.All(context.TODO(), &doc)
 	if err != nil {
+		Logger.Error("Failed to decode documents", zap.Error(err))
 		return
 	}
 	f = true
@@ -82,6 +89,7 @@ func MongoGetOneDoc(collection string, filter interface{}, docInp *models.User) 
 	f = false
 	client := MongoConn.Database(MongoDb).Collection(collection)
 	if err := client.FindOne(context.TODO(), filter).Decode(docInp); err != nil {
+		Logger.Error("Failed to find one document", zap.Error(err))
 		return
 	}
 	f = true
@@ -94,6 +102,7 @@ func MongoDeleteManyDoc(collection string, filter interface{}) (f bool) {
 	client := MongoConn.Database(MongoDb).Collection(collection)
 	_, err := client.DeleteMany(context.TODO(), filter)
 	if err != nil {
+		Logger.Error("Failed to delete many documents", zap.Error(err))
 		return
 	}
 	return true
@@ -105,6 +114,7 @@ func MongoUpdateManyDoc(collection string, filter, update bson.M) error {
 
 	res, err := client.UpdateMany(context.TODO(), filter, update)
 	if err != nil {
+		Logger.Error("Failed to update many documents", zap.Error(err))
 		return err
 	}
 	total := res.ModifiedCount + res.UpsertedCount
@@ -120,6 +130,7 @@ func MongoUpdateOneDoc(collection string, filter, update bson.M) error {
 
 	res, err := client.UpdateOne(context.TODO(), filter, update)
 	if err != nil {
+		Logger.Error("Failed to update one document", zap.Error(err))
 		return err
 	}
 	if res.MatchedCount != res.UpsertedCount {

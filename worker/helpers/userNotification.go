@@ -9,6 +9,7 @@ import (
 	"firebase.google.com/go/v4/messaging"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.uber.org/zap"
 )
 
 var AllUsers map[primitive.ObjectID]models.User
@@ -37,7 +38,7 @@ func RunNoficationWorker() {
 func DoEvery(after time.Duration, f ...func()) {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("DoEvery crashed: ", err)
+			Logger.Error("DoEvery crashed", zap.Error(err.(error)))
 		}
 	}()
 	if len(f) == 0 {
@@ -54,7 +55,7 @@ func DoEvery(after time.Duration, f ...func()) {
 func FilerAndSendNotifications() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("FilerAndSendNotifications crashed: ", err)
+			Logger.Error("FilerAndSendNotifications crashed", zap.Error(err.(error)))
 		}
 	}()
 	utcTime := time.Now().UTC()
@@ -70,14 +71,13 @@ func FilerAndSendNotifications() {
 
 	docs, ok := res.([]*UserNotification)
 	if !ok {
+		Logger.Error("Failed to cast NotifyMap value")
 		return
 	}
 
 	for _, doc := range docs {
-		n := fmt.Sprintf("%s: %s", time.Now().Format("2006-01-02 15:04:05"), doc.Notification.Title)
-		InsertRedisListLPush("habit_notification_To_Send", []string{n})
 		if err := SendHabitNotification(doc); err != nil {
-			continue
+			Logger.Error("Failed to send notification", zap.Error(err))
 		}
 	}
 	NotifyMap.Delete(timeEpoch)
@@ -86,7 +86,7 @@ func FilerAndSendNotifications() {
 func GetHabitRecords() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("GetHabitRecords crashed: ", err)
+			Logger.Error("GetHabitRecords crashed", zap.Error(err.(error)))
 		}
 	}()
 	utcTime := time.Now().UTC().Add(time.Minute * 5) // 5 min ahead of current time
@@ -191,7 +191,7 @@ func GetHabitRecords() {
 func ClearOldRecords() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("ClearOldRecords crashed: ", err)
+			Logger.Error("ClearOldRecords crashed", zap.Error(err.(error)))
 		}
 	}()
 
@@ -213,7 +213,7 @@ func ClearOldRecords() {
 func HabitNotDoneReminder() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("HabitNotDoneReminder crashed: ", err)
+			Logger.Error("HabitNotDoneReminder crashed", zap.Error(err.(error)))
 		}
 	}()
 	utcTime := time.Now().UTC()
@@ -336,7 +336,7 @@ func HabitNotDoneReminder() {
 func InactiveHabits() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println("InactiveHabits crashed: ", err)
+			Logger.Error("InactiveHabits crashed", zap.Error(err.(error)))
 		}
 	}()
 	utcTime := time.Now().Add(time.Hour * -24).UTC().Unix()
@@ -349,15 +349,18 @@ func InactiveHabits() {
 		var habit models.Habit
 		byte, err := bson.Marshal(v)
 		if err != nil {
+			Logger.Error("Failed to marshal habit", zap.Error(err))
 			continue
 		}
 		if err := bson.Unmarshal(byte, &habit); err != nil {
+			Logger.Error("Failed to unmarshal habit", zap.Error(err))
 			continue
 		}
 		MongoUpdateOneDoc("users", bson.M{"_id": habit.UserID}, bson.M{"$inc": bson.M{"habitCount": -1}})
 	}
 	update := bson.M{"$set": bson.M{"isActive": false}}
 	if err := MongoUpdateManyDoc("habits", filter, update); err != nil {
+		Logger.Error("Failed to update habits", zap.Error(err))
 		return
 	}
 }
