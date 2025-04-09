@@ -94,7 +94,7 @@ func GetHabitRecords() {
 	if timeEpoch > MaxTime {
 		timeEpoch -= 86400
 	}
-	query := bson.M{"startTime": bson.M{"$gte": timeEpoch, "$lt": timeEpoch + Duration_Notify}, "notify": true}
+	query := bson.M{"startTime": bson.M{"$gte": timeEpoch, "$lt": timeEpoch + Duration_Notify}, "notify": true, "isActive": true}
 
 	docs, f := MongoGetManyDoc("habits", query)
 	if !f {
@@ -111,10 +111,18 @@ func GetHabitRecords() {
 		if err != nil {
 			continue
 		}
-		nofity := make([]int64, 0)
 		if habitData.HabitType == "negative" {
 			continue
 		}
+		userid := habitData.UserID
+		userDetails, err := GetUserDetails(userid)
+		if err != nil {
+			continue
+		}
+		if userDetails.FCMToken == "" {
+			continue
+		}
+		nofity := make([]int64, 0)
 		switch habitData.Repeat.Name {
 		case "days":
 			day := int(utcTime.Weekday())
@@ -159,17 +167,13 @@ func GetHabitRecords() {
 				continue
 			}
 		}
-		userid := habitData.UserID
-		userDetails, err := GetUserDetails(userid)
-		if err != nil {
-			continue
-		}
+
 		userName := userDetails.FirstName
 		habitName := habitData.Name
 		userPayload := &UserNotification{}
 		paylod := &messaging.Notification{
-			Title:    fmt.Sprintf("Hey %s, It's Time for Your Habit: %s!", userName, habitName),
-			Body:     "You're just 5 minutes away from achieving your goal! Get ready and make today amazing. 💪",
+			Title:    fmt.Sprintf("🚀 Hey %s! Time for Your Habit: %s", userName, habitName),
+			Body:     "Only 5 minutes to go! Stay on track and crush it—your goals are waiting. Let's make it count! 💥",
 			ImageURL: ImageUrl,
 		}
 		userPayload.Notification = paylod
