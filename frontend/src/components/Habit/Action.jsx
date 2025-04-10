@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { addHabit, deleteHabit } from "@/store/HabitSlice";
+import { addArchive,deleteArchive } from "@/store/ArchiveSlice";
 import { useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { FaEllipsisVertical } from "react-icons/fa6";
@@ -16,7 +17,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import toast from "react-hot-toast";
 import { conf } from "@/conf/conf";
-import { addArchive } from "@/store/ArchiveSlice";
 
 function Action({ row }) {
    const dispatch = useDispatch();
@@ -40,6 +40,7 @@ function Action({ row }) {
       delhabt
          .then((data) => {
             dispatch(deleteHabit(id));
+            dispatch(deleteArchive(id));
          })
          .catch((err) => console.log(err));
    };
