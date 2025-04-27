@@ -4,7 +4,7 @@ import { conf } from "@/conf/conf";
 
 const SECRET_KEY = conf.SECRET_KEY;
 
-const setToken = async (token, value) => {
+export const setToken = async (token, value) => {
    if (!value || !token) return;
    value = String(value);
    let Val = btoa(
@@ -21,7 +21,7 @@ const setToken = async (token, value) => {
       value: Val,
    });
 };
-const getToken = async (token) => {
+export const getToken = async (token) => {
    if (!token) return;
    const { value } = await Preferences.get({
       key: token,
@@ -40,17 +40,15 @@ const getToken = async (token) => {
    return Val;
 };
 
-const removeToken = async (token) => {
+export const removeToken = async (token) => {
    await Preferences.remove({ key: token });
 };
 
-const clearTokens = async () => {
+export const clearTokens = async () => {
    await Preferences.clear();
    axios.defaults.headers.common["Accesstoken"] = "";
    axios.defaults.headers.common["Refreshtoken"] = "";
 };
-const SyncClearTokens = async () => {
+export const SyncClearTokens = async () => {
    await Preferences.clear();
 };
-
-export { setToken, getToken, removeToken, clearTokens, SyncClearTokens };

@@ -1,6 +1,4 @@
 import React, { useEffect } from "react";
-import { Pencil1Icon } from "@radix-ui/react-icons";
-
 import {
    AlertDialog,
    AlertDialogAction,
@@ -19,6 +17,7 @@ import { AddNote, DeleteNote, LoadNotes } from "@/store/NoteSlice";
 import { conf } from "@/conf/conf";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Pencil } from "lucide-react";
 
 function NotesBox({ habitId, date }) {
    if (!habitId || !date) return null;
@@ -107,7 +106,7 @@ function NotesBox({ habitId, date }) {
       <div>
          <AlertDialog>
             <AlertDialogTrigger>
-               <Pencil1Icon className="w-5 h-5" />
+               <Pencil className="w-5 h-5" />
             </AlertDialogTrigger>
             <AlertDialogContent>
                <AlertDialogHeader>

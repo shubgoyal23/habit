@@ -1,6 +1,6 @@
 import { Share } from "@capacitor/share";
+import { CreditCard } from "lucide-react";
 import toast from "react-hot-toast";
-import { FaCreditCard } from "react-icons/fa6";
 
 const ShareApp = () => {
    const shareApp = async () => {
@@ -25,8 +25,7 @@ const ShareApp = () => {
          className="flex items-center space-x-2 justify-start gap-2 cursor-pointer"
          onClick={shareApp}
       >
-         <FaCreditCard />
-         <span>Share with friends</span>
+         <CreditCard /> <span>Share with friends</span>
       </div>
    );
 };

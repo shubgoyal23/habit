@@ -10,13 +10,12 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
-import { FaBell, FaUser } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
+import { User } from "lucide-react";
 
 export function EditDetails() {
    const [details, setdetails] = useState({});
@@ -51,8 +50,7 @@ export function EditDetails() {
       <Dialog>
          <DialogTrigger asChild>
             <div className="flex items-center space-x-2 justify-start gap-2 cursor-pointer">
-               <FaUser />
-               <span>Edit Profile</span>
+               <User /> <span>Edit Profile</span>
             </div>
          </DialogTrigger>
          <DialogContent className="sm:max-w-[425px]">

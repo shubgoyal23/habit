@@ -13,14 +13,10 @@ import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { addListHabits } from "@/store/HabitSlice";
 import { conf } from "@/conf/conf";
-import { IoIosArrowForward } from "react-icons/io";
 import { addSteak } from "@/store/StreakSlice";
-import { FaRegCheckCircle } from "react-icons/fa";
-import { SlClose } from "react-icons/sl";
-import { PiFireFill } from "react-icons/pi";
-import { MdOutlineNoteAlt } from "react-icons/md";
 import { AddNote } from "@/store/NoteSlice";
 import NoteCard from "../Notes/NoteCard";
+import { ChevronRight, CircleCheck, CircleX, Flame, NotebookPen } from "lucide-react";
 
 const monthsName = [
    "January",
@@ -170,7 +166,7 @@ function Steak() {
             if (checkFreez) {
                return (
                   <div className="size-6 m-auto flex justify-center items-center">
-                     <PiFireFill className="size-6 text-blue-500" />
+                     <Flame className="size-6 text-blue-500" />
                   </div>
                );
             }
@@ -202,9 +198,9 @@ function Steak() {
             <NoteCard note={note}>
                <div className="size-6 m-auto flex justify-center items-center">
                   {done ? (
-                     <MdOutlineNoteAlt className="size-6 text-green-500" />
+                     <NotebookPen className="size-6 text-green-500" />
                   ) : (
-                     <MdOutlineNoteAlt className="size-6 text-red-500" />
+                     <NotebookPen className="size-6 text-red-500" />
                   )}
                </div>
             </NoteCard>
@@ -213,9 +209,9 @@ function Steak() {
       return (
          <div className="size-6 m-auto flex justify-center items-center">
             {done ? (
-               <FaRegCheckCircle className="size-6 text-green-500" />
+               <CircleCheck className="size-6 text-green-500" />
             ) : (
-               <SlClose className="size-6 text-red-500" />
+               <CircleX className="size-6 text-red-500" />
             )}
          </div>
       );
@@ -241,11 +237,11 @@ function Steak() {
          </h1>
          <div className="flex justify-between text-xl font-bold items-center gap-2 mb-6 w-fit bg-gray-50 dark:bg-gray-800 m-auto px-5 h-10 rounded-lg">
             <button onClick={() => changeMonth(-1)} className="size-6">
-               <IoIosArrowForward className="rotate-180" />
+               <ChevronRight className="rotate-180" />
             </button>
             <div className="font-normal">{`${monthsName[month]} ${year}`}</div>
             <button onClick={() => changeMonth(1)} className="size-6">
-               <IoIosArrowForward className="" />
+               <ChevronRight className="" />
             </button>
          </div>
          <Table className="md:p-6 border border-gray-200 rounded-md">

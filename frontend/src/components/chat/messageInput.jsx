@@ -1,5 +1,5 @@
-import { IoMdSend } from "react-icons/io";
 import { useForm } from "react-hook-form";
+import { SendHorizontal } from "lucide-react";
 
 export default function MessageInput({ sendMessage }) {
    const { register, handleSubmit, setValue } = useForm();
@@ -23,7 +23,7 @@ export default function MessageInput({ sendMessage }) {
                {...register("context", { required: true })}
             />
             <button type="submit">
-               <IoMdSend className="w-6 h-6" />
+               <SendHorizontal className="w-6 h-6" />
             </button>
          </form>
       </div>

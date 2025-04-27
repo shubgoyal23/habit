@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useState } from "react";
-import { FaCircleQuestion } from "react-icons/fa6";
 import axios from "axios";
 import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
@@ -23,6 +22,7 @@ import {
    SelectValue,
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
+import { CircleHelp } from "lucide-react";
 
 export function Support() {
    const [topic, setTopic] = useState("help");
@@ -52,7 +52,7 @@ export function Support() {
       <Dialog>
          <DialogTrigger asChild>
             <div className="flex items-center space-x-2 justify-start gap-2 cursor-pointer">
-               <FaCircleQuestion />
+               <CircleHelp />
                <span>Help & Feedback</span>
             </div>
          </DialogTrigger>

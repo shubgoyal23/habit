@@ -16,8 +16,8 @@ import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { addSteak } from "@/store/StreakSlice";
-import { RxSpeakerLoud, RxSpeakerOff } from "react-icons/rx";
 import notificationSound from "../../resources/timer_notify.mp3";
+import { Volume2, VolumeX } from "lucide-react";
 
 function useQuery() {
    return new URLSearchParams(useLocation().search);
@@ -103,7 +103,7 @@ function Timer() {
                      className="cursor-pointer"
                      onClick={() => setTune((prev) => !prev)}
                   >
-                     {tune ? <RxSpeakerLoud /> : <RxSpeakerOff />}
+                     {tune ? <Volume2 /> : <VolumeX />}
                   </div>
                </div>
                <CardDescription>

@@ -23,13 +23,13 @@ import { useNavigate } from "react-router-dom";
 import { addListHabits } from "@/store/HabitSlice";
 import MarkSteak from "./MarkSteak";
 import Action from "./Action";
-import { LuChevronsUpDown } from "react-icons/lu";
 import RowSelector from "./RowSelector";
 import FilterInput from "./FilterInput";
 import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
 import { EpochToTime } from "@/lib/helpers";
 import { getToken, setToken } from "@/lib/storeToken";
+import { ChevronsUpDown } from "lucide-react";
 
 const columns = [
    {
@@ -256,7 +256,7 @@ function Habit() {
                                          header.getContext()
                                       )}
                                  {header.column.getCanSort() && (
-                                    <LuChevronsUpDown className="h-4 w-4" />
+                                    <ChevronsUpDown className="h-4 w-4" />
                                  )}
                               </span>
                            </TableHead>

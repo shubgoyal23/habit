@@ -2,11 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { CiViewList } from "react-icons/ci";
-import { FaFire } from "react-icons/fa";
-import { FaHome } from "react-icons/fa";
-import { IoIosAdd } from "react-icons/io";
-import { FaIdCard, FaRightToBracket } from "react-icons/fa6";
+import { Flame, House, IdCard, LogIn, Plus, TableOfContents } from "lucide-react";
 
 function Navbar() {
    const loggedin = useSelector((state) => state.auth.loggedin);
@@ -18,30 +14,30 @@ function Navbar() {
               {
                  title: "Login",
                  to: "/login",
-                 icon: <FaRightToBracket className="w-6 h-6" />,
+                 icon: <LogIn className="w-6 h-6" />,
               },
               {
                  title: "Register",
                  to: "/register",
-                 icon: <FaIdCard className="w-6 h-6" />,
+                 icon: <IdCard className="w-6 h-6" />,
               },
            ])
          : setMenu([
-              { title: "Home", to: "/", icon: <FaHome className="w-6 h-6" /> },
+              { title: "Home", to: "/", icon: <House className="w-6 h-6" /> },
               {
                  title: "Add Habit",
                  to: "/habit/new",
-                 icon: <IoIosAdd className="w-6 h-6" />,
+                 icon: <Plus className="w-6 h-6" />,
               },
               {
                  title: "Habits Table",
                  to: "/habit-list",
-                 icon: <CiViewList className="w-6 h-6" />,
+                 icon: <TableOfContents className="w-6 h-6" />,
               },
               {
                  title: "Streak Table",
                  to: "/steak",
-                 icon: <FaFire className="w-6 h-6" />,
+                 icon: <Flame className="w-6 h-6" />,
               },
            ]);
    }, [loggedin]);

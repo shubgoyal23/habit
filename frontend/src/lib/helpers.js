@@ -1,4 +1,4 @@
-const EpochToTime = (epoch) => {
+export const EpochToTime = (epoch) => {
    if (!epoch) {
       return;
    }
@@ -14,7 +14,7 @@ const EpochToTime = (epoch) => {
    }
    return `${hr}:${min}`;
 };
-const EpochToDate = (epoch) => {
+export const EpochToDate = (epoch) => {
    epoch = Number(epoch);
    if (!epoch) {
       return;
@@ -23,7 +23,7 @@ const EpochToDate = (epoch) => {
    return time;
 };
 
-const GetUTCDateEpoch = (date) => {
+export const GetUTCDateEpoch = (date) => {
    if (!date) return;
    let dateNew = new Date(date);
    let utcDate =
@@ -39,7 +39,7 @@ const GetUTCDateEpoch = (date) => {
    return Math.ceil(utcDate);
 };
 
-const GetHabitDueToday = (habit) => {
+export const GetHabitDueToday = (habit) => {
    let list = [...habit];
    let finalList = [];
    let dateToday = new Date();
@@ -72,5 +72,3 @@ const GetHabitDueToday = (habit) => {
    }
    return finalList;
 };
-
-export { EpochToTime, EpochToDate, GetUTCDateEpoch, GetHabitDueToday };

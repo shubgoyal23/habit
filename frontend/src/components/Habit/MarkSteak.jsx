@@ -3,8 +3,8 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { conf } from "@/conf/conf";
-import { MdOutlineRadioButtonUnchecked, MdCheckCircle } from "react-icons/md";
 import { addSteak } from "@/store/StreakSlice";
+import { Circle, CircleCheck } from "lucide-react";
 
 function MarkSteak({ row }) {
    const streakList = useSelector((state) => state.streak) || [];
@@ -58,9 +58,9 @@ function MarkSteak({ row }) {
          >
             {(data.habitType === "negative" && !marked) ||
             (data.habitType !== "negative" && marked) ? (
-               <MdCheckCircle className="text-green-600 size-6" />
+               <CircleCheck className="text-green-600 size-6" />
             ) : (
-               <MdOutlineRadioButtonUnchecked className="text-gray-400 size-6" />
+               <Circle className="text-gray-400 size-6" />
             )}
          </button>
       </>

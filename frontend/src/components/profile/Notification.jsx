@@ -12,11 +12,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useEffect, useState } from "react";
-import { FaBell } from "react-icons/fa6";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
+import { Bell } from "lucide-react";
 
 export function Notification() {
    const [rTimes, setRTimes] = useState("22:00");
@@ -66,7 +66,7 @@ export function Notification() {
       <Dialog>
          <DialogTrigger asChild>
             <div className="flex items-center space-x-2 justify-start gap-2 cursor-pointer">
-               <FaBell />
+               <Bell />
                <span>Notifications</span>
             </div>
          </DialogTrigger>

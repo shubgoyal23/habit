@@ -24,16 +24,13 @@ import {
    CollapsibleContent,
    CollapsibleTrigger,
 } from "../ui/collapsible";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa6";
 import { Checkbox } from "../ui/checkbox";
-import { HiArrowPathRoundedSquare } from "react-icons/hi2";
-import { AiOutlineStop } from "react-icons/ai";
-import { TiTick } from "react-icons/ti";
 import Repeat from "./Repeat";
 import DateSelector from "./DateSelector";
 import TimeSelector from "./TimeSelector";
 import { EpochToDate, EpochToTime } from "@/lib/helpers";
 import { deleteArchive } from "@/store/ArchiveSlice";
+import { Ban, Check, ChevronDown, ChevronUp, RefreshCcw } from "lucide-react";
 
 export default function AddHabit() {
    const user = useSelector((state) => state.auth.loggedin);
@@ -190,7 +187,7 @@ export default function AddHabit() {
                            } p-1 rounded-md cursor-pointer flex flex-col justify-center items-center text-xs transition-all duration-500`}
                            onClick={() => setType("regular")}
                         >
-                           <HiArrowPathRoundedSquare className="h-6 w-6" />
+                           <RefreshCcw className="h-6 w-6" />
                            Regular
                         </span>
                         <span
@@ -199,7 +196,7 @@ export default function AddHabit() {
                            } p-1 rounded-md h-16 cursor-pointer flex flex-col justify-center items-center text-xs transition-all duration-500`}
                            onClick={() => setType("negative")}
                         >
-                           <AiOutlineStop className="h-6 w-6" />
+                           <Ban className="h-6 w-6" />
                            Negative
                         </span>
                         <span
@@ -208,7 +205,7 @@ export default function AddHabit() {
                            } p-1 rounded-md  cursor-pointer flex flex-col justify-center items-center text-xs transition-all duration-500`}
                            onClick={() => setType("todo")}
                         >
-                           <TiTick className="h-6 w-6" />
+                           <Check className="h-6 w-6" />
                            one time Todo
                         </span>
                      </div>
@@ -292,13 +289,13 @@ export default function AddHabit() {
                               {isOpen ? (
                                  <>
                                     <span>Hide Additional Settings</span>
-                                    <FaChevronUp className="h-3 w-3" />
+                                    <ChevronUp className="h-3 w-3" />
                                     <span className="sr-only">Toggle</span>
                                  </>
                               ) : (
                                  <>
                                     <span>Additional Settings</span>
-                                    <FaChevronDown className="h-3 w-3" />
+                                    <ChevronDown className="h-3 w-3" />
                                     <span className="sr-only">Toggle</span>
                                  </>
                               )}

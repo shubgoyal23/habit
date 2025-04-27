@@ -7,14 +7,6 @@ import {
    CardHeader,
    CardTitle,
 } from "../ui/card";
-import {
-   FaCircleExclamation,
-   FaDesktop,
-   FaMoon,
-   FaRightFromBracket,
-   FaSun,
-} from "react-icons/fa6";
-import { FaLock, FaSyncAlt } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { setTheme } from "@/store/ThemeSlice";
 import {
@@ -32,6 +24,7 @@ import { EditDetails } from "./EditDetails";
 import { Support } from "./Support";
 import ShareApp from "./share";
 import { SyncClearTokens } from "@/lib/storeToken";
+import { CircleAlert, Lock, LogOut, Monitor, Moon, RefreshCcw, Sun } from "lucide-react";
 
 function Profile() {
    const userTheme = useSelector((state) => state.userTheme);
@@ -66,7 +59,7 @@ function Profile() {
                            to={"/privacy-policy"}
                            className="flex items-center space-x-2 justify-start gap-2"
                         >
-                           <FaLock />
+                           <Lock />
                            <span>Privacy</span>
                         </NavLink>
                      </div>
@@ -78,7 +71,7 @@ function Profile() {
                            to={"/terms-and-conditions"}
                            className="flex items-center space-x-2 justify-start gap-2"
                         >
-                           <FaCircleExclamation />
+                           <CircleAlert />
                            <span>Terms & Policies</span>
                         </NavLink>
                      </div>
@@ -88,11 +81,11 @@ function Profile() {
                      <div className="space-y-1 p-2 pl-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
                         <div className="flex items-center space-x-2 justify-start gap-2">
                            {userTheme === "dark" ? (
-                              <FaMoon />
+                              <Moon />
                            ) : userTheme === "light" ? (
-                              <FaSun />
+                              <Sun />
                            ) : (
-                              <FaDesktop />
+                              <Monitor />
                            )}
                            <Select className="p-1" onValueChange={handeltheme}>
                               <SelectTrigger
@@ -117,14 +110,14 @@ function Profile() {
                            className="flex items-center space-x-2 justify-start gap-2 cursor-pointer"
                            onClick={syncHandler}
                         >
-                           <FaSyncAlt />
+                           <RefreshCcw />
                            <span>Sync Data</span>
                         </div>
                         <div
                            className="flex items-center space-x-2 justify-start gap-2 cursor-pointer"
                            onClick={() => navigate("/logout")}
                         >
-                           <FaRightFromBracket />
+                           <LogOut />
                            <span>Logout</span>
                         </div>
                      </div>

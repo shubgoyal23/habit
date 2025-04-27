@@ -21,7 +21,6 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import Action from "./Action";
-import { LuChevronsUpDown } from "react-icons/lu";
 import RowSelector from "./RowSelector";
 import FilterInput from "./FilterInput";
 import { conf } from "@/conf/conf";
@@ -29,6 +28,7 @@ import toast from "react-hot-toast";
 import { EpochToTime } from "@/lib/helpers";
 import { getToken, setToken } from "@/lib/storeToken";
 import { addListArchives } from "@/store/ArchiveSlice";
+import { ChevronsUpDown } from "lucide-react";
 
 const columns = [
    {
@@ -265,7 +265,7 @@ function Archive() {
                                          header.getContext()
                                       )}
                                  {header.column.getCanSort() && (
-                                    <LuChevronsUpDown className="h-4 w-4" />
+                                    <ChevronsUpDown className="h-4 w-4" />
                                  )}
                               </span>
                            </TableHead>

@@ -4,7 +4,7 @@ import { setToken, getToken } from "./storeToken";
 import { Device } from "@capacitor/device";
 import { App } from "@capacitor/app";
 
-const setTokenToStorageAndAxios = async (dataRec) => {
+export const setTokenToStorageAndAxios = async (dataRec) => {
    if (!Capacitor.isNativePlatform()) return;
    if (dataRec?.accessToken) {
       await setToken("accesstoken", dataRec?.accessToken);
@@ -20,7 +20,7 @@ const setTokenToStorageAndAxios = async (dataRec) => {
    }
 };
 
-const SetTokenToAxios = async () => {
+export const SetTokenToAxios = async () => {
    if (!Capacitor.isNativePlatform()) return;
    let accessToken = await getToken("accesstoken");
    let refreshToken = await getToken("refreshtoken");
@@ -28,7 +28,7 @@ const SetTokenToAxios = async () => {
    axios.defaults.headers.common["Refreshtoken"] = `Bearer ${refreshToken}`;
 };
 
-const clearToken = async () => {
+export const clearToken = async () => {
    if (!Capacitor.isNativePlatform()) return;
    await setToken("accesstoken", "");
    await setToken("refreshtoken", "");
@@ -36,14 +36,14 @@ const clearToken = async () => {
    axios.defaults.headers.common["Refreshtoken"] = "";
 };
 
-const SetTheme = async (theme) => {
+export const SetTheme = async (theme) => {
    await setToken("theme", theme);
 };
-const getTheme = async () => {
+export const getTheme = async () => {
    return getToken("theme");
 };
 
-const logDeviceInfo = async () => {
+export const logDeviceInfo = async () => {
    if (!Capacitor.isNativePlatform()) return;
    const deviceId = await Device.getId();
    const info = await Device.getInfo();
@@ -62,16 +62,7 @@ const logDeviceInfo = async () => {
    return device;
 };
 
-const GetDeviceId = async () => {
+export const GetDeviceId = async () => {
    if (!Capacitor.isNativePlatform()) return;
    return await Device.getId();
-};
-export {
-   setTokenToStorageAndAxios,
-   SetTokenToAxios,
-   clearToken,
-   SetTheme,
-   getTheme,
-   logDeviceInfo,
-   GetDeviceId,
 };

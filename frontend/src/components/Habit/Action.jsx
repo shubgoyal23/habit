@@ -4,7 +4,6 @@ import { addHabit, deleteHabit } from "@/store/HabitSlice";
 import { addArchive,deleteArchive } from "@/store/ArchiveSlice";
 import { useDispatch } from "react-redux";
 import { Button } from "@/components/ui/button";
-import { FaEllipsisVertical } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import {
@@ -17,6 +16,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import toast from "react-hot-toast";
 import { conf } from "@/conf/conf";
+import { EllipsisVertical } from "lucide-react";
 
 function Action({ row }) {
    const dispatch = useDispatch();
@@ -99,7 +99,7 @@ function Action({ row }) {
          <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
                <span className="sr-only">Open menu</span>
-               <FaEllipsisVertical className="h-4 w-4" />
+               <EllipsisVertical className="h-4 w-4" />
             </Button>
          </DropdownMenuTrigger>
          <DropdownMenuContent align="end">

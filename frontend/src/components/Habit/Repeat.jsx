@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { IoIosArrowForward } from "react-icons/io";
 import { cn } from "@/lib/utils";
-import { MdClear } from "react-icons/md";
 import {
    Collapsible,
    CollapsibleContent,
@@ -22,6 +20,7 @@ import {
    SelectTrigger,
    SelectValue,
 } from "../ui/select";
+import { ChevronRight, X } from "lucide-react";
 
 function Repeat({ getValues, setValue, timesobj }) {
    const [repeatisOpen, setRepeatIsOpen] = useState(false);
@@ -58,7 +57,7 @@ function Repeat({ getValues, setValue, timesobj }) {
                         (repeat.length == 7 ? "EveryDay" : "Some Days in week")}
                      {repeatMode == "dates" && "Some Days in month"}
                      {repeatMode == "hours" && hr && `every ${hr} minutes`}
-                     <IoIosArrowForward className="h-3 w-3" />
+                     <ChevronRight className="h-3 w-3" />
                   </span>
                </Button>
             </CollapsibleTrigger>
@@ -152,7 +151,7 @@ function Repeat({ getValues, setValue, timesobj }) {
                                  onClick={() => setDates([])}
                               >
                                  Clear All Dates
-                                 <MdClear className="h-4 w-4 cursor-pointer" />
+                                 <X className="h-4 w-4 cursor-pointer" />
                               </span>
                            ) : (
                               ""

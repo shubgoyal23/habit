@@ -4,7 +4,6 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { login as authlogin } from "./store/AuthSlice";
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Login, Register, Logout } from "./components/index";
 import ErrorPage from "./components/Error/ErrorHandler";
 import Loader from "./components/Loading/Loading";
 import { conf } from "./conf/conf";
@@ -36,6 +35,9 @@ const Chat = lazy(() => import("./components/chat/chat"));
 const Navi = lazy(() => import("./components/app/Navigate"));
 const Archive = lazy(() => import("./components/Habit/Archive"));
 const Timmer = lazy(() => import("./components/Timer/Timer"));
+const Login = lazy(() => import("./components/auth/Login"));
+const Logout = lazy(() => import("./components/auth/Logout"));
+const Register = lazy(() => import("./components/auth/Register"));
 
 const router = createBrowserRouter([
    {
@@ -53,15 +55,27 @@ const router = createBrowserRouter([
          },
          {
             path: "/login",
-            element: <Login />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Login />
+               </Suspense>
+            ),
          },
          {
             path: "/logout",
-            element: <Logout />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Logout />
+               </Suspense>
+            ),
          },
          {
             path: "/register",
-            element: <Register />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <Register />
+               </Suspense>
+            ),
          },
          {
             path: "/verify",
