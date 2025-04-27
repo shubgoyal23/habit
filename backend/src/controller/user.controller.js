@@ -316,8 +316,8 @@ const logoutUser = asyncHandler(async (req, res) => {
    };
 
    res.status(200)
-      .cookie("accessToken", "", options)
-      .cookie("refreshToken", "", options)
+      .clearCookie("accessToken", options)
+      .clearCookie("refreshToken", options)
       .json(new ApiResponse(200, {}, "User logged out Successfully"));
 });
 
@@ -338,7 +338,7 @@ const refreshToken = asyncHandler(async (req, res) => {
       process.env.REFRESH_TOKEN_SECRET
    );
 
-   const user = await User.findById(decodedToken._id)
+   const user = await User.findById(decodedToken._id);
 
    if (!user && !(user?.refreshToken === token)) {
       throw new ApiError(401, "User not found");
@@ -382,13 +382,7 @@ const editUserDetails = asyncHandler(async (req, res) => {
 
    return res
       .status(200)
-      .json(
-         new ApiResponse(
-            200,
-            user,
-            "Account details updated successfully"
-         )
-      );
+      .json(new ApiResponse(200, user, "Account details updated successfully"));
 });
 const editUserPassword = asyncHandler(async (req, res) => {
    let { password, newPassword } = req.body;

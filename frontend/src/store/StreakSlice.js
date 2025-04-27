@@ -1,3 +1,4 @@
+import { clearToken } from "@/lib/apphelper";
 import { setToken } from "@/lib/storeToken";
 import { createSlice } from "@reduxjs/toolkit";
 
@@ -13,8 +14,12 @@ const streakSlice = createSlice({
          state[`${data.month}-${data.year}`][data.habitId] = data;
          setToken("streakList", JSON.stringify(state));
       },
+      clearSteak() {
+         clearToken("streakList");
+         return {};
+      },
    },
 });
 
-export const { addSteak } = streakSlice.actions;
+export const { addSteak, clearSteak } = streakSlice.actions;
 export default streakSlice.reducer;

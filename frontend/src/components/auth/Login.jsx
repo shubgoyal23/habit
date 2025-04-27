@@ -25,6 +25,7 @@ import {
    sendFcmTokenToServer,
 } from "@/lib/notification";
 import GoogleLoginApp from "./GoogleLogin";
+import { fetchAppDataInBackground } from "@/lib/initApp";
 
 export default function Login() {
    const [showPass, setShowPass] = useState(false);
@@ -42,7 +43,7 @@ export default function Login() {
       await RegisterForNotifications();
       await sendFcmTokenToServer();
       const device = await logDeviceInfo();
-      if (data) {
+      if (data && device) {
          device.userid = data._id;
          await axios
             .post(`${conf.BACKEND_URL}/api/v1/app/device`, device, {
@@ -78,6 +79,7 @@ export default function Login() {
          .then((data) => {
             dispatch(authlogin(data.data.data));
             AppSpecific(data.data.data);
+            fetchAppDataInBackground(dispatch);
             navigate("/");
          })
          .catch((err) => console.log(err));
@@ -86,7 +88,7 @@ export default function Login() {
       const token = data?.token;
       const login = axios.post(
          `${conf.BACKEND_URL}/api/v1/users/login-google`,
-         { token, timeZone: new Date().getTimezoneOffset()},
+         { token, timeZone: new Date().getTimezoneOffset() },
          {
             withCredentials: true,
          }
@@ -102,6 +104,7 @@ export default function Login() {
          .then((data) => {
             dispatch(authlogin(data.data.data));
             AppSpecific(data.data.data);
+            fetchAppDataInBackground(dispatch);
             navigate("/");
          })
          .catch((err) => console.log(err));

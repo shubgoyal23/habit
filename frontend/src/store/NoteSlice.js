@@ -27,8 +27,11 @@ const noteSlice = createSlice({
          state = action.payload;
          return state;
       },
+      ClearNotes() {
+         return {};
+      },
    },
 });
 
-export const { AddNote, DeleteNote, LoadNotes } = noteSlice.actions;
+export const { AddNote, DeleteNote, LoadNotes, ClearNotes } = noteSlice.actions;
 export default noteSlice.reducer;

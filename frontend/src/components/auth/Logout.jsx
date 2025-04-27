@@ -7,6 +7,8 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { conf } from "@/conf/conf";
 import { clearToken } from "@/lib/apphelper";
+import { clearSteak } from "@/store/StreakSlice";
+import { ClearNotes } from "@/store/NoteSlice";
 
 function Logout() {
    const dispatch = useDispatch();
@@ -27,8 +29,10 @@ function Logout() {
          .finally(() => {
             dispatch(authlogout());
             dispatch(addListHabits([]));
+            dispatch(clearSteak());
+            dispatch(ClearNotes());
             clearToken();
-            navigate("/");
+            navigate("/login");
          });
    }, []);
    return <div>LoggingOut...</div>;
