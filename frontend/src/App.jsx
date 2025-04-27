@@ -1,25 +1,10 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Layout from "./Layout";
-import axios from "axios";
 import { useDispatch } from "react-redux";
-import { login as authlogin } from "./store/AuthSlice";
 import { lazy, Suspense, useEffect, useState } from "react";
 import ErrorPage from "./components/Error/ErrorHandler";
 import Loader from "./components/Loading/Loading";
-import { conf } from "./conf/conf";
-
-import { VerifyOtp } from "./components/auth/VerifyOtp";
-import { ResetPage } from "./components/auth/Reset";
-import {
-   getTheme,
-   SetTokenToAxios,
-   setTokenToStorageAndAxios,
-} from "./lib/apphelper";
-import { setTheme } from "./store/ThemeSlice";
-import { addListHabits } from "./store/HabitSlice";
-import { addSteak } from "./store/StreakSlice";
-import { getToken, setToken } from "./lib/storeToken";
-import { AddNote, LoadNotes } from "./store/NoteSlice";
+import { initThemeAndLogin, fetchAppDataInBackground } from "./lib/initApp";
 
 const Privacy = lazy(() => import("./components/etc/Privacy"));
 const TermsAndConditions = lazy(() =>
@@ -38,6 +23,9 @@ const Timmer = lazy(() => import("./components/Timer/Timer"));
 const Login = lazy(() => import("./components/auth/Login"));
 const Logout = lazy(() => import("./components/auth/Logout"));
 const Register = lazy(() => import("./components/auth/Register"));
+
+const VerifyOtp = lazy(() => import("./components/auth/VerifyOtp"));
+const ResetPage = lazy(() => import("./components/auth/PasswordReset"));
 
 const router = createBrowserRouter([
    {
@@ -79,11 +67,19 @@ const router = createBrowserRouter([
          },
          {
             path: "/verify",
-            element: <VerifyOtp />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <VerifyOtp />
+               </Suspense>
+            ),
          },
          {
             path: "/reset",
-            element: <ResetPage />,
+            element: (
+               <Suspense fallback={<Loader />}>
+                  <ResetPage />
+               </Suspense>
+            ),
          },
          {
             path: "/habit-list",
@@ -178,154 +174,15 @@ export default function App() {
    const dispatch = useDispatch();
    const [loading, setLoading] = useState(true);
 
-   const LoadHabitList = async () => {
-      let hlist = await getToken("habitList");
-      if (hlist) {
-         hlist = JSON.parse(hlist);
-         dispatch(addListHabits(hlist));
-      }
-      let lastsync = await getToken("lastsyncHL");
-      lastsync = 1 * 24 * 60 * 60 * 1000 + lastsync;
-      if (new Date().getTime() > lastsync) {
-         const habitreq = await axios.get(
-            `${conf.BACKEND_URL}/api/v1/steak/habit`,
-            {
-               withCredentials: true,
-            }
-         );
-         const { data: hData } = habitreq?.data;
-         if (hData?.length > 0) {
-            setToken("lastsyncHL", new Date().getTime());
-            dispatch(addListHabits(hData));
-         }
-      }
-   };
-   const LoadSteakList = async () => {
-      let slist = await getToken("streakList");
-      if (slist) {
-         slist = JSON.parse(slist);
-         let keys = Object.keys(slist);
-         for (let sl of keys) {
-            let ids = Object.keys(slist[sl]);
-            for (let i = 0; i < ids.length; i++) {
-               dispatch(addSteak(slist[sl][ids[i]]));
-            }
-         }
-      }
-      let lastsync = await getToken("lastsyncSL");
-      lastsync = 1 * 24 * 60 * 60 * 1000 + lastsync;
-      if (new Date().getTime() > lastsync) {
-         const steakList = await axios.post(
-            `${conf.BACKEND_URL}/api/v1/steak/streak-list`,
-            { month: new Date().getMonth(), year: new Date().getFullYear() },
-            {
-               withCredentials: true,
-            }
-         );
-         const { data: sData } = steakList?.data;
-         if (sData?.length > 0) {
-            setToken("lastsyncSL", new Date().getTime());
-            for (let i = 0; i < sData.length; i++) {
-               dispatch(addSteak(sData[i]));
-            }
-         }
-      }
-   };
-
-   const LoadNotesForMonth = async () => {
-      const notes = await getToken("notes");
-      if (notes) {
-         const noteslist = JSON.parse(notes);
-         if (noteslist) {
-            dispatch(LoadNotes(noteslist));
-         }
-      }
-      let lastsync = await getToken("lastsyncNotes");
-      lastsync = 1 * 24 * 60 * 60 * 1000 + lastsync;
-      let date = new Date();
-      if (date.getTime() > lastsync) {
-         let sDate = date.getMonth() + "-" + date.getFullYear();
-         const req = axios.post(
-            `${conf.BACKEND_URL}/api/v1/notes/list-month`,
-            {
-               fulldate: sDate,
-            },
-            {
-               withCredentials: true,
-            }
-         );
-         req.then((data) => {
-            setToken("lastsyncNotes", new Date().getTime());
-            const noteslist = data.data.data;
-            if (noteslist.length > 0) {
-               for (let i = 0; i < noteslist.length; i++) {
-                  let dataitem = noteslist[i];
-                  dispatch(
-                     AddNote({
-                        id: dataitem.habitId,
-                        date: dataitem.date,
-                        month: sDate,
-                        notesData: {
-                           _id: dataitem._id,
-                           note: dataitem.note,
-                        },
-                     })
-                  );
-               }
-            }
-         }).catch((err) => console.log(err));
-      }
-   };
-
-   const checkUser = async () => {
-      await SetTokenToAxios();
-      let storeData = null;
-      await axios
-         .get(`${conf.BACKEND_URL}/api/v1/users/current`, {
-            withCredentials: true,
-         })
-         .then((data) => {
-            storeData = data?.data?.data;
-         })
-         .catch((err) => console.log(err));
-
-      if (!storeData) {
-         await axios
-            .get(`${conf.BACKEND_URL}/api/v1/users/renew-token`, {
-               withCredentials: true,
-            })
-            .then((data) => {
-               storeData = data?.data?.data;
-            })
-            .catch((err) => console.log(err));
-      }
-
-      if (!storeData) {
-         setLoading(false);
-         return;
-      }
-      dispatch(authlogin(storeData));
-      if (storeData?.refreshToken) {
-         await setTokenToStorageAndAxios(storeData);
-      }
-      setLoading(false);
-      return storeData;
-   };
-
-   const asyncTasks = async () => {
-      const theme = await getTheme("theme");
-      dispatch(setTheme(theme));
-      const loggedIn = await checkUser();
-      if (loggedIn) {
-         LoadHabitList();
-         LoadSteakList();
-         LoadNotesForMonth();
-      }
-   };
-
    useEffect(() => {
-      asyncTasks();
+      initThemeAndLogin(dispatch).then((loggedIn) => {
+         if (loggedIn) {
+            fetchAppDataInBackground(dispatch); // no need to await
+         }
+         setLoading(false);
+      });
    }, []);
+
    return loading ? (
       <Loader />
    ) : (
