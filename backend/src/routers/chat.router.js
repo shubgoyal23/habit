@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { verifyJwt } from "../middleware/auth.middleware.js";
-import { chat } from "../controller/chat.contreoller.js";
+import { chat } from "../controller/chat.controller.js";
 import { rateLimit } from "express-rate-limit";
 
 const limiter = rateLimit({
