@@ -45,7 +45,7 @@ function Repeat({ getValues, setValue, timesobj }) {
 
    return (
       <Collapsible open={repeatisOpen} onOpenChange={setRepeatIsOpen}>
-         <div className="flex items-center justify-between">
+         <div className="flex space-y-2 items-center justify-between">
             <CollapsibleTrigger asChild>
                <Button
                   variant="outline"
@@ -62,7 +62,7 @@ function Repeat({ getValues, setValue, timesobj }) {
                </Button>
             </CollapsibleTrigger>
          </div>
-         <CollapsibleContent className="p-2 py-3 border border-t-0 border-gray-700 rounded-md">
+         <CollapsibleContent className="p-4 mt-2 border border-t-1 border-gray-700 rounded-md">
             <div className="mb-2">
                <Label
                   htmlFor=""
@@ -76,15 +76,15 @@ function Repeat({ getValues, setValue, timesobj }) {
                   />
                </Label>
                {repeatMode == "days" ? (
-                  <div className="grid grid-cols-7 gap-1 pt-1">
+                  <div className="flex justify-start items-center gap-1 pt-1">
                      {days.map((day, index) => (
                         <span
                            key={index}
                            className={`${
                               repeat.includes(index)
-                                 ? "bg-violet-800"
+                                 ? "bg-primary"
                                  : "bg-gray-500"
-                           } p-1 rounded-md cursor-pointer flex flex-col font-bold justify-center items-center text-sm`}
+                           } p-1 rounded-md cursor-pointer flex flex-col font-bold justify-center items-center text-sm size-8`}
                            onClick={() => {
                               if (repeat.includes(index)) {
                                  if (repeat.length === 1) {

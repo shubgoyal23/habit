@@ -8,8 +8,8 @@ import { Calendar } from "../ui/calendar";
 function DateSelector({ dates, setDates, type }) {
    return (
       <div className="flex gap-2 items-center justify-between">
-         <div className="flex-1">
-            <Label className="mb-2" htmlFor="startTime">Start Date</Label>
+         <div className="flex-1 space-y-2">
+            <Label className="ml-3" htmlFor="startTime">Start Date</Label>
             <Popover>
                <PopoverTrigger asChild>
                   <Button
@@ -38,8 +38,8 @@ function DateSelector({ dates, setDates, type }) {
             </Popover>
          </div>
          {type !== "todo" && (
-            <div className="flex-1">
-               <Label className="mb-2" htmlFor="startTime">End Date</Label>
+            <div className="flex-1 space-y-2">
+               <Label className="ml-3" htmlFor="startTime">End Date</Label>
                <Popover>
                   <PopoverTrigger asChild>
                      <Button

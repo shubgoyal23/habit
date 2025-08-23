@@ -2,7 +2,14 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
-import { Flame, House, IdCard, LogIn, Plus, TableOfContents } from "lucide-react";
+import {
+   Flame,
+   House,
+   IdCard,
+   LogIn,
+   Plus,
+   TableOfContents,
+} from "lucide-react";
 
 function Navbar() {
    const loggedin = useSelector((state) => state.auth.loggedin);
@@ -42,7 +49,7 @@ function Navbar() {
            ]);
    }, [loggedin]);
    return (
-      <header className="w-full lg:px-16 px-6 h-16 bg-gray-300/50 dark:bg-gray-900/50 backdrop-blur-lg flex justify-between items-center py-2 shadow-top-lg md:shadow-md z-50 rounded-t-xl md:rounded-t-none md:rounded-b-xl">
+      <header className="w-full lg:px-16 px-6 h-16 bg-background/50 backdrop-blur-lg flex justify-between items-center py-2 shadow-top-lg md:shadow-md z-50 rounded-t-xl md:rounded-t-none md:rounded-b-xl">
          <div className="flex-1 hidden md:flex justify-between items-center">
             <Link
                className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-yellow-400 to-pink-500 text-transparent bg-clip-text"
@@ -63,7 +70,7 @@ function Navbar() {
                         <NavLink
                            className={({ isActive }) =>
                               `${
-                                 isActive ? "text-violet-800" : ""
+                                 isActive ? "text-primary" : ""
                               } flex flex-col-reverse md:flex-row items-center justify-center text-center md:gap-1 transition-all duration-500`
                            }
                            to={item.to}
@@ -77,7 +84,7 @@ function Navbar() {
                      <NavLink
                         className={({ isActive }) =>
                            `${
-                              isActive ? "font-bold text-violet-800" : ""
+                              isActive ? "font-bold text-primary" : ""
                            } hidden md:flex flex-col-reverse md:flex-row items-center justify-center text-center md:gap-1`
                         }
                         to={"/profile"}

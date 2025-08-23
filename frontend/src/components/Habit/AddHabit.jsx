@@ -119,7 +119,7 @@ export default function AddHabit() {
          const addHAbit = axios.post(
             `${conf.BACKEND_URL}/api/v1/steak/habit`,
             data,
-            { withCredentials: true }
+            { withCredentials: true },
          );
 
          toast.promise(addHAbit, {
@@ -138,7 +138,7 @@ export default function AddHabit() {
          const addHAbit = axios.patch(
             `${conf.BACKEND_URL}/api/v1/steak/habit`,
             { id: id, ...data },
-            { withCredentials: true }
+            { withCredentials: true },
          );
 
          toast.promise(addHAbit, {
@@ -162,7 +162,7 @@ export default function AddHabit() {
    };
    return (
       <div className="w-full flex justify-center items-start">
-         <Card className="mx-auto max-w-sm w-full">
+         <Card className="mx-auto max-w-md w-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">
                   {id === "new" ? "Create Habit" : "Edit Habit"}
@@ -175,7 +175,7 @@ export default function AddHabit() {
                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                   {/* habit type */}
                   <div>
-                     <Label className="mb-2" htmlFor="type">
+                     <Label className="mb-2 ml-3" htmlFor="type">
                         Habit Type
                      </Label>
                      <div className="grid grid-cols-3 gap-2">
@@ -183,7 +183,7 @@ export default function AddHabit() {
                            className={`${
                               type === "regular"
                                  ? "bg-green-600"
-                                 : "bg-gray-500"
+                                 : "bg-secondary opacity-50"
                            } p-1 rounded-md cursor-pointer flex flex-col justify-center items-center text-xs transition-all duration-500`}
                            onClick={() => setType("regular")}
                         >
@@ -192,7 +192,9 @@ export default function AddHabit() {
                         </span>
                         <span
                            className={`${
-                              type === "negative" ? "bg-red-600" : "bg-gray-500"
+                              type === "negative"
+                                 ? "bg-red-600"
+                                 : "bg-secondary opacity-50"
                            } p-1 rounded-md h-16 cursor-pointer flex flex-col justify-center items-center text-xs transition-all duration-500`}
                            onClick={() => setType("negative")}
                         >
@@ -201,7 +203,9 @@ export default function AddHabit() {
                         </span>
                         <span
                            className={`${
-                              type === "todo" ? "bg-blue-800" : "bg-gray-500"
+                              type === "todo"
+                                 ? "bg-blue-800"
+                                 : "bg-secondary opacity-50"
                            } p-1 rounded-md  cursor-pointer flex flex-col justify-center items-center text-xs transition-all duration-500`}
                            onClick={() => setType("todo")}
                         >
@@ -212,9 +216,9 @@ export default function AddHabit() {
                   </div>
                   {/* habit type description */}
                   <div>
-                     <div className="relative bg-gray-300 dark:bg-gray-800 rounded-md p-2 pl-4">
+                     <div className="relative bg-chart-4 rounded-md p-2 pl-4">
                         <span
-                           className={`absolute -top-[6px] box-border p-2 bg-gray-300 dark:bg-gray-800 rotate-45 transition-all duration-500 rounded-sm  ${
+                           className={`absolute -top-[6px] box-border p-2 bg-chart-4 rotate-45 transition-all duration-500 rounded-sm  ${
                               type == "regular"
                                  ? "left-[13%]"
                                  : type == "todo"
@@ -244,8 +248,8 @@ export default function AddHabit() {
                      </div>
                   </div>
                   {/* habit name */}
-                  <div>
-                     <Label className="mb-2" htmlFor="name">
+                  <div className="space-y-2">
+                     <Label className="ml-3" htmlFor="name">
                         Habit Name
                      </Label>
                      <Input
@@ -302,9 +306,9 @@ export default function AddHabit() {
                            </Button>
                         </CollapsibleTrigger>
                      </div>
-                     <CollapsibleContent className="space-y-2 mt-2">
-                        <div className="">
-                           <Label className="mb-2" htmlFor="description">
+                     <CollapsibleContent className="space-y-2 border border-t-1 rounded-md border-gray-700 p-4">
+                        <div className="space-y-2">
+                           <Label className="ml-3" htmlFor="description">
                               Description
                            </Label>
                            <Textarea
@@ -316,8 +320,8 @@ export default function AddHabit() {
                         </div>
 
                         <div className="flex gap-2 items-center justify-between">
-                           <div>
-                              <Label className="mb-2" htmlFor="place">
+                           <div className="space-y-2">
+                              <Label className="ml-3" htmlFor="place">
                                  Place
                               </Label>
                               <Input
@@ -327,8 +331,8 @@ export default function AddHabit() {
                                  {...register("place")}
                               />
                            </div>
-                           <div>
-                              <Label className="mb-2" htmlFor="point">
+                           <div className="space-y-2">
+                              <Label className="ml-3" htmlFor="point">
                                  Importance
                               </Label>
                               <Input
@@ -341,7 +345,7 @@ export default function AddHabit() {
                         </div>
 
                         <div className="space-y-2">
-                           <Label className="mb-2" htmlFor="how">
+                           <Label className="ml-3" htmlFor="how">
                               How you will do it
                            </Label>
                            <Input
@@ -352,7 +356,7 @@ export default function AddHabit() {
                            />
                         </div>
                         <div className="space-y-2">
-                           <Label className="mb-2" htmlFor="ifthen">
+                           <Label className="ml-3" htmlFor="ifthen">
                               If not done then?
                            </Label>
                            <Input
@@ -366,7 +370,7 @@ export default function AddHabit() {
                   </Collapsible>
 
                   {type !== "negative" && (
-                     <div className="flex items-center justify-start">
+                     <div className="flex items-center justify-start ml-3">
                         <Checkbox
                            id="notify"
                            checked={notify}
@@ -374,13 +378,13 @@ export default function AddHabit() {
                               setNotify((prev) => !prev);
                            }}
                         />
-                        <Label className="mb-2 ml-2" htmlFor="notify">
+                        <Label className="ml-2" htmlFor="notify">
                            Send reminder to do the task
                         </Label>
                      </div>
                   )}
                   <Button
-                     className="w-full bg-violet-800 text-white text-bold hover:bg-violet-900 shadow-md dark:shadow-gray-800 shadow-gray-300"
+                     className="w-full"
                      type="submit"
                   >
                      {id === "new" ? "Create Habit" : "Edit Habit"}

@@ -91,7 +91,7 @@ export default function Login() {
          { token, timeZone: new Date().getTimezoneOffset() },
          {
             withCredentials: true,
-         }
+         },
       );
 
       toast.promise(login, {
@@ -112,7 +112,7 @@ export default function Login() {
 
    return (
       <div className="w-full flex justify-center items-center my-10">
-         <Card className="mx-auto max-w-sm w-full">
+         <Card className="mx-auto max-w-md w-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Login</CardTitle>
                <CardDescription>
@@ -122,7 +122,9 @@ export default function Login() {
             <CardContent>
                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                   <div className="space-y-2">
-                     <Label htmlFor="email">Email</Label>
+                     <Label htmlFor="email" className="pl-3">
+                        Email
+                     </Label>
                      <Input
                         id="email"
                         placeholder="m@example.com"
@@ -132,14 +134,16 @@ export default function Login() {
                      />
                   </div>
                   <div className="space-y-2">
-                     <Label htmlFor="password">Password</Label>
+                     <Label htmlFor="password" className="pl-3">
+                        Password
+                     </Label>
                      <Input
                         id="password"
                         required
                         type={showPass ? "text" : "password"}
                         {...register("password")}
                      />
-                     <div className="flex items-center space-x-2 pt-1">
+                     <div className="flex items-center space-x-2 pt-1 pl-3">
                         <Checkbox
                            id="showpassword"
                            onClick={() => setShowPass((prev) => !prev)}
@@ -163,6 +167,7 @@ export default function Login() {
                   <Link
                      className="text-gray-500 hover:text-blue-500 ml-1"
                      to={"/reset?id=verify-email"}
+                     
                   >
                      Verify Email
                   </Link>

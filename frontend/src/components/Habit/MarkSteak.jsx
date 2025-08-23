@@ -18,7 +18,7 @@ function MarkSteak({ row }) {
          { id: data._id },
          {
             withCredentials: true,
-         }
+         },
       );
       toast.promise(request, {
          loading: "Loading",
@@ -41,7 +41,7 @@ function MarkSteak({ row }) {
       if (!streakList[indexStamp]) return;
       if (!streakList[indexStamp][data?._id]) return;
       let check = streakList[indexStamp][data._id]?.daysCompleted.includes(
-         indexDate.getDate()
+         indexDate.getDate(),
       );
       if (check) {
          setmarked(true);
@@ -53,14 +53,14 @@ function MarkSteak({ row }) {
       <>
          <button
             type="checkbox"
-            className="size-4 cursor-pointer border-gray-200 rounded text-blue-600 focus:ring-blue-500"
+            className="size-5 cursor-pointer border-gray-200 rounded text-blue-600 focus:ring-blue-500"
             onClick={handleMarked}
          >
             {(data.habitType === "negative" && !marked) ||
             (data.habitType !== "negative" && marked) ? (
-               <CircleCheck className="text-green-600 size-6" />
+               <CircleCheck className="text-green-600 size-5" />
             ) : (
-               <Circle className="text-gray-400 size-6" />
+               <Circle className="text-gray-400 size-5" />
             )}
          </button>
       </>

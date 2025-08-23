@@ -109,8 +109,8 @@ function TimeSelector({ times, setTimes }) {
 
    return (
       <div className="grid grid-cols-3 gap-2 items-center justify-between">
-         <div>
-            <Label className="mb-2" htmlFor="startTime">Start Time</Label>
+         <div className="space-y-2">
+            <Label className="ml-3" htmlFor="startTime">Start Time</Label>
             <Input
                id="startTime"
                placeholder="1:00 PM"
@@ -128,8 +128,8 @@ function TimeSelector({ times, setTimes }) {
                }}
             />
          </div>
-         <div>
-            <Label className="mb-2" htmlFor="endTime">End Time</Label>
+         <div className="space-y-2">
+            <Label className="ml-3" htmlFor="endTime">End Time</Label>
             <Input
                id="endTime"
                placeholder="1:00 PM"
@@ -144,8 +144,8 @@ function TimeSelector({ times, setTimes }) {
                }}
             />
          </div>
-         <div>
-            <Label className="mb-2" htmlFor="time">Duration</Label>
+         <div className="space-y-2">
+            <Label className="ml-3" htmlFor="time">Duration</Label>
             <Input
                id="time"
                placeholder="60 min"

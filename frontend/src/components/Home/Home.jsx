@@ -47,27 +47,35 @@ function Home() {
             </h2>
          </div>
          <div className="w-full flex-col justify-between items-center m-0 mt-6 px-2 py-4 rounded-lg">
-            <h2 className="m-0 text-lg underline underline-offset-4 text-center">
+            <h2 className="m-0 text-xl font-bold underline underline-offset-4 text-center text-chart-4">
                Todays Tasks
             </h2>
-            <div className="">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-2 mt-2">
                {habitList?.map((item) => (
                   <div
                      key={item?._id}
-                     className="space-y-1 p-2 pl-3 flex justify-start items-center gap-5"
+                     className="w-full bg-primary/20 rounded-lg p-2 md:p-5 border border-primary/50"
                   >
-                     <MarkSteak row={{ original: item }} />
-                     <div className="flex flex-1 items-center justify-between bg-black/10 dark:bg-white/10 rounded-lg py-4 px-2">
-                        <span>{item.name}</span>
-                        <div className="flex gap-2 items-baseline">
+                     <div className="w-full font-bold text-lg flex items-center justify-between">
+                        <h3 className="text-chart-1">{item.name}</h3>
+                        <MarkSteak row={{ original: item }} />
+                     </div>
+                     <div className="flex w-full gap-2 items-center justify-between mt-5 flex-col md:flex-row">
+                        <div className="w-full flex-1">
                            <NotesBox habitId={item?._id} date={dateToday} />
-                           <Timer
-                              onClick={() =>
-                                 navigate(
-                                    `/timer?id=${item?._id}&min=${item?.duration}`
-                                 )
-                              }
-                           />
+                        </div>
+                        <div
+                           className="flex flex-1 w-full items-center justify-between md:justify-end gap-1 cursor-pointer hover:text-primary"
+                           onClick={() =>
+                              navigate(
+                                 `/timer?id=${item?._id}&min=${item?.duration}`,
+                              )
+                           }
+                        >
+                           <div>Start Timer</div>
+                           <div>
+                              <Timer className="w-4 h-4" />
+                           </div>
                         </div>
                      </div>
                   </div>

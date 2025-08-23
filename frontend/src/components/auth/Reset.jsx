@@ -15,7 +15,7 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useForm } from "react-hook-form";
 
-export function ResetPage() {
+export default function ResetPage() {
    const [searchParams] = useSearchParams();
    const navigate = useNavigate();
    const id = searchParams.get("id");
@@ -56,7 +56,7 @@ export function ResetPage() {
    };
    return (
       <div className="w-full flex justify-center items-center my-10">
-         <Card className="mx-auto max-w-sm">
+         <Card className="mx-auto max-w-md w-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">{head}</CardTitle>
                <CardDescription>
@@ -66,7 +66,7 @@ export function ResetPage() {
             <CardContent>
                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                   <div className="space-y-2">
-                     <Label htmlFor="email">Email</Label>
+                     <Label htmlFor="email" className="pl-3">Email</Label>
                      <Input
                         id="email"
                         placeholder="m@example.com"

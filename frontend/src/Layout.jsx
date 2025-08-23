@@ -4,7 +4,9 @@ import { Toaster } from "react-hot-toast";
 
 function Layout() {
    return (
-      <div className={`text-black dark:text-white bg-gray-50 dark:bg-gray-950 w-full h-[100svh] overflow-hidden flex flex-col-reverse md:flex-col sm-py-4`}>
+      <div
+         className={`text-foreground bg-background w-full h-[100svh] overflow-hidden flex flex-col-reverse md:flex-col sm-py-4`}
+      >
          <div className="w-full h-16">
             <Navbar />
          </div>

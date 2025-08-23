@@ -57,7 +57,7 @@ function NotesBox({ habitId, date }) {
             },
             {
                withCredentials: true,
-            }
+            },
          );
          toast.promise(req, {
             loading: "Loading",
@@ -73,7 +73,7 @@ function NotesBox({ habitId, date }) {
                   date: sDate,
                   month: mDate,
                   notesData: { _id: itemdata._id, note: itemdata.note },
-               })
+               }),
             );
          }).catch((err) => console.log(err));
       }
@@ -87,7 +87,7 @@ function NotesBox({ habitId, date }) {
          },
          {
             withCredentials: true,
-         }
+         },
       );
       toast.promise(req, {
          loading: "Loading",
@@ -103,10 +103,15 @@ function NotesBox({ habitId, date }) {
    };
 
    return (
-      <div>
+      <div className="w-full">
          <AlertDialog>
-            <AlertDialogTrigger>
-               <Pencil className="w-5 h-5" />
+            <AlertDialogTrigger className="w-full">
+               <div className="flex w-full justify-between items-center md:justify-start gap-1 cursor-pointer hover:text-primary">
+                  <div>Add Note</div>
+                  <div>
+                     <Pencil className="w-3 h-3" />
+                  </div>
+               </div>
             </AlertDialogTrigger>
             <AlertDialogContent>
                <AlertDialogHeader>

@@ -10,7 +10,7 @@ import {
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { conf } from "@/conf/conf";
 import toast from "react-hot-toast";
@@ -24,6 +24,7 @@ function useQuery() {
 }
 
 function Timer() {
+   const navigate = useNavigate();
    const query = useQuery();
    const id = query.get("id");
    const min = query.get("min");
@@ -55,7 +56,7 @@ function Timer() {
          { id: id },
          {
             withCredentials: true,
-         }
+         },
       );
       toast.promise(request, {
          loading: "Loading",
@@ -114,7 +115,7 @@ function Timer() {
                <div className="space-y-4">
                   <div className="space-y-2">
                      <h2>Time Left</h2>
-                     <div className="space-y-1 p-2 pl-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
+                     <div className="space-y-1 p-2 pl-3 bg-primary/20 rounded-lg shadow flex flex-col gap-2">
                         <div className="flex text-8xl  items-center space-x-2 justify-center gap-2">
                            {time.min}:
                            {time.sec < 10 ? "0" + time.sec : time.sec}
@@ -126,7 +127,7 @@ function Timer() {
                   <div className="space-y-4 pt-5">
                      <div className="space-y-2">
                         <h2>Set Time</h2>
-                        <div className="space-y-1 p-2 pl-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
+                        <div className="space-y-1 p-1 rounded-lg flex flex-col gap-2">
                            <div className="flex items-center space-x-2 justify-start gap-2">
                               <div>
                                  <Label className="mb-2 pl-2">Minutes</Label>
@@ -172,15 +173,24 @@ function Timer() {
                   </div>
                )}
 
-               <CardFooter className="p-0 pt-5 justify-between">
+               <CardFooter className="p-0 pt-5 justify-between flex-col gap-2">
                   <Button
                      className={`w-full py-2 rounded-md ${
-                        intervalRef.current ? "bg-red-500" : "bg-violet-500"
+                        intervalRef.current ? "bg-destructive" : "bg-primary"
                      }  text-white`}
                      onClick={startTimer}
                   >
                      {intervalRef.current ? "Stop" : "Start"}
                   </Button>
+                  {intervalRef.current === null && (
+                     <Button
+                        variant={"outline"}
+                        className="w-full"
+                        onClick={() => navigate("/")}
+                     >
+                        Close
+                     </Button>
+                  )}
                </CardFooter>
             </CardContent>
          </Card>

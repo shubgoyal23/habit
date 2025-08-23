@@ -23,9 +23,8 @@ const Timmer = lazy(() => import("./components/Timer/Timer"));
 const Login = lazy(() => import("./components/auth/Login"));
 const Logout = lazy(() => import("./components/auth/Logout"));
 const Register = lazy(() => import("./components/auth/Register"));
-
 const VerifyOtp = lazy(() => import("./components/auth/VerifyOtp"));
-const ResetPage = lazy(() => import("./components/auth/PasswordReset"));
+const ResetPage = lazy(() => import("./components/auth/Reset"));
 
 const router = createBrowserRouter([
    {

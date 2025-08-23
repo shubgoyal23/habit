@@ -33,7 +33,7 @@ export default function Register() {
       const register = axios.post(
          `${conf.BACKEND_URL}/api/v1/users/register`,
          data,
-         { withCredentials: true }
+         { withCredentials: true },
       );
 
       toast.promise(register, {
@@ -43,13 +43,15 @@ export default function Register() {
             `${err.response?.data?.message || "Something went wrong"}`,
       });
       register
-         .then((data) => navigate(`/verify?id=${data.data.data._id}&type=register`))
+         .then((data) =>
+            navigate(`/verify?id=${data.data.data._id}&type=register`),
+         )
          .catch((err) => console.log(err));
    };
 
    return (
       <div className="w-full flex justify-center items-start my-10">
-         <Card className="mx-auto max-w-sm">
+         <Card className="mx-auto max-w-md w-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Register</CardTitle>
                <CardDescription>
@@ -59,8 +61,10 @@ export default function Register() {
             <CardContent>
                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                   <div className="flex gap-2 items-center justify-between">
-                     <div>
-                        <Label htmlFor="firstName">First Name</Label>
+                     <div className="space-y-2">
+                        <Label className="pl-3" htmlFor="firstName">
+                           First Name
+                        </Label>
                         <Input
                            id="firstName"
                            placeholder="first Name"
@@ -69,8 +73,10 @@ export default function Register() {
                            {...register("firstName")}
                         />
                      </div>
-                     <div>
-                        <Label htmlFor="lastName">Last Name</Label>
+                     <div className="space-y-2">
+                        <Label className="pl-3" htmlFor="lastName">
+                           Last Name
+                        </Label>
                         <Input
                            id="lastName"
                            placeholder="last Name"
@@ -81,7 +87,9 @@ export default function Register() {
                      </div>
                   </div>
                   <div className="space-y-2">
-                     <Label htmlFor="email">Email</Label>
+                     <Label className="pl-3" htmlFor="email">
+                        Email
+                     </Label>
                      <Input
                         id="email"
                         placeholder="m@example.com"
@@ -91,14 +99,16 @@ export default function Register() {
                      />
                   </div>
                   <div className="space-y-2">
-                     <Label htmlFor="password">Password</Label>
+                     <Label className="pl-3" htmlFor="password">
+                        Password
+                     </Label>
                      <Input
                         id="password"
                         required
                         type={showPass ? "text" : "password"}
                         {...register("password")}
                      />
-                     <div className="flex items-center space-x-2 pt-1">
+                     <div className="flex items-center space-x-2 pt-1 pl-3">
                         <Checkbox
                            id="showpassword"
                            onClick={() => setShowPass((prev) => !prev)}

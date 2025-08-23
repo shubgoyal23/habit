@@ -12,7 +12,7 @@ import axios from "axios";
 import { conf } from "@/conf/conf";
 import { PasswordReset } from "./PasswordReset";
 
-export function VerifyOtp() {
+export default function VerifyOtp() {
    const [searchParams] = useSearchParams();
    const navigate = useNavigate();
    const id = searchParams.get("id");
