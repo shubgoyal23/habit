@@ -19,12 +19,12 @@ const create2 = tool(Createhabit, {
       startTime: z
          .string()
          .describe(
-            "Time representing the start time of the habit in 00:00 format"
+            "Time representing the start time of the habit in 00:00 format",
          ),
       startDate: z
          .string()
          .describe(
-            "date representing the start date of the habit as input for new Date(date)"
+            "date representing the start date of the habit as input for new Date(date)",
          ),
       user: z.object({ _id: z.string(), timeZone: z.number() }), // Ensure user is required
    }),
@@ -39,12 +39,12 @@ const create = tool(Createhabit, {
       startTime: z
          .string()
          .describe(
-            "Time representing the start time of the habit in 00:00 format"
+            "Time representing the start time of the habit in 00:00 format",
          ),
       startDate: z
          .string()
          .describe(
-            "date representing the start date of the habit as input for new Date(date)"
+            "date representing the start date of the habit as input for new Date(date)",
          ),
    }),
 });
@@ -60,13 +60,15 @@ const edit = tool(EditHabit, {
       startTime: z
          .string()
          .describe(
-            "Time representing the start time of the habit in 00:00 format"
-         ),
+            "Time representing the start time of the habit in 00:00 format",
+         )
+         .optional(),
       startDate: z
          .string()
          .describe(
-            "date representing the start date of the habit as input for new Date(date)"
-         ),
+            "date representing the start date of the habit as input for new Date(date)",
+         )
+         .optional(),
    }),
 });
 
