@@ -24,7 +24,15 @@ import { EditDetails } from "./EditDetails";
 import { Support } from "./Support";
 import ShareApp from "./share";
 import { SyncClearTokens } from "@/lib/storeToken";
-import { CircleAlert, Lock, LogOut, Monitor, Moon, RefreshCcw, Sun } from "lucide-react";
+import {
+   CircleAlert,
+   Lock,
+   LogOut,
+   Monitor,
+   Moon,
+   RefreshCcw,
+   Sun,
+} from "lucide-react";
 
 function Profile() {
    const userTheme = useSelector((state) => state.userTheme);
@@ -40,7 +48,7 @@ function Profile() {
       window.location.reload();
    };
    return (
-      <div className="w-full flex justify-center items-center">
+      <div className="w-full h-full flex justify-center items-center">
          <Card className="mx-auto w-sm">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Profile</CardTitle>
@@ -87,9 +95,9 @@ function Profile() {
                            ) : (
                               <Monitor />
                            )}
-                           <Select className="p-1" onValueChange={handeltheme}>
+                           <Select onValueChange={handeltheme}>
                               <SelectTrigger
-                                 className="p-1 border-none outline-none flex-1"
+                                 className="p-1 border-none outline-none flex-1 bg-primary/10 dark:bg-primary/10"
                                  variant="none"
                               >
                                  <SelectValue placeholder="Select a Theme" />

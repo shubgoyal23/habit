@@ -50,7 +50,7 @@ export default function Register() {
    };
 
    return (
-      <div className="w-full flex justify-center items-start my-10">
+      <div className="w-full flex justify-center items-center h-full">
          <Card className="mx-auto max-w-md w-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Register</CardTitle>

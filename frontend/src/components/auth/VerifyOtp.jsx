@@ -52,7 +52,7 @@ export default function VerifyOtp() {
       }
    };
    return (
-      <div className="w-full h-[60svh] flex justify-center items-center flex-col">
+      <div className="w-full h-full flex justify-center items-center flex-col">
          <h1 className="mb-2">Enter OTP</h1>
          <InputOTP
             maxLength={6}

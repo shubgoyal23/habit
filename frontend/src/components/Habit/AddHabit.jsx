@@ -161,8 +161,8 @@ export default function AddHabit() {
       }
    };
    return (
-      <div className="w-full flex justify-center items-start">
-         <Card className="mx-auto max-w-md w-full">
+      <div className="w-full h-full flex justify-center items-center">
+         <Card className="mx-auto max-w-md w-full h-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">
                   {id === "new" ? "Create Habit" : "Edit Habit"}
@@ -171,7 +171,7 @@ export default function AddHabit() {
                   Enter Full details to get most out of this App
                </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="overflow-y-scroll h-full">
                <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
                   {/* habit type */}
                   <div>

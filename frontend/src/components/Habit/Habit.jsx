@@ -228,7 +228,7 @@ function Habit() {
             <FilterInput table={table} />
             <RowSelector table={table} />
          </div>
-         <Table className="md:p-6 text-center border border-gray-200 rounded-md">
+         <Table className="md:p-6 text-center border border-gray-500 rounded-md">
             <TableCaption>
                {habitList.length === 0
                   ? "Add habit to see here"

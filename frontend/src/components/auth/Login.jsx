@@ -111,7 +111,7 @@ export default function Login() {
    };
 
    return (
-      <div className="w-full flex justify-center items-center my-10">
+      <div className="w-full h-full flex justify-center items-center">
          <Card className="mx-auto max-w-md w-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Login</CardTitle>
