@@ -95,8 +95,8 @@ function Timer() {
    };
 
    return (
-      <div className="w-full flex justify-center items-center">
-         <Card className="mx-auto w-sm">
+      <div className="w-full h-full flex justify-center items-center">
+         <Card className="mx-auto max-w-md w-full">
             <CardHeader className="space-y-1">
                <div className="flex items-center space-x-2 justify-between gap-2">
                   <CardTitle className="text-2xl font-bold">Pomodoro</CardTitle>
