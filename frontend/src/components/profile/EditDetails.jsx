@@ -63,8 +63,8 @@ export function EditDetails() {
             </DialogHeader>
             <div className="grid gap-4 py-4">
                <div className="flex gap-2 items-center justify-between">
-                  <div>
-                     <Label htmlFor="firstName">First Name</Label>
+                  <div className="space-y-2">
+                     <Label htmlFor="firstName" className="ml-3">First Name</Label>
                      <Input
                         id="firstName"
                         placeholder="first Name"
@@ -75,8 +75,8 @@ export function EditDetails() {
                         }
                      />
                   </div>
-                  <div>
-                     <Label htmlFor="lastName">Last Name</Label>
+                  <div className="space-y-2">
+                     <Label htmlFor="lastName" className="ml-3">Last Name</Label>
                      <Input
                         id="lastName"
                         placeholder="last Name"
