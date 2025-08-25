@@ -54,10 +54,10 @@ function Home() {
             </CardHeader>
             <CardContent className="overflow-y-scroll h-full">
                <div>
-                  <h2 className="m-0 text-xl font-bold underline underline-offset-4 text-center text-chart-4">
+                  <h2 className="m-0 text-sm text-center text-chart-4">
                      Todays Tasks
                   </h2>
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 p-2 mt-2">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
                      {habitList?.map((item) => (
                         <div
                            key={item?._id}
