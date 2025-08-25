@@ -16,7 +16,21 @@ import { conf } from "@/conf/conf";
 import { addSteak } from "@/store/StreakSlice";
 import { AddNote } from "@/store/NoteSlice";
 import NoteCard from "../Notes/NoteCard";
-import { ChevronRight, CircleCheck, CircleX, Flame, NotebookPen } from "lucide-react";
+import {
+   ChevronRight,
+   CircleCheck,
+   CircleX,
+   Flame,
+   NotebookPen,
+} from "lucide-react";
+import {
+   Card,
+   CardContent,
+   CardDescription,
+   CardFooter,
+   CardHeader,
+   CardTitle,
+} from "../ui/card";
 
 const monthsName = [
    "January",
@@ -231,72 +245,94 @@ function Steak() {
    };
 
    return (
-      <div className="w-full p-2 md:p-6 mt-3">
-         <h1 className="text-center text-xl font-semibold my-3 text-blue-500 underline underline-offset-2">
-            Habits Streak
-         </h1>
-         <div className="flex justify-between text-xl font-bold items-center gap-2 mb-6 w-fit bg-gray-50 dark:bg-gray-800 m-auto px-5 h-10 rounded-lg">
-            <button onClick={() => changeMonth(-1)} className="size-6">
-               <ChevronRight className="rotate-180" />
-            </button>
-            <div className="font-normal">{`${monthsName[month]} ${year}`}</div>
-            <button onClick={() => changeMonth(1)} className="size-6">
-               <ChevronRight className="" />
-            </button>
-         </div>
-         <Table className="md:p-6 border border-gray-200 rounded-md">
-            <TableCaption>
-               {habitList.length === 0
-                  ? "Add habit to see here"
-                  : "A list of your Daily Habits."}
-            </TableCaption>
-            <TableHeader className="bg-violet-50 dark:bg-gray-950">
-               <TableRow className="text-sm">
-                  <TableHead className="max-w-5 overflow-x-scroll text-center">
-                     Day/ Habit
-                  </TableHead>
-                  {habitList.map((item) => {
-                     if (item.habitType != "todo") {
-                        return (
-                           <TableHead
-                              key={item._id}
-                              className="max-w-10 text-center overflow-x-scroll"
-                           >
-                              {item.name}
-                           </TableHead>
-                        );
-                     }
-                  })}
-               </TableRow>
-            </TableHeader>
-            <TableBody className="text-center">
-               {Array(daysInMonth(month))
-                  .fill(0)
-                  .map((_, i) => (
-                     <TableRow key={`day-${i + 1}`}>
-                        <TableCell>{`${i + 1}`}</TableCell>
+      <div className="w-full h-full flex justify-center items-center">
+         <Card className="mx-auto w-full h-full pb-0">
+            <CardHeader className="space-y-1">
+               <div className="flex justify-between">
+                  <div>
+                     <CardTitle className="text-2xl font-bold">
+                        Habits Streak
+                     </CardTitle>
+                     <CardDescription>
+                        Don&apos;t break the chain keep it going!
+                     </CardDescription>
+                  </div>
+                  <div className="flex justify-between text-xl font-bold items-center gap-2 px-5 h-10 rounded-lg bg-accent">
+                     <button onClick={() => changeMonth(-1)} className="size-6">
+                        <ChevronRight className="rotate-180" />
+                     </button>
+                     <div className="font-normal">{`${monthsName[month]} ${year}`}</div>
+                     <button onClick={() => changeMonth(1)} className="size-6">
+                        <ChevronRight className="" />
+                     </button>
+                  </div>
+               </div>
+            </CardHeader>
+            <CardContent className="overflow-y-scroll h-full">
+               <Table className="md:p-6">
+                  <TableCaption>
+                     {habitList.length === 0
+                        ? "Add habit to see here"
+                        : "A list of your Daily Habits Streak."}
+                  </TableCaption>
+                  <TableHeader className="">
+                     <TableRow className="text-sm">
+                        <TableHead
+                           className="max-w-5 overflow-x-scroll text-center bg-primary/20
+                                 first:rounded-tl-lg
+                                 last:rounded-tr-lg"
+                        >
+                           Day/ Habit
+                        </TableHead>
                         {habitList.map((item) => {
                            if (item.habitType != "todo") {
                               return (
-                                 <TableCell
+                                 <TableHead
                                     key={item._id}
-                                    className="align-center"
+                                    className="max-w-10 text-center overflow-x-scroll bg-primary/20
+                                 first:rounded-tl-lg
+                                 last:rounded-tr-lg"
                                  >
-                                    {checkDate(item, i)}
-                                 </TableCell>
+                                    {item.name}
+                                 </TableHead>
                               );
                            }
                         })}
                      </TableRow>
-                  ))}
-            </TableBody>
-         </Table>
-
-         <div className="flex justify-center mt-6">
-            <Link to={"/habit/new"} className="text-blue-500 underline">
-               Add New Habit
-            </Link>
-         </div>
+                  </TableHeader>
+                  <TableBody className="text-center">
+                     {Array(daysInMonth(month))
+                        .fill(0)
+                        .map((_, i) => (
+                           <TableRow key={`day-${i + 1}`}>
+                              <TableCell className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1">{`${
+                                 i + 1
+                              }`}</TableCell>
+                              {habitList.map((item) => {
+                                 if (item.habitType != "todo") {
+                                    return (
+                                       <TableCell
+                                          key={item._id}
+                                          className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1"
+                                       >
+                                          {checkDate(item, i)}
+                                       </TableCell>
+                                    );
+                                 }
+                              })}
+                           </TableRow>
+                        ))}
+                  </TableBody>
+               </Table>
+            </CardContent>
+            <CardFooter className="justify-center">
+               <div className="flex justify-center">
+                  <Link to={"/habit/new"} className="text-chart-4">
+                     Add New Habit
+                  </Link>
+               </div>
+            </CardFooter>
+         </Card>
       </div>
    );
 }

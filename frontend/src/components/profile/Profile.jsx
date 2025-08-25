@@ -3,7 +3,6 @@ import {
    Card,
    CardContent,
    CardDescription,
-   CardFooter,
    CardHeader,
    CardTitle,
 } from "../ui/card";
@@ -49,89 +48,88 @@ function Profile() {
    };
    return (
       <div className="w-full h-full flex justify-center items-center">
-         <Card className="mx-auto w-sm">
+         <Card className="mx-auto w-full max-w-md h-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Profile</CardTitle>
                <CardDescription>
                   Manage your profile settings and privacy options from here
                </CardDescription>
             </CardHeader>
-            <CardContent>
-               <div className="space-y-4">
-                  <div className="space-y-2">
-                     <h2>Account</h2>
-                     <div className="space-y-1 p-2 pl-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
-                        <EditDetails />
-                        <Notification />
-                        <NavLink
-                           to={"/privacy-policy"}
-                           className="flex items-center space-x-2 justify-start gap-2"
-                        >
-                           <Lock />
-                           <span>Privacy</span>
-                        </NavLink>
-                     </div>
-                     <h2 className="mt-2">Support & About</h2>
-                     <div className="space-y-1 p-2 pl-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
-                        <Support />
-                        <ShareApp />
-                        <NavLink
-                           to={"/terms-and-conditions"}
-                           className="flex items-center space-x-2 justify-start gap-2"
-                        >
-                           <CircleAlert />
-                           <span>Terms & Policies</span>
-                        </NavLink>
-                     </div>
+            <CardContent className="overflow-y-scroll h-full space-y-4">
+               <div>
+                  <h2 className="ml-3">Account</h2>
+                  <div className="space-y-1 p-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
+                     <EditDetails />
+                     <Notification />
+                     <NavLink
+                        to={"/privacy-policy"}
+                        className="flex items-center space-x-2 justify-start gap-2"
+                     >
+                        <Lock />
+                        <span>Privacy</span>
+                     </NavLink>
+                  </div>
+               </div>
+               <div>
+                  <h2 className="ml-3">Support & About</h2>
+                  <div className="space-y-1 p-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
+                     <Support />
+                     <ShareApp />
+                     <NavLink
+                        to={"/terms-and-conditions"}
+                        className="flex items-center space-x-2 justify-start gap-2"
+                     >
+                        <CircleAlert />
+                        <span>Terms & Policies</span>
+                     </NavLink>
+                  </div>
+               </div>
 
-                     {/* actions */}
-                     <h2 className="mt-2">Actions</h2>
-                     <div className="space-y-1 p-2 pl-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
-                        <div className="flex items-center space-x-2 justify-start gap-2">
-                           {userTheme === "dark" ? (
-                              <Moon />
-                           ) : userTheme === "light" ? (
-                              <Sun />
-                           ) : (
-                              <Monitor />
-                           )}
-                           <Select onValueChange={handeltheme}>
-                              <SelectTrigger
-                                 className="p-1 border-none outline-none flex-1 bg-primary/10 dark:bg-primary/10"
-                                 variant="none"
-                              >
-                                 <SelectValue placeholder="Select a Theme" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                 <SelectGroup>
-                                    <SelectLabel>Theme</SelectLabel>
-                                    <SelectItem value="system">
-                                       System
-                                    </SelectItem>
-                                    <SelectItem value="dark">Dark</SelectItem>
-                                    <SelectItem value="light">Light</SelectItem>
-                                 </SelectGroup>
-                              </SelectContent>
-                           </Select>
-                        </div>
-                        <div
-                           className="flex items-center space-x-2 justify-start gap-2 cursor-pointer"
-                           onClick={syncHandler}
-                        >
-                           <RefreshCcw />
-                           <span>Sync Data</span>
-                        </div>
-                        <div
-                           className="flex items-center space-x-2 justify-start gap-2 cursor-pointer"
-                           onClick={() => navigate("/logout")}
-                        >
-                           <LogOut />
-                           <span>Logout</span>
-                        </div>
+               {/* actions */}
+               <div>
+                  <h2 className="ml-3">Actions</h2>
+                  <div className="space-y-1 p-3 bg-white/10 rounded-lg shadow flex flex-col gap-2">
+                     <div className="flex items-center space-x-2 justify-start gap-2">
+                        {userTheme === "dark" ? (
+                           <Moon />
+                        ) : userTheme === "light" ? (
+                           <Sun />
+                        ) : (
+                           <Monitor />
+                        )}
+                        <Select onValueChange={handeltheme}>
+                           <SelectTrigger
+                              className="p-1 border-none outline-none flex-1 bg-primary/10 dark:bg-primary/10"
+                              variant="none"
+                           >
+                              <SelectValue placeholder="Select a Theme" />
+                           </SelectTrigger>
+                           <SelectContent>
+                              <SelectGroup>
+                                 <SelectLabel>Theme</SelectLabel>
+                                 <SelectItem value="system">System</SelectItem>
+                                 <SelectItem value="dark">Dark</SelectItem>
+                                 <SelectItem value="light">Light</SelectItem>
+                              </SelectGroup>
+                           </SelectContent>
+                        </Select>
+                     </div>
+                     <div
+                        className="flex items-center space-x-2 justify-start gap-2 cursor-pointer"
+                        onClick={syncHandler}
+                     >
+                        <RefreshCcw />
+                        <span>Sync Data</span>
+                     </div>
+                     <div
+                        className="flex items-center space-x-2 justify-start gap-2 cursor-pointer"
+                        onClick={() => navigate("/logout")}
+                     >
+                        <LogOut />
+                        <span>Logout</span>
                      </div>
                   </div>
                </div>
-               <CardFooter className="p-0 pt-1 justify-between"></CardFooter>
             </CardContent>
          </Card>
       </div>

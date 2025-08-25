@@ -30,6 +30,14 @@ import toast from "react-hot-toast";
 import { EpochToTime } from "@/lib/helpers";
 import { getToken, setToken } from "@/lib/storeToken";
 import { ChevronsUpDown } from "lucide-react";
+import {
+   Card,
+   CardContent,
+   CardDescription,
+   CardFooter,
+   CardHeader,
+   CardTitle,
+} from "../ui/card";
 
 const columns = [
    {
@@ -220,86 +228,101 @@ function Habit() {
    }, [habitList]);
 
    return (
-      <div className="w-full p-2 md:p-6 mt-3">
-         <h1 className="text-center text-xl font-semibold my-3 text-blue-500 underline underline-offset-2">
-            Habit List
-         </h1>
-         <div className="flex justify-between items-center">
-            <FilterInput table={table} />
-            <RowSelector table={table} />
-         </div>
-         <Table className="md:p-6 text-center border border-gray-500 rounded-md">
-            <TableCaption>
-               {habitList.length === 0
-                  ? "Add habit to see here"
-                  : "A list of your Daily Habits."}
-            </TableCaption>
-            <TableHeader>
-               {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="">
-                     {headerGroup.headers.map((header) => {
-                        return (
-                           <TableHead
-                              key={header.id}
-                              className={`${
-                                 header.column.getCanSort()
-                                    ? "cursor-pointer"
-                                    : ""
-                              } `}
-                              onClick={header.column.getToggleSortingHandler()}
+      <div className="w-full h-full flex justify-center items-center">
+         <Card className="mx-auto w-full h-full pb-0">
+            <CardHeader className="space-y-1">
+               <CardTitle className="text-2xl font-bold">Habit List</CardTitle>
+               <CardDescription>List of All Habits You have</CardDescription>
+               <div className="flex justify-between items-center">
+                  <FilterInput table={table} />
+                  <RowSelector table={table} />
+               </div>
+            </CardHeader>
+            <CardContent className="overflow-y-scroll h-full">
+               <Table className="md:p-4 text-center">
+                  <TableCaption>
+                     {habitList.length === 0
+                        ? "Add habit to see here"
+                        : "A list of your Daily Habits."}
+                  </TableCaption>
+                  <TableHeader className="">
+                     {table.getHeaderGroups().map((headerGroup) => (
+                        <TableRow key={headerGroup.id}>
+                           {headerGroup.headers.map((header) => {
+                              return (
+                                 <TableHead
+                                    key={header.id}
+                                    className={`
+                                       ${
+                                          header.column.getCanSort()
+                                             ? "cursor-pointer"
+                                             : ""
+                                       }
+                                       bg-primary/20
+                                       first:rounded-tl-lg
+                                       last:rounded-tr-lg
+                                     `}
+                                    onClick={header.column.getToggleSortingHandler()}
+                                 >
+                                    <span className="flex justify-center items-center">
+                                       {header.isPlaceholder
+                                          ? null
+                                          : flexRender(
+                                               header.column.columnDef.header,
+                                               header.getContext()
+                                            )}
+                                       {header.column.getCanSort() && (
+                                          <ChevronsUpDown className="h-4 w-4" />
+                                       )}
+                                    </span>
+                                 </TableHead>
+                              );
+                           })}
+                        </TableRow>
+                     ))}
+                  </TableHeader>
+                  <TableBody>
+                     {table.getRowModel().rows?.length ? (
+                        table.getRowModel().rows.map((row) => (
+                           <TableRow
+                              key={row.id}
+                              data-state={row.getIsSelected() && "selected"}
+                              className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1"
                            >
-                              <span className="flex justify-center items-center">
-                                 {header.isPlaceholder
-                                    ? null
-                                    : flexRender(
-                                         header.column.columnDef.header,
-                                         header.getContext()
-                                      )}
-                                 {header.column.getCanSort() && (
-                                    <ChevronsUpDown className="h-4 w-4" />
-                                 )}
-                              </span>
-                           </TableHead>
-                        );
-                     })}
-                  </TableRow>
-               ))}
-            </TableHeader>
-            <TableBody>
-               {table.getRowModel().rows?.length ? (
-                  table.getRowModel().rows.map((row) => (
-                     <TableRow
-                        key={row.id}
-                        data-state={row.getIsSelected() && "selected"}
-                     >
-                        {row.getVisibleCells().map((cell) => (
-                           <TableCell key={cell.id}>
-                              {flexRender(
-                                 cell.column.columnDef.cell,
-                                 cell.getContext()
-                              )}
+                              {row.getVisibleCells().map((cell) => (
+                                 <TableCell key={cell.id}>
+                                    {flexRender(
+                                       cell.column.columnDef.cell,
+                                       cell.getContext()
+                                    )}
+                                 </TableCell>
+                              ))}
+                           </TableRow>
+                        ))
+                     ) : (
+                        <TableRow>
+                           <TableCell
+                              colSpan={columns.length}
+                              className="h-24 text-center rounded-b-lg bg-secondary"
+                           >
+                              No results.
                            </TableCell>
-                        ))}
-                     </TableRow>
-                  ))
-               ) : (
-                  <TableRow>
-                     <TableCell
-                        colSpan={columns.length}
-                        className="h-24 text-center"
-                     >
-                        No results.
-                     </TableCell>
-                  </TableRow>
-               )}
-            </TableBody>
-         </Table>
-
-         <div className="flex justify-center mt-6">
-            <Link to={"/habit-archive"} className="text-blue-500 underline">
-               Archived Habit List
-            </Link>
-         </div>
+                        </TableRow>
+                     )}
+                  </TableBody>
+               </Table>
+            </CardContent>
+            <CardFooter className="justify-center">
+               <div className="flex justify-center">
+                  <Link
+                     to={"/habit-archive"}
+                     className="text-chart-4"
+                  >
+                     Archived Habit List
+                  </Link>
+               </div>
+            </CardFooter>
+         </Card>
       </div>
    );
 }
