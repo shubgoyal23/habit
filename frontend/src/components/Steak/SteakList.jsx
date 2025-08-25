@@ -248,7 +248,7 @@ function Steak() {
       <div className="w-full h-full flex justify-center items-center">
          <Card className="mx-auto w-full h-full pb-0">
             <CardHeader className="space-y-1">
-               <div className="flex justify-between flex-col md:flex-row">
+               <div className="flex justify-between flex-col md:flex-row gap-2">
                   <div>
                      <CardTitle className="text-2xl font-bold">
                         Habits Streak
