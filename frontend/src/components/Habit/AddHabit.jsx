@@ -162,7 +162,7 @@ export default function AddHabit() {
    };
    return (
       <div className="w-full h-full flex justify-center items-center">
-         <Card className="pt-4 md:pt-0 mx-auto max-w-md w-full h-full">
+         <Card className="pt-10 md:pt-0 mx-auto max-w-md w-full h-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">
                   {id === "new" ? "Create Habit" : "Edit Habit"}

@@ -48,7 +48,7 @@ function Profile() {
    };
    return (
       <div className="w-full h-full flex justify-center items-center">
-         <Card className="pt-4 md:pt-0 mx-auto w-full max-w-md h-full">
+         <Card className="pt-10 md:pt-0 mx-auto w-full max-w-md h-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Profile</CardTitle>
                <CardDescription>

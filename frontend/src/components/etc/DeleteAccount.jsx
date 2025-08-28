@@ -51,7 +51,7 @@ function DeleteAccount() {
 
    return (
       <div className="w-full flex justify-center items-start my-10">
-         <Card className="pt-4 md:pt-0 mx-auto max-w-sm">
+         <Card className="pt-10 md:pt-0 mx-auto max-w-sm">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">
                   Close Account

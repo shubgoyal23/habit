@@ -246,7 +246,7 @@ function Steak() {
 
    return (
       <div className="w-full h-full flex justify-center items-center">
-         <Card className="pt-4 md:pt-0 mx-auto w-full h-full pb-0">
+         <Card className="pt-10 md:pt-0 mx-auto w-full h-full pb-0">
             <CardHeader className="space-y-1">
                <div className="flex justify-between flex-col md:flex-row gap-2">
                   <div>
