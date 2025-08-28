@@ -49,11 +49,14 @@ function Home() {
                      {habitList?.map((item) => (
                         <div
                            key={item?._id}
-                           className="w-full bg-primary/20 rounded-lg p-2 md:p-5 border border-primary/50"
+                           className={`w-full rounded-lg p-2 md:p-5 border border-primary/50 ${item.habitType == "todo" ? "bg-chart-2/20" : "bg-chart-4/20"}`}
                         >
                            <div className="w-full font-bold text-lg flex items-center justify-between">
                               <h3 className="text-chart-1">{item.name}</h3>
                               <MarkSteak row={{ original: item }} />
+                           </div>
+                           <div className="w-full font-bold text-sm">
+                              <h3 className="text-chart-2">{item.startTime}</h3>
                            </div>
                            <div className="flex w-full gap-2 items-center justify-between mt-5 flex-col md:flex-row">
                               <div className="w-full flex-1">
