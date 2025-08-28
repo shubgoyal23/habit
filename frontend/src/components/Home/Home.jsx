@@ -51,19 +51,21 @@ function Home() {
                            key={item?._id}
                            className={`w-full rounded-lg p-2 md:p-5 border ${
                               item.habitType == "todo"
-                                 ? "bg-chart-4/20 border-chart-4"
-                                 : "bg-chart-2/20 border-chart-2"
+                                 ? "bg-chart-4/20 border-chart-4 hover:bg-chart-4/50"
+                                 : "bg-chart-2/20 border-chart-2 hover:bg-chart-2/50"
                            }`}
                         >
                            <div className="w-full font-bold text-lg flex items-center justify-between">
-                              <h3 className="text-chart-1 capitalize">{item.name}</h3>
+                              <h3 className="text-chart-1 capitalize">
+                                 {item.name}
+                              </h3>
                               <MarkSteak row={{ original: item }} />
                            </div>
-                           <div className="w-full text-sm flex items-center justify-between">
+                           <div className="w-full text-sm flex items-center justify-between mt-5">
                               <h3>startTime: </h3>
                               <h3>{EpochToTime(item.startTime * 1000)}</h3>
                            </div>
-                           <div className="flex w-full gap-2 items-center justify-between mt-5 flex-col md:flex-row">
+                           <div className="flex w-full gap-2 items-center justify-between flex-col md:flex-row">
                               <div className="w-full flex-1">
                                  <NotesBox
                                     habitId={item?._id}
