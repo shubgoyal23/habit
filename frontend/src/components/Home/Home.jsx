@@ -34,7 +34,7 @@ function Home() {
 
    return (
       <div className="w-full h-full flex justify-center items-center">
-         <Card className="mx-auto w-full h-full pb-0">
+         <Card className="pt-4 md:pt-0 mx-auto w-full h-full pb-0">
             <CardHeader className="space-y-1 flex justify-between items-center">
                <CardTitle className="text-2xl font-bold">
                   Hello, {user?.firstName}!

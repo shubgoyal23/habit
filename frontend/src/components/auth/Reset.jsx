@@ -56,7 +56,7 @@ export default function ResetPage() {
    };
    return (
       <div className="w-full flex justify-center items-center h-full">
-         <Card className="mx-auto max-w-md w-full">
+         <Card className="pt-4 md:pt-0 mx-auto max-w-md w-full">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">{head}</CardTitle>
                <CardDescription>

@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 function Layout() {
    return (
       <div
-         className={`text-foreground bg-background w-full h-[100svh] overflow-hidden flex flex-col-reverse md:flex-col py-4 md:py-0`}
+         className={`text-foreground bg-background w-full h-[100svh] overflow-hidden flex flex-col-reverse md:flex-col pb-4 md:pb-0`}
       >
          <div className="w-full h-16">
             <Navbar />

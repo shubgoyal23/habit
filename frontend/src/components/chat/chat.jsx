@@ -34,7 +34,7 @@ export default function Chat() {
 
    return (
       <div className="w-full h-[calc(100svh-80px)] flex justify-center items-center">
-         <Card className="mx-auto h-full max-w-sm w-full flex flex-col m-0">
+         <Card className="pt-4 md:pt-0 mx-auto h-full max-w-sm w-full flex flex-col m-0">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">HabitMate</CardTitle>
                <CardDescription>
