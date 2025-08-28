@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
    Table,
    TableBody,
@@ -68,6 +68,20 @@ function Steak() {
    const streakList = useSelector((state) => state.streak) || [];
    const [month, setMonth] = useState(new Date().getMonth());
    const [year, setYear] = useState(new Date().getFullYear());
+   const todayRef = useRef(null);
+
+   const handleDateRef = () => {
+      if (
+         todayRef.current &&
+         month == DateToday.getMonth() &&
+         year == DateToday.getFullYear()
+      ) {
+         todayRef.current.scrollIntoView({
+            behavior: "smooth", // smooth scroll
+            block: "center", // align to center of container
+         });
+      }
+   };
 
    useEffect(() => {
       if (!user) {
@@ -90,6 +104,7 @@ function Steak() {
    useEffect(() => {
       handleNextMonth();
       LoadNotesForMonth();
+      handleDateRef();
    }, [month, year]);
 
    const handleNextMonth = () => {
@@ -304,8 +319,17 @@ function Steak() {
                      {Array(daysInMonth(month))
                         .fill(0)
                         .map((_, i) => (
-                           <TableRow key={`day-${i + 1}`}>
-                              <TableCell className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1">{`${
+                           <TableRow
+                              key={`day-${i + 1}`}
+                              ref={
+                                 i + 1 === DateToday.getDate() &&
+                                 month === DateToday.getMonth() &&
+                                 year === DateToday.getFullYear()
+                                    ? todayRef
+                                    : null
+                              }
+                           >
+                              <TableCell className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1 bg-secondary">{`${
                                  i + 1
                               }`}</TableCell>
                               {habitList.map((item) => {
