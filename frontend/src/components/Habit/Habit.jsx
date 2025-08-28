@@ -238,14 +238,14 @@ function Habit() {
                   <RowSelector table={table} />
                </div>
             </CardHeader>
-            <CardContent className="h-full">
-               <Table className="md:p-4 text-center">
+            <CardContent className="h-full flex flex-col">
+               <Table className="md:p-4 text-center flex flex-col max-h-full">
                   <TableCaption>
                      {habitList.length === 0
                         ? "Add habit to see here"
                         : "A list of your Daily Habits."}
                   </TableCaption>
-                  <TableHeader className="">
+                  <TableHeader className="flex-shrink-0">
                      {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
                            {headerGroup.headers.map((header) => {
@@ -281,7 +281,7 @@ function Habit() {
                         </TableRow>
                      ))}
                   </TableHeader>
-                  <TableBody className="overflow-y-scroll h-full flex flex-col">
+                  <TableBody className="overflow-y-scroll">
                      {table.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
                            <TableRow
