@@ -239,7 +239,7 @@ function Archive() {
 
    return (
       <div className="w-full h-full flex justify-center items-center">
-         <Card className="pt-10 md:pt-0 mx-auto w-full h-full pb-0">
+         <Card className="pt-10 md:pt-6 mx-auto w-full h-full pb-0">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">
                   Archived Habit List

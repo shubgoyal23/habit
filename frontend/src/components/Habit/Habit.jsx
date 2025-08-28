@@ -229,7 +229,7 @@ function Habit() {
 
    return (
       <div className="w-full h-full flex justify-center items-center">
-         <Card className="pt-10 md:pt-0 mx-auto w-full h-full pb-0">
+         <Card className="pt-10 md:pt-6 mx-auto w-full h-full pb-0">
             <CardHeader className="space-y-1">
                <CardTitle className="text-2xl font-bold">Habit List</CardTitle>
                <CardDescription>List of All Habits You have</CardDescription>
@@ -238,7 +238,7 @@ function Habit() {
                   <RowSelector table={table} />
                </div>
             </CardHeader>
-            <CardContent className="overflow-y-scroll h-full">
+            <CardContent className="h-full">
                <Table className="md:p-4 text-center">
                   <TableCaption>
                      {habitList.length === 0
@@ -281,13 +281,13 @@ function Habit() {
                         </TableRow>
                      ))}
                   </TableHeader>
-                  <TableBody>
+                  <TableBody className="overflow-y-scroll">
                      {table.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
                            <TableRow
                               key={row.id}
                               data-state={row.getIsSelected() && "selected"}
-                              className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1"
+                              className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1 bg-secondary"
                            >
                               {row.getVisibleCells().map((cell) => (
                                  <TableCell key={cell.id}>
@@ -314,10 +314,7 @@ function Habit() {
             </CardContent>
             <CardFooter className="justify-center">
                <div className="flex justify-center">
-                  <Link
-                     to={"/habit-archive"}
-                     className="text-chart-4"
-                  >
+                  <Link to={"/habit-archive"} className="text-chart-4">
                      Archived Habit List
                   </Link>
                </div>
