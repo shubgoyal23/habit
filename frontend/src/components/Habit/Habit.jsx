@@ -281,7 +281,7 @@ function Habit() {
                         </TableRow>
                      ))}
                   </TableHeader>
-                  <TableBody className="overflow-y-scroll h-full">
+                  <TableBody className="overflow-y-scroll h-full flex flex-col">
                      {table.getRowModel().rows?.length ? (
                         table.getRowModel().rows.map((row) => (
                            <TableRow
