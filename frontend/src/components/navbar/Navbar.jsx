@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { NavLink } from "react-router-dom";
 import {
+   CircleUser,
    Flame,
    House,
    IdCard,
@@ -46,6 +47,11 @@ function Navbar() {
                  to: "/steak",
                  icon: <Flame className="w-6 h-6" />,
               },
+              {
+                 title: "Profile",
+                 to: "/profile",
+                 icon: <CircleUser className="w-6 h-6" />,
+              },
            ]);
    }, [loggedin]);
    return (
@@ -80,18 +86,6 @@ function Navbar() {
                         </NavLink>
                      </li>
                   ))}
-                  {loggedin && (
-                     <NavLink
-                        className={({ isActive }) =>
-                           `${
-                              isActive ? "font-bold text-primary" : ""
-                           } hidden md:flex flex-col-reverse md:flex-row items-center justify-center text-center md:gap-1`
-                        }
-                        to={"/profile"}
-                     >
-                        <span>Profile</span>
-                     </NavLink>
-                  )}
                </ul>
             </nav>
          </div>

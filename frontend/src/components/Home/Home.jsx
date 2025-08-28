@@ -39,18 +39,6 @@ function Home() {
                <CardTitle className="text-2xl font-bold">
                   Hello, {user?.firstName}!
                </CardTitle>
-               <Link to="/profile" className="md:hidden">
-                  <div className="w-6 h-6">
-                     {user?.picture ? (
-                        <img
-                           src={user?.picture}
-                           className="w-full h-full rounded-full"
-                        />
-                     ) : (
-                        <CircleUser className="w-6 h-6" />
-                     )}
-                  </div>
-               </Link>
             </CardHeader>
             <CardContent className="overflow-y-scroll h-full">
                <div>
