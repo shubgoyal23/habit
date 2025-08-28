@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import MarkSteak from "../Habit/MarkSteak";
-import { GetHabitDueToday } from "@/lib/helpers";
+import { EpochToTime, GetHabitDueToday } from "@/lib/helpers";
 import NotesBox from "../Notes/NotesBox";
 import { CircleUser, Timer } from "lucide-react";
 import {
@@ -49,14 +49,19 @@ function Home() {
                      {habitList?.map((item) => (
                         <div
                            key={item?._id}
-                           className={`w-full rounded-lg p-2 md:p-5 border border-primary/50 ${item.habitType == "todo" ? "bg-chart-2/20" : "bg-chart-4/20"}`}
+                           className={`w-full rounded-lg p-2 md:p-5 border ${
+                              item.habitType == "todo"
+                                 ? "bg-chart-4/20 border-chart-4"
+                                 : "bg-chart-2/20 border-chart-2"
+                           }`}
                         >
                            <div className="w-full font-bold text-lg flex items-center justify-between">
-                              <h3 className="text-chart-1">{item.name}</h3>
+                              <h3 className="text-chart-1 capitalize">{item.name}</h3>
                               <MarkSteak row={{ original: item }} />
                            </div>
-                           <div className="w-full font-bold text-sm">
-                              <h3 className="text-chart-2">{item.startTime}</h3>
+                           <div className="w-full text-sm flex items-center justify-between">
+                              <h3>startTime: </h3>
+                              <h3>{EpochToTime(item.startTime * 1000)}</h3>
                            </div>
                            <div className="flex w-full gap-2 items-center justify-between mt-5 flex-col md:flex-row">
                               <div className="w-full flex-1">
