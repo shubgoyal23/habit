@@ -91,13 +91,6 @@ function Home() {
                   </div>
                </div>
             </CardContent>
-            <CardFooter className="justify-center">
-               <div className="flex justify-center">
-                  <Link to={"/habit"} className="text-chart-4">
-                     Add New Habit
-                  </Link>
-               </div>
-            </CardFooter>
          </Card>
       </div>
    );
