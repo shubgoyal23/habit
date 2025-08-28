@@ -313,7 +313,7 @@ function Steak() {
                                     return (
                                        <TableCell
                                           key={item._id}
-                                          className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1"
+                                          className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1 bg-secondary"
                                        >
                                           {checkDate(item, i)}
                                        </TableCell>
