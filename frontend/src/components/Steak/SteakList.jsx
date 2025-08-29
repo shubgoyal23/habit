@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import {
    Table,
    TableBody,
-   TableCaption,
+
    TableCell,
    TableHead,
    TableHeader,
@@ -286,11 +286,6 @@ function Steak() {
             <CardContent className="h-full overflow-y-scroll">
                <div className="overflow-y-hidden rounded-lg border">
                   <Table className="md:p-6">
-                     <TableCaption>
-                        {habitList.length === 0
-                           ? "Add habit to see here"
-                           : "A list of your Daily Habits Streak."}
-                     </TableCaption>
                      <TableHeader className="">
                         <TableRow className="text-sm">
                            <TableHead
