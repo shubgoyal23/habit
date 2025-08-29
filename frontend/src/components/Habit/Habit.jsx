@@ -241,11 +241,6 @@ function Habit() {
             <CardContent className="h-full">
                <div className="overflow-y-scroll h-full rounded-lg border">
                   <Table className="md:p-4 text-center">
-                     <TableCaption>
-                        {habitList.length === 0
-                           ? "Add habit to see here"
-                           : "A list of your Daily Habits."}
-                     </TableCaption>
                      <TableHeader className="">
                         {table.getHeaderGroups().map((headerGroup) => (
                            <TableRow key={headerGroup.id}>

@@ -252,76 +252,74 @@ function Archive() {
                   <RowSelector table={table} />
                </div>
             </CardHeader>
-            <CardContent className="overflow-y-scroll h-full">
-               <Table className="md:p-6 text-center">
-                  <TableCaption>
-                     {data.length === 0
-                        ? "Add habit to see here"
-                        : "A list of your Daily Habits."}
-                  </TableCaption>
-                  <TableHeader>
-                     {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id} className="">
-                           {headerGroup.headers.map((header) => {
-                              return (
-                                 <TableHead
-                                    key={header.id}
-                                    className={`${
-                                       header.column.getCanSort()
-                                          ? "cursor-pointer"
-                                          : ""
-                                    }  bg-primary/20
+            <CardContent className="h-full">
+               <div className="overflow-y-scroll h-full rounded-lg border">
+                  <Table className="md:p-6 text-center">
+                     <TableHeader>
+                        {table.getHeaderGroups().map((headerGroup) => (
+                           <TableRow key={headerGroup.id} className="">
+                              {headerGroup.headers.map((header) => {
+                                 return (
+                                    <TableHead
+                                       key={header.id}
+                                       className={`${
+                                          header.column.getCanSort()
+                                             ? "cursor-pointer"
+                                             : ""
+                                       }  bg-primary/20
                                        first:rounded-tl-lg
                                        last:rounded-tr-lg`}
-                                    onClick={header.column.getToggleSortingHandler()}
-                                 >
-                                    <span className="flex justify-center items-center">
-                                       {header.isPlaceholder
-                                          ? null
-                                          : flexRender(
-                                               header.column.columnDef.header,
-                                               header.getContext()
-                                            )}
-                                       {header.column.getCanSort() && (
-                                          <ChevronsUpDown className="h-4 w-4" />
-                                       )}
-                                    </span>
-                                 </TableHead>
-                              );
-                           })}
-                        </TableRow>
-                     ))}
-                  </TableHeader>
-                  <TableBody>
-                     {table.getRowModel().rows?.length ? (
-                        table.getRowModel().rows.map((row) => (
-                           <TableRow
-                              key={row.id}
-                              data-state={row.getIsSelected() && "selected"}
-                              className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1"
-                           >
-                              {row.getVisibleCells().map((cell) => (
-                                 <TableCell key={cell.id}>
-                                    {flexRender(
-                                       cell.column.columnDef.cell,
-                                       cell.getContext()
-                                    )}
-                                 </TableCell>
-                              ))}
+                                       onClick={header.column.getToggleSortingHandler()}
+                                    >
+                                       <span className="flex justify-center items-center">
+                                          {header.isPlaceholder
+                                             ? null
+                                             : flexRender(
+                                                  header.column.columnDef
+                                                     .header,
+                                                  header.getContext()
+                                               )}
+                                          {header.column.getCanSort() && (
+                                             <ChevronsUpDown className="h-4 w-4" />
+                                          )}
+                                       </span>
+                                    </TableHead>
+                                 );
+                              })}
                            </TableRow>
-                        ))
-                     ) : (
-                        <TableRow>
-                           <TableCell
-                              colSpan={columns.length}
-                              className="h-24 text-center rounded-b-lg bg-secondary"
-                           >
-                              No results.
-                           </TableCell>
-                        </TableRow>
-                     )}
-                  </TableBody>
-               </Table>
+                        ))}
+                     </TableHeader>
+                     <TableBody>
+                        {table.getRowModel().rows?.length ? (
+                           table.getRowModel().rows.map((row) => (
+                              <TableRow
+                                 key={row.id}
+                                 data-state={row.getIsSelected() && "selected"}
+                                 className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1 bg-secondary"
+                              >
+                                 {row.getVisibleCells().map((cell) => (
+                                    <TableCell key={cell.id}>
+                                       {flexRender(
+                                          cell.column.columnDef.cell,
+                                          cell.getContext()
+                                       )}
+                                    </TableCell>
+                                 ))}
+                              </TableRow>
+                           ))
+                        ) : (
+                           <TableRow>
+                              <TableCell
+                                 colSpan={columns.length}
+                                 className="h-24 text-center rounded-b-lg bg-secondary"
+                              >
+                                 No results.
+                              </TableCell>
+                           </TableRow>
+                        )}
+                     </TableBody>
+                  </Table>
+               </div>
             </CardContent>
             <CardFooter className="justify-center">
                <div className="flex justify-center">

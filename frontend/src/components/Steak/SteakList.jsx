@@ -283,71 +283,73 @@ function Steak() {
                   </div>
                </div>
             </CardHeader>
-            <CardContent className="overflow-y-scroll h-full">
-               <Table className="md:p-6">
-                  <TableCaption>
-                     {habitList.length === 0
-                        ? "Add habit to see here"
-                        : "A list of your Daily Habits Streak."}
-                  </TableCaption>
-                  <TableHeader className="">
-                     <TableRow className="text-sm">
-                        <TableHead
-                           className="max-w-5 overflow-x-scroll text-center bg-primary/20
+            <CardContent className="h-full">
+               <div className="overflow-y-scroll h-full rounded-lg border">
+                  <Table className="md:p-6">
+                     <TableCaption>
+                        {habitList.length === 0
+                           ? "Add habit to see here"
+                           : "A list of your Daily Habits Streak."}
+                     </TableCaption>
+                     <TableHeader className="">
+                        <TableRow className="text-sm">
+                           <TableHead
+                              className="max-w-5 overflow-x-scroll text-center bg-primary/20
                                  first:rounded-tl-lg
                                  last:rounded-tr-lg"
-                        >
-                           Day/ Habit
-                        </TableHead>
-                        {habitList.map((item) => {
-                           if (item.habitType != "todo") {
-                              return (
-                                 <TableHead
-                                    key={item._id}
-                                    className="max-w-10 text-center overflow-x-scroll bg-primary/20
-                                 first:rounded-tl-lg
-                                 last:rounded-tr-lg"
-                                 >
-                                    {item.name}
-                                 </TableHead>
-                              );
-                           }
-                        })}
-                     </TableRow>
-                  </TableHeader>
-                  <TableBody className="text-center">
-                     {Array(daysInMonth(month))
-                        .fill(0)
-                        .map((_, i) => (
-                           <TableRow
-                              key={`day-${i + 1}`}
-                              ref={
-                                 i + 1 === DateToday.getDate() &&
-                                 month === DateToday.getMonth() &&
-                                 year === DateToday.getFullYear()
-                                    ? todayRef
-                                    : null
-                              }
                            >
-                              <TableCell className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1 bg-secondary">{`${
-                                 i + 1
-                              }`}</TableCell>
-                              {habitList.map((item) => {
-                                 if (item.habitType != "todo") {
-                                    return (
-                                       <TableCell
-                                          key={item._id}
-                                          className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1 bg-secondary"
-                                       >
-                                          {checkDate(item, i)}
-                                       </TableCell>
-                                    );
+                              Day/ Habit
+                           </TableHead>
+                           {habitList.map((item) => {
+                              if (item.habitType != "todo") {
+                                 return (
+                                    <TableHead
+                                       key={item._id}
+                                       className="max-w-10 text-center overflow-x-scroll bg-primary/20
+                                 first:rounded-tl-lg
+                                 last:rounded-tr-lg"
+                                    >
+                                       {item.name}
+                                    </TableHead>
+                                 );
+                              }
+                           })}
+                        </TableRow>
+                     </TableHeader>
+                     <TableBody className="text-center">
+                        {Array(daysInMonth(month))
+                           .fill(0)
+                           .map((_, i) => (
+                              <TableRow
+                                 key={`day-${i + 1}`}
+                                 ref={
+                                    i + 1 === DateToday.getDate() &&
+                                    month === DateToday.getMonth() &&
+                                    year === DateToday.getFullYear()
+                                       ? todayRef
+                                       : null
                                  }
-                              })}
-                           </TableRow>
-                        ))}
-                  </TableBody>
-               </Table>
+                              >
+                                 <TableCell className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1 bg-secondary">{`${
+                                    i + 1
+                                 }`}</TableCell>
+                                 {habitList.map((item) => {
+                                    if (item.habitType != "todo") {
+                                       return (
+                                          <TableCell
+                                             key={item._id}
+                                             className="last:[&>td:first-child]:rounded-bl-lg last:[&>td:last-child]:rounded-br-lg border-b mb-1 bg-secondary"
+                                          >
+                                             {checkDate(item, i)}
+                                          </TableCell>
+                                       );
+                                    }
+                                 })}
+                              </TableRow>
+                           ))}
+                     </TableBody>
+                  </Table>
+               </div>
             </CardContent>
             <CardFooter className="justify-center">
                <div className="flex justify-center">
