@@ -238,8 +238,8 @@ function Habit() {
                   <RowSelector table={table} />
                </div>
             </CardHeader>
-            <CardContent className="h-full">
-               <div className="overflow-y-scroll h-full rounded-lg border">
+            <CardContent className="overflow-y-scroll h-full">
+               <div className="overflow-y-hidden rounded-lg border">
                   <Table className="md:p-4 text-center">
                      <TableHeader className="">
                         {table.getHeaderGroups().map((headerGroup) => (

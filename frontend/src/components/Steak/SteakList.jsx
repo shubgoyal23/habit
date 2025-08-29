@@ -283,8 +283,8 @@ function Steak() {
                   </div>
                </div>
             </CardHeader>
-            <CardContent className="h-full">
-               <div className="overflow-y-scroll h-full rounded-lg border">
+            <CardContent className="h-full overflow-y-scroll">
+               <div className="overflow-y-hidden rounded-lg border">
                   <Table className="md:p-6">
                      <TableCaption>
                         {habitList.length === 0
