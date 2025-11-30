@@ -3,20 +3,9 @@ package models
 import (
 	"time"
 
+	"firebase.google.com/go/v4/messaging"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
-
-// type User struct {
-// 	Id        primitive.ObjectID `bson:"_id"`
-// 	FirstName string             `bson:"firstName"`
-// 	LastName  string             `bson:"lastName"`
-// 	Email     string             `bson:"email"`
-// 	FcmToken  string             `bson:"fcmToken"`
-// 	Epoch     int64              `bson:"epoch"`
-// 	Username  string             `bson:"username"`
-// 	TimeZone  int                `bson:"timeZone"`
-// 	IsActive  bool               `bson:"isActive"`
-// }
 
 // User struct
 type User struct {
@@ -35,6 +24,7 @@ type User struct {
 	// StreakCount   int          `json:"streakCount" bson:"streakCount"`
 	// LastName      string       `json:"lastName" bson:"lastName"`
 	// Email         string       `json:"email" bson:"email" validate:"required,email,unique"`
+	// EmailSub      bool         `json:"emailSub" bson:"emailSub"`
 	// Username      string       `json:"username" bson:"username" validate:"required,unique"`
 	// IsActive      *bool        `json:"isActive,omitempty" bson:"isActive,omitempty"`
 	// Phone         *string      `json:"phone,omitempty" bson:"phone,omitempty"`
@@ -82,4 +72,13 @@ type Habit struct {
 	HabitType   string             `bson:"habitType" json:"habitType"`                         // Habit type: regular, negative, or oneTime
 	CreatedAt   time.Time          `bson:"createdAt,omitempty" json:"createdAt,omitempty"`     // Timestamp when created
 	UpdatedAt   time.Time          `bson:"updatedAt,omitempty" json:"updatedAt,omitempty"`     // Timestamp when updated
+}
+
+// UserNotification represents the user notification schema
+type UserNotification struct {
+	Notification *messaging.Notification
+	Token        string
+	// HabitId      string
+	// Email        string
+	// UserId       primitive.ObjectID
 }

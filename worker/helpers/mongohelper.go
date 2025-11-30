@@ -34,7 +34,7 @@ func MongoInit(uri string, dbName string) (f bool) {
 }
 
 // add doc to mongo db
-func MongoAddOncDoc(collection string, doc interface{}) (f bool) {
+func MongoAddOneDoc(collection string, doc interface{}) (f bool) {
 	f = false
 	client := MongoConn.Database(MongoDb).Collection(collection)
 

@@ -20,7 +20,7 @@ func main() {
 		panic(err)
 	}
 
-	if logger, err := helpers.InitLogger(); err != nil {
+	if logger, err := helpers.InitLogger("habit-worker"); err != nil {
 		panic(err)
 	} else {
 		Logger = logger
@@ -36,7 +36,7 @@ func main() {
 	Logger.Info("Starting Server", zap.String("version", "2.0.0"))
 	helpers.InitVariables()
 	helpers.InitImageHandler()
-	go helpers.RunNoficationWorker()
+	go helpers.InitScheduler()
 
 	<-stop
 	Logger.Info("Shutting down Server")

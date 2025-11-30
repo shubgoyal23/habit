@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
          validate: {
             validator: function (v) {
                return /^[\w-]+(?:\.[\w-]+)*@(?:[\w-]+\.)+[a-zA-Z]{2,7}$/.test(
-                  v
+                  v,
                );
             },
             message: (props) => `${props.value} is not a valid email address!`,
@@ -37,6 +37,10 @@ const userSchema = new mongoose.Schema(
       notifyTime: {
          type: Number,
          default: 0,
+      },
+      emailSub: {
+         type: Boolean,
+         default: true,
       },
       habitSkip: {
          type: Number,
@@ -68,7 +72,7 @@ const userSchema = new mongoose.Schema(
          default: 0,
       },
    },
-   { timestamps: true }
+   { timestamps: true },
 );
 
 userSchema.pre("save", async function (next) {
@@ -89,7 +93,7 @@ userSchema.methods.generateAccessToken = async function () {
       process.env.ACCESS_TOKEN_SECRET,
       {
          expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-      }
+      },
    );
 };
 userSchema.methods.generateRefreshToken = async function () {
@@ -100,7 +104,7 @@ userSchema.methods.generateRefreshToken = async function () {
       process.env.REFRESH_TOKEN_SECRET,
       {
          expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-      }
+      },
    );
 };
 

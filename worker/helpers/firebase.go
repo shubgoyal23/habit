@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"context"
+	"habit_notify/models"
 	"os"
 	"path/filepath"
 
@@ -34,7 +35,15 @@ func InitFirebase() error {
 	return nil
 }
 
-func SendHabitNotification(user *UserNotification) error {
+func SendHabitNotification(user *models.UserNotification) error {
+	defer func() {
+		if err := recover(); err != nil {
+			Logger.Error("SendHabitNotification crashed", zap.Error(err.(error)))
+		}
+	}()
+	if user == nil || user.Token == "" || user.Notification == nil {
+		return nil
+	}
 	client, err := firebaseApp.Messaging(context.Background())
 	if err != nil {
 		Logger.Error("Failed to get messaging client", zap.Error(err))

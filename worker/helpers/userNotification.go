@@ -13,42 +13,12 @@ import (
 )
 
 var AllUsers map[primitive.ObjectID]models.User
-var Duration_Notify int64 = 1800 // 30 min in sec
+var DurationNotify int64 = 1800 // 30 min in sec
 var NotifyMap sync.Map
 var MaxTime int64 = time.Date(2025, time.January, 1, 23, 59, 59, 59, time.UTC).Unix() //end epoch of 1 jan 2025
 
-type UserNotification struct {
-	Notification *messaging.Notification
-	Token        string
-}
-
 func InitVariables() {
 	AllUsers = make(map[primitive.ObjectID]models.User)
-}
-
-func RunNoficationWorker() {
-	go DoEvery(time.Minute, FilerAndSendNotifications)                                                         // run every minute
-	go DoEvery(time.Duration(Duration_Notify)*time.Second, GetHabitRecords, ChangeImage, HabitNotDoneReminder) // run every Duration_Notify
-	go DoEvery(24*time.Hour, ClearOldRecords)                                                                  // run every 12 hours
-	go DoEvery(6*time.Hour, InactiveHabits)                                                                    // run every 12 hours
-
-	go GetHabitRecords() // this will runs for first time
-}
-
-func DoEvery(after time.Duration, f ...func()) {
-	defer func() {
-		if err := recover(); err != nil {
-			Logger.Error("DoEvery crashed", zap.Error(err.(error)))
-		}
-	}()
-	if len(f) == 0 {
-		return
-	}
-	for range time.Tick(after) {
-		for _, fn := range f {
-			go fn()
-		}
-	}
 }
 
 // sends notificaion to users if they exist in NotifyMap at that epoch
@@ -69,7 +39,7 @@ func FilerAndSendNotifications() {
 		return
 	}
 
-	docs, ok := res.([]*UserNotification)
+	docs, ok := res.([]*models.UserNotification)
 	if !ok {
 		Logger.Error("Failed to cast NotifyMap value")
 		return
@@ -94,13 +64,13 @@ func GetHabitRecords() {
 	if timeEpoch > MaxTime {
 		timeEpoch -= 86400
 	}
-	query := bson.M{"startTime": bson.M{"$gte": timeEpoch, "$lt": timeEpoch + Duration_Notify}, "notify": true, "isActive": true}
-
+	// contains all habit ids that are due for this period
+	var habitIds []string
+	query := bson.M{"startTime": bson.M{"$gte": timeEpoch, "$lt": timeEpoch + DurationNotify}, "isActive": true}
 	docs, f := MongoGetManyDoc("habits", query)
 	if !f {
 		return
 	}
-
 	for _, doc := range docs {
 		dataByte, err := bson.Marshal(doc)
 		if err != nil {
@@ -111,7 +81,8 @@ func GetHabitRecords() {
 		if err != nil {
 			continue
 		}
-		if habitData.HabitType == "negative" {
+		habitIds = append(habitIds, habitData.Id.Hex())
+		if habitData.HabitType == "negative" || !habitData.Notify {
 			continue
 		}
 		userid := habitData.UserID
@@ -170,7 +141,7 @@ func GetHabitRecords() {
 
 		userName := userDetails.FirstName
 		habitName := habitData.Name
-		userPayload := &UserNotification{}
+		userPayload := &models.UserNotification{}
 		paylod := &messaging.Notification{
 			Title:    fmt.Sprintf("🚀 Hey %s! Time for Your Habit: %s", userName, habitName),
 			Body:     "Only 5 minutes to go! Stay on track and crush it—your goals are waiting. Let's make it count! 💥",
@@ -181,36 +152,20 @@ func GetHabitRecords() {
 		nofity = append(nofity, habitData.StartTime)
 
 		for _, t := range nofity {
-			if val, ok := NotifyMap.Load(t); !ok {
-				NotifyMap.Store(t, []*UserNotification{userPayload})
+			val, ok := NotifyMap.Load(t)
+			if !ok {
+				NotifyMap.Store(t, []*models.UserNotification{userPayload})
 			} else {
-				val := val.([]*UserNotification)
+				val := val.([]*models.UserNotification)
 				val = append(val, userPayload)
 				NotifyMap.Store(t, val)
 			}
 		}
 	}
-}
 
-func ClearOldRecords() {
-	defer func() {
-		if err := recover(); err != nil {
-			Logger.Error("ClearOldRecords crashed", zap.Error(err.(error)))
-		}
-	}()
-
-	utcTime := time.Now().UTC().Add(time.Minute * -60)
-	NotifyMap.Range(func(key, value interface{}) bool {
-		if key.(int64) < utcTime.Unix() {
-			NotifyMap.Delete(key)
-		}
-		return true
-	})
-	utcTime = utcTime.AddDate(0, 0, -2)
-	t := time.Date(utcTime.Year(), utcTime.Month(), utcTime.Day(), 12, 0, 0, 0, time.UTC).UTC()
-	if err := DelRedisKey(fmt.Sprintf("habitCompleted:%d", t.Unix())); err != nil {
-		return
-	}
+	// add habit to redis set of habit schedule for today
+	today := time.Date(utcTime.Year(), utcTime.Month(), utcTime.Day(), 0, 0, 0, 0, time.UTC).Unix()
+	AddHabitToRedisSet(today, habitIds...)
 }
 
 // this function sends notification to user if habit is not done till 11 pm localtime
@@ -225,7 +180,7 @@ func HabitNotDoneReminder() {
 	if timeEpoch > MaxTime {
 		timeEpoch -= 86400
 	}
-	dateEpoch := timeEpoch + Duration_Notify
+	dateEpoch := timeEpoch + DurationNotify
 
 	users, f := MongoGetManyDoc("users", bson.M{"notifyTime": bson.M{"$gte": timeEpoch, "$lt": dateEpoch}})
 	if !f || len(users) == 0 {
@@ -320,7 +275,7 @@ func HabitNotDoneReminder() {
 		if err != nil {
 			continue
 		}
-		var message UserNotification
+		var message models.UserNotification
 		message.Token = userDetails.FCMToken
 		message.Notification = &messaging.Notification{
 			Title:    fmt.Sprintf("Hey %s, Don't Forget Your Tasks!", userDetails.FirstName),
@@ -328,9 +283,9 @@ func HabitNotDoneReminder() {
 			ImageURL: ImageUrl,
 		}
 		if val, ok := NotifyMap.Load(userDetails.NotifyTime); !ok {
-			NotifyMap.Store(userDetails.NotifyTime, []*UserNotification{&message})
+			NotifyMap.Store(userDetails.NotifyTime, []*models.UserNotification{&message})
 		} else {
-			val := val.([]*UserNotification)
+			val := val.([]*models.UserNotification)
 			val = append(val, &message)
 			NotifyMap.Store(userDetails.NotifyTime, val)
 		}
@@ -368,3 +323,52 @@ func InactiveHabits() {
 		return
 	}
 }
+
+// add habit id to redis set
+func AddHabitToRedisSet(t int64, habitids ...string) {
+	defer func() {
+		if err := recover(); err != nil {
+			Logger.Error("AddHabitToRedisSet crashed", zap.Error(err.(error)))
+		}
+	}()
+	if len(habitids) == 0 {
+		return
+	}
+	key := fmt.Sprintf("habitSchedule:%d", t)
+	if _, err := InsertRedisSet(key, habitids...); err != nil {
+		Logger.Error("Failed to insert habit to redis set", zap.Error(err))
+	}
+}
+
+// send email notification to users if habit is not done for 3 days
+// func SendEmailNotification() {
+// 	defer func() {
+// 		if err := recover(); err != nil {
+// 			Logger.Error("SendEmailNotification crashed", zap.Error(err.(error)))
+// 		}
+// 	}()
+// 	utcTime := time.Now().Add(time.Hour * -72).UTC().Unix()
+// 	filter := bson.M{"endDate": bson.M{"$lt": utcTime}, "isActive": true}
+// 	ids, f := MongoGetManyDoc("habits", filter)
+// 	if !f {
+// 		return
+// 	}
+// 	for _, v := range ids {
+// 		var habit models.Habit
+// 		byte, err := bson.Marshal(v)
+// 		if err != nil {
+// 			Logger.Error("Failed to marshal habit", zap.Error(err))
+// 			continue
+// 		}
+// 		if err := bson.Unmarshal(byte, &habit); err != nil {
+// 			Logger.Error("Failed to unmarshal habit", zap.Error(err))
+// 			continue
+// 		}
+// 		MongoUpdateOneDoc("users", bson.M{"_id": habit.UserID}, bson.M{"$inc": bson.M{"habitCount": -1}})
+// 	}
+// 	update := bson.M{"$set": bson.M{"isActive": false}}
+// 	if err := MongoUpdateManyDoc("habits", filter, update); err != nil {
+// 		Logger.Error("Failed to update habits", zap.Error(err))
+// 		return
+// 	}
+// }

@@ -34,7 +34,7 @@ const registeruser = asyncHandler(async (req, res) => {
    if (!firstName || !email || !password) {
       throw new ApiError(
          401,
-         "firstName, Email, and Password is required to register user"
+         "firstName, Email, and Password is required to register user",
       );
    }
 
@@ -60,12 +60,12 @@ const registeruser = asyncHandler(async (req, res) => {
    await ConnectRedis();
    await Redisclient.set(
       `OTP:${user._id.toString()}`,
-      JSON.stringify({ email, otp: otpcheck, attempt: 3 })
+      JSON.stringify({ email, otp: otpcheck, attempt: 3 }),
    );
    Redisclient.expire(`OTP:${user._id.toString()}`, 300);
 
    const checkUserRegistered = await User.findOne({ email })?.select(
-      "_id firstName lastName"
+      "_id firstName lastName",
    );
 
    if (!checkUserRegistered) {
@@ -78,8 +78,8 @@ const registeruser = asyncHandler(async (req, res) => {
          new ApiResponse(
             200,
             checkUserRegistered,
-            "user Registered successfully"
-         )
+            "user Registered successfully",
+         ),
       );
 });
 
@@ -120,8 +120,8 @@ const VerifyOtp = asyncHandler(async (req, res) => {
          new ApiResponse(
             200,
             { _id: id, email, type },
-            "Verification successfully"
-         )
+            "Verification successfully",
+         ),
       );
 });
 const loginUser = asyncHandler(async (req, res) => {
@@ -138,13 +138,13 @@ const loginUser = asyncHandler(async (req, res) => {
    if (!finduser.isActive) {
       throw new ApiError(
          403,
-         "Email Not Verified, Please verify your email to login"
+         "Email Not Verified, Please verify your email to login",
       );
    }
    if (finduser.thirdPartyLogin) {
       throw new ApiError(
          403,
-         `You are registered with ${finduser.thirdPartyLogin} account. Please login with ${finduser.thirdPartyLogin} account`
+         `You are registered with ${finduser.thirdPartyLogin} account. Please login with ${finduser.thirdPartyLogin} account`,
       );
    }
 
@@ -183,7 +183,7 @@ const loginUserGoogle = asyncHandler(async (req, res) => {
    const client = new OAuth2Client(
       process.env.GOOGLE_CLIENT_ID,
       process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI
+      process.env.GOOGLE_REDIRECT_URI,
    );
 
    const { tokens } = await client.getToken({
@@ -225,7 +225,7 @@ const loginUserGoogle = asyncHandler(async (req, res) => {
    if (!finduser.isActive) {
       throw new ApiError(
          403,
-         "Email Not Verified, Please verify your email to login"
+         "Email Not Verified, Please verify your email to login",
       );
    }
 
@@ -268,7 +268,7 @@ const ResendOtp = asyncHandler(async (req, res) => {
    if (type == "verify-email" && user.isActive) {
       throw new ApiError(
          403,
-         "Email Already Verified, Please login to continue"
+         "Email Already Verified, Please login to continue",
       );
    }
 
@@ -279,7 +279,7 @@ const ResendOtp = asyncHandler(async (req, res) => {
    await ConnectRedis();
    await Redisclient.set(
       `OTP:${user._id.toString()}`,
-      JSON.stringify({ email, otp: otpcheck, attempt: 3 })
+      JSON.stringify({ email, otp: otpcheck, attempt: 3 }),
    );
    Redisclient.expire(`OTP:${user._id.toString()}`, 300);
 
@@ -289,8 +289,8 @@ const ResendOtp = asyncHandler(async (req, res) => {
          new ApiResponse(
             200,
             { _id: user._id },
-            "An Email to verify your account has been send to your email id"
-         )
+            "An Email to verify your account has been send to your email id",
+         ),
       );
 });
 const logoutUser = asyncHandler(async (req, res) => {
@@ -303,7 +303,7 @@ const logoutUser = asyncHandler(async (req, res) => {
             refreshToken: 1,
          },
       },
-      { new: true }
+      { new: true },
    );
 
    if (!finduser) {
@@ -335,7 +335,7 @@ const refreshToken = asyncHandler(async (req, res) => {
    }
    const decodedToken = await jwt.verify(
       token,
-      process.env.REFRESH_TOKEN_SECRET
+      process.env.REFRESH_TOKEN_SECRET,
    );
 
    const user = await User.findById(decodedToken._id);
@@ -425,8 +425,8 @@ const forgetPassword = asyncHandler(async (req, res) => {
          new ApiResponse(
             200,
             {},
-            "Password updated successfully, you can login now"
-         )
+            "Password updated successfully, you can login now",
+         ),
       );
 });
 
@@ -508,6 +508,29 @@ const FeedbackForm = asyncHandler(async (req, res) => {
       .json(new ApiResponse(200, {}, "User deleted successfully"));
 });
 
+const EmailSubscription = asyncHandler(async (req, res) => {
+   let { email, subscribe } = req.query;
+
+   if (!email || !subscribe) {
+      throw new ApiError(401, "All fields are required");
+   }
+
+   const user = await User.findOne({ email });
+
+   if (!user) {
+      throw new ApiError(401, "User not found");
+   }
+
+   user.emailSub = !!subscribe;
+   await user.save();
+
+   return res
+      .status(200)
+      .json(
+         new ApiResponse(200, {}, "Email subscription updated successfully"),
+      );
+});
+
 export {
    registeruser,
    loginUser,
@@ -523,4 +546,5 @@ export {
    ResendOtp,
    FeedbackForm,
    loginUserGoogle,
+   EmailSubscription,
 };
