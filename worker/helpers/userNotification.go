@@ -164,7 +164,7 @@ func GetHabitRecords() {
 	}
 
 	// add habit to redis set of habit schedule for today
-	today := time.Date(utcTime.Year(), utcTime.Month(), utcTime.Day(), 0, 0, 0, 0, time.UTC).Unix()
+	today := time.Date(utcTime.Year(), utcTime.Month(), utcTime.Day(), 12, 0, 0, 0, time.UTC).Unix()
 	AddHabitToRedisSet(today, habitIds...)
 }
 
