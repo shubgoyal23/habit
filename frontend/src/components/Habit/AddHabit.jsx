@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import {
    CardTitle,
    CardDescription,
@@ -37,6 +37,8 @@ export default function AddHabit() {
    let { id } = useParams();
    const dispatch = useDispatch();
    const navigate = useNavigate();
+   const location = useLocation();
+   const prefill = location.state?.prefill;
 
    const userData = useSelector((state) => state.habit) || [];
    const userDataArchive = useSelector((state) => state.archive) || [];
@@ -90,6 +92,17 @@ export default function AddHabit() {
    useEffect(() => {
       getHabitDate();
    }, [userData]);
+
+   useEffect(() => {
+      if (id === "new" && prefill) {
+         setValue("name", prefill.name || "");
+         setValue("description", prefill.description || "");
+         if (prefill.duration) {
+            setTimes((prev) => ({ ...prev, duration: prefill.duration }));
+         }
+         if (prefill.habitType) setType(prefill.habitType);
+      }
+   }, []);
 
    useEffect(() => {
       if (!user) {
@@ -275,6 +288,7 @@ export default function AddHabit() {
                         timesobj={times}
                         getValues={getValues}
                         setValue={setValue}
+                        initialRepeat={id === "new" ? prefill?.repeat : undefined}
                      />
                   )}
 

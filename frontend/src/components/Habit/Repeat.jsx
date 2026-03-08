@@ -22,10 +22,10 @@ import {
 } from "../ui/select";
 import { ChevronRight, X } from "lucide-react";
 
-function Repeat({ getValues, setValue, timesobj }) {
+function Repeat({ getValues, setValue, timesobj, initialRepeat }) {
    const [repeatisOpen, setRepeatIsOpen] = useState(false);
-   const [repeatMode, setRepeatMode] = useState("days");
-   const [repeat, setRepeat] = useState([0, 1, 2, 3, 4, 5, 6]);
+   const [repeatMode, setRepeatMode] = useState(initialRepeat?.name || "days");
+   const [repeat, setRepeat] = useState(initialRepeat?.value || [0, 1, 2, 3, 4, 5, 6]);
    const days = ["S", "M", "T", "W", "T", "F", "S"];
    const [dates, setDates] = useState([]);
    const [hr, setHr] = useState(null);

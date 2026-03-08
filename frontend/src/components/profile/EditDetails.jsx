@@ -10,6 +10,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+   Select,
+   SelectContent,
+   SelectItem,
+   SelectTrigger,
+   SelectValue,
+} from "@/components/ui/select";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -26,6 +33,9 @@ export function EditDetails() {
          setdetails({
             firstName: user.firstName,
             lastName: user.lastName,
+            age: user.age || "",
+            gender: user.gender || "",
+            country: user.country || "",
          });
       }
    }, [user]);
@@ -36,7 +46,7 @@ export function EditDetails() {
          details,
          {
             withCredentials: true,
-         }
+         },
       );
       toast.promise(save, {
          loading: "Saving changes...",
@@ -64,10 +74,12 @@ export function EditDetails() {
             <div className="grid gap-4 py-4">
                <div className="flex gap-2 items-center justify-between">
                   <div className="space-y-2">
-                     <Label htmlFor="firstName" className="ml-3">First Name</Label>
+                     <Label htmlFor="firstName" className="ml-3">
+                        First Name
+                     </Label>
                      <Input
                         id="firstName"
-                        placeholder="first Name"
+                        placeholder="First Name"
                         type="text"
                         value={details?.firstName}
                         onChange={(e) =>
@@ -76,10 +88,12 @@ export function EditDetails() {
                      />
                   </div>
                   <div className="space-y-2">
-                     <Label htmlFor="lastName" className="ml-3">Last Name</Label>
+                     <Label htmlFor="lastName" className="ml-3">
+                        Last Name
+                     </Label>
                      <Input
                         id="lastName"
-                        placeholder="last Name"
+                        placeholder="Last Name"
                         type="text"
                         value={details?.lastName}
                         onChange={(e) =>
@@ -87,6 +101,57 @@ export function EditDetails() {
                         }
                      />
                   </div>
+               </div>
+               <div className="flex gap-2 items-center justify-between">
+                  <div className="space-y-2 w-full">
+                     <Label htmlFor="age" className="ml-3">
+                        Age
+                     </Label>
+                     <Input
+                        id="age"
+                        placeholder="Age"
+                        type="number"
+                        min={1}
+                        max={120}
+                        value={details?.age}
+                        onChange={(e) =>
+                           setdetails({ ...details, age: e.target.value })
+                        }
+                     />
+                  </div>
+                  <div className="space-y-2 w-full">
+                     <Label className="ml-3">Gender</Label>
+                     <Select
+                        value={details?.gender}
+                        onValueChange={(val) =>
+                           setdetails({ ...details, gender: val })
+                        }
+                        className="w-full"
+                     >
+                        <SelectTrigger>
+                           <SelectValue placeholder="Select gender" />
+                        </SelectTrigger>
+                        <SelectContent>
+                           <SelectItem value="male">Male</SelectItem>
+                           <SelectItem value="female">Female</SelectItem>
+                           <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                     </Select>
+                  </div>
+               </div>
+               <div className="space-y-2">
+                  <Label htmlFor="country" className="ml-3">
+                     Country
+                  </Label>
+                  <Input
+                     id="country"
+                     placeholder="Country"
+                     type="text"
+                     value={details?.country}
+                     onChange={(e) =>
+                        setdetails({ ...details, country: e.target.value })
+                     }
+                  />
                </div>
             </div>
             <DialogFooter>

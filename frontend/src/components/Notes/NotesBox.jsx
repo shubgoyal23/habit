@@ -19,7 +19,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { Pencil } from "lucide-react";
 
-function NotesBox({ habitId, date }) {
+function NotesBox({ habitId, date, compact = false }) {
    if (!habitId || !date) return null;
    const d = new Date(date);
    const sDate = `${d.getDate()}`;
@@ -106,12 +106,19 @@ function NotesBox({ habitId, date }) {
       <div className="w-full">
          <AlertDialog>
             <AlertDialogTrigger className="w-full">
-               <div className="flex w-full justify-between items-center md:justify-start gap-1 cursor-pointer hover:text-primary">
-                  <div>Add Note</div>
-                  <div>
+               {compact ? (
+                  <div className="flex w-full items-center justify-center gap-1 cursor-pointer">
                      <Pencil className="w-3 h-3" />
+                     Note
                   </div>
-               </div>
+               ) : (
+                  <div className="flex w-full justify-between items-center md:justify-start gap-1 cursor-pointer hover:text-primary">
+                     <div>Add Note</div>
+                     <div>
+                        <Pencil className="w-3 h-3" />
+                     </div>
+                  </div>
+               )}
             </AlertDialogTrigger>
             <AlertDialogContent>
                <AlertDialogHeader>

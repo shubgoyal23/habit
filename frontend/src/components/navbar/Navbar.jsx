@@ -55,21 +55,13 @@ function Navbar() {
            ]);
    }, [loggedin]);
    return (
-      <header className="w-full lg:px-16 px-6 h-16 bg-background/50 backdrop-blur-lg flex justify-between items-center py-2 shadow-top-lg md:shadow-md z-50 rounded-t-xl md:rounded-t-none md:rounded-b-xl">
-         <div className="flex-1 hidden md:flex justify-between items-center">
-            <Link
-               className="text-3xl font-bold bg-gradient-to-r from-pink-500 via-yellow-400 to-pink-500 text-transparent bg-clip-text"
-               to={"/"}
-            >
-               Habit Tracker
-            </Link>
-         </div>
+      <header className="w-full px-6 h-16 bg-background/50 backdrop-blur-lg flex justify-between items-center py-2 shadow-top-lg z-50 rounded-t-xl max-w-3xl mx-auto">
          <div className={`flex-1 items-center w-full`}>
             <nav className="w-full">
                <ul
                   className={`flex items-center ${
                      loggedin ? "justify-between" : "justify-center gap-4"
-                  } sm:justify-evenly md:justify-end md:gap-4 lg:gap-6 w-full text-xs md:text-base text-gray-700 dark:text-gray-200`}
+                  } w-full text-xs text-gray-700 dark:text-gray-200`}
                >
                   {menu.map((item) => (
                      <li key={item.title}>
@@ -77,12 +69,12 @@ function Navbar() {
                            className={({ isActive }) =>
                               `${
                                  isActive ? "text-primary" : ""
-                              } flex flex-col-reverse md:flex-row items-center justify-center text-center md:gap-1 transition-all duration-500`
+                              } flex flex-col items-center justify-center text-center gap-0.5 transition-all duration-500`
                            }
                            to={item.to}
                         >
+                           {item.icon}
                            {item.title}
-                           <span className="md:hidden">{item.icon}</span>
                         </NavLink>
                      </li>
                   ))}
