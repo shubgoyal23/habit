@@ -55,6 +55,12 @@ const userSchema = new mongoose.Schema(
          _id: false,
       },
       picture: String,
+      age: Number,
+      gender: {
+         type: String,
+         enum: ["male", "female", "other"],
+      },
+      country: String, // ISO 3166-1 alpha-2 code e.g. "IN", "US"
       habitsAllowed: {
          type: Number,
          default: 10,

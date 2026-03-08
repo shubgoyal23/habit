@@ -365,7 +365,7 @@ const refreshToken = asyncHandler(async (req, res) => {
 });
 
 const editUserDetails = asyncHandler(async (req, res) => {
-   let { firstName, lastName, notify, notifyTime } = req.body;
+   let { firstName, lastName, notify, notifyTime, age, gender, country } = req.body;
    const id = req.user._id;
 
    const updateuser = await User.findByIdAndUpdate(id, {
@@ -373,6 +373,9 @@ const editUserDetails = asyncHandler(async (req, res) => {
       lastName,
       notify,
       notifyTime,
+      age,
+      gender,
+      country,
    });
    if (!updateuser) {
       throw new ApiError(500, "user details update failed");

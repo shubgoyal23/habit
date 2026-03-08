@@ -32,6 +32,7 @@ import steakRouter from "./routers/steak.router.js";
 import chatRouter from "./routers/chat.router.js";
 import appRouter from "./routers/app.router.js";
 import NotesRouter from "./routers/note.router.js";
+import suggestedRouter from "./routers/suggested.router.js";
 
 app.get("/ping", (req, res) => {
    res.send("pong");
@@ -49,6 +50,7 @@ app.use("/api/v1/steak", steakRouter);
 app.use("/api/v1/chat", chatRouter);
 app.use("/api/v1/app", appRouter);
 app.use("/api/v1/notes", NotesRouter);
+app.use("/api/v1/suggested", suggestedRouter);
 
 app.use((err, req, res, next) => {
    if (err instanceof ApiError) {
