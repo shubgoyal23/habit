@@ -174,75 +174,90 @@ const loginUser = asyncHandler(async (req, res) => {
       .cookie("refreshToken", refreshToken, options)
       .json(new ApiResponse(200, user, "User Logged in successfully"));
 });
-const loginUserGoogle = asyncHandler(async (req, res) => {
-   const { token, timeZone } = req.body;
+const socialLogin = asyncHandler(async (req, res) => {
+   const { token, timeZone, provider } = req.body;
 
    if (!token) {
       throw new ApiError(401, "Tokein is required to Login");
    }
-   const client = new OAuth2Client(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
-      process.env.GOOGLE_REDIRECT_URI,
-   );
+   let user = {};
+   let success = false;
+   switch (provider) {
+      case "google":
+         const client = new OAuth2Client(
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.GOOGLE_CLIENT_SECRET,
+            process.env.GOOGLE_REDIRECT_URI,
+         );
+         const { tokens } = await client.getToken({
+            code: token,
+            redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+         });
+         if (!tokens) {
+            throw new ApiError(
+               403,
+               "User not found, check Email id or register one",
+            );
+         }
+         client.setCredentials(tokens);
 
-   const { tokens } = await client.getToken({
-      code: token,
-      redirect_uri: process.env.GOOGLE_REDIRECT_URI,
-   });
+         const userInfo = await client.request({
+            url: "https://www.googleapis.com/oauth2/v2/userinfo",
+         });
 
-   if (!tokens) {
-      throw new ApiError(403, "User not found, check Email id or register one");
+         let payload = userInfo.data;
+         const email = payload?.email;
+         let finduser = await User.findOne({
+            $or: [{ email }, { "thirdPartyInfo.uid": payload?.id }],
+         });
+         if (!finduser) {
+            finduser = await User.create({
+               email,
+               firstName: payload?.given_name,
+               lastName: payload?.family_name,
+               picture: payload?.picture,
+               timeZone,
+               isActive: true,
+               notify: true,
+               notifyTime: GetTimeZoneEpoch(22, 0, timeZone),
+               thirdPartyLogin: true,
+               thirdPartyInfo: {
+                  provider: provider,
+                  uid: payload?.id,
+               },
+            });
+         }
+
+         if (!finduser.isActive) {
+            throw new ApiError(
+               403,
+               "Email Not Verified, Please verify your email to login",
+            );
+         }
+         user._id = finduser._id;
+         user.firstName = finduser.firstName;
+         user.lastName = finduser.lastName;
+         user.notify = finduser.notify;
+         user.notifyTime = finduser.notifyTime;
+         success = true;
+         break;
+      default:
+         break;
    }
-   client.setCredentials(tokens);
 
-   const userInfo = await client.request({
-      url: "https://www.googleapis.com/oauth2/v2/userinfo",
-   });
-
-   let payload = userInfo.data;
-   const email = payload?.email;
-
-   let finduser = await User.findOne({ email });
-   if (!finduser) {
-      finduser = await User.create({
-         email,
-         firstName: payload?.given_name,
-         lastName: payload?.family_name,
-         picture: payload?.picture,
-         timeZone,
-         isActive: true,
-         notify: true,
-         notifyTime: GetTimeZoneEpoch(22, 0, timeZone),
-         thirdPartyLogin: true,
-         thirdPartyInfo: {
-            provider: "Google",
-            uid: payload?.id,
-         },
-      });
-   }
-
-   if (!finduser.isActive) {
-      throw new ApiError(
-         403,
-         "Email Not Verified, Please verify your email to login",
-      );
+   if (!success) {
+      throw new ApiError(401, "Invalid provider");
    }
 
    const { refreshToken, accessToken } =
-      await generateAccessTokenAndRefresToken(finduser._id);
+      await generateAccessTokenAndRefresToken(user._id);
 
    const options = {
       httpOnly: true,
       secure: true,
       maxAge: 365 * 24 * 60 * 60 * 1000,
    };
-   let user = {};
-   user._id = finduser._id;
-   user.firstName = finduser.firstName;
-   user.lastName = finduser.lastName;
-   user.notify = finduser.notify;
-   user.notifyTime = finduser.notifyTime;
+
    user.refreshToken = refreshToken;
    user.accessToken = accessToken;
 
@@ -365,7 +380,8 @@ const refreshToken = asyncHandler(async (req, res) => {
 });
 
 const editUserDetails = asyncHandler(async (req, res) => {
-   let { firstName, lastName, notify, notifyTime, age, gender, country } = req.body;
+   let { firstName, lastName, notify, notifyTime, age, gender, country } =
+      req.body;
    const id = req.user._id;
 
    const updateuser = await User.findByIdAndUpdate(id, {
@@ -548,6 +564,6 @@ export {
    VerifyOtp,
    ResendOtp,
    FeedbackForm,
-   loginUserGoogle,
+   socialLogin,
    EmailSubscription,
 };

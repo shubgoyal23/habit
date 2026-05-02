@@ -84,11 +84,10 @@ export default function Login() {
          })
          .catch((err) => console.log(err));
    };
-   const LoginWithGoogle = (data) => {
-      const token = data?.token;
+   const SocialLogin = async ({token, provider}) => {
       const login = axios.post(
-         `${conf.BACKEND_URL}/api/v1/users/login-google`,
-         { token, timeZone: new Date().getTimezoneOffset() },
+         `${conf.BACKEND_URL}/api/v1/users/login/social`,
+         { token, timeZone: new Date().getTimezoneOffset(), provider },
          {
             withCredentials: true,
          },
@@ -160,7 +159,7 @@ export default function Login() {
                      <Button className="w-full" type="submit">
                         Login
                      </Button>
-                     <GoogleLoginApp LoginWithGoogle={LoginWithGoogle} />
+                     <GoogleLoginApp SocialLogin={SocialLogin} />
                   </div>
                </form>
                <CardFooter className="p-0 pt-1 justify-between">

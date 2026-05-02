@@ -13,7 +13,7 @@ import {
    VerifyOtp,
    ResendOtp,
    FeedbackForm,
-   loginUserGoogle,
+   socialLogin,
    EmailSubscription,
 } from "../controller/user.controller.js";
 import { verifyJwt } from "../middleware/auth.middleware.js";
@@ -22,7 +22,7 @@ const router = Router();
 
 router.route("/register").post(registeruser);
 router.route("/login").post(loginUser);
-router.route("/login-google").post(loginUserGoogle);
+router.route("/login/social").post(socialLogin);
 router.route("/verify").post(VerifyOtp);
 router.route("/resend-otp").post(ResendOtp);
 router.route("/forgot-password").post(forgetPassword);

@@ -12,11 +12,19 @@ export default defineConfig({
       },
    },
    build: {
-      rollupOptions: {
+      rolldownOptions: {
          output: {
-            manualChunks: {
-               react: ["react", "react-dom"],
-               ui: ["react-router-dom"],
+            codeSplitting: {
+               groups: [
+                  {
+                     name: "vendor",
+                     test: /node_modules\/(react|react-dom)/,
+                  },
+                  {
+                     name: "ui",
+                     test: /node_modules\/(@radix-ui|lucide-react|react-router-dom)/,
+                  },
+               ],
             },
          },
       },
